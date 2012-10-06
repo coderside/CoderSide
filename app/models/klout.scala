@@ -5,12 +5,7 @@ import scala.concurrent.future
 import play.api.libs.concurrent.execution.defaultContext
 import models.twitter.TwitterUser
 
-trait KloutAPI {
-  def influence: Future[Influence]
-  def twitterID(kloutID: String): Future[TwitterUser]
-}
-
-object DftKloutAPI {
+object KloutAPI {
   def influence: Future[Influence] = future(Influence())
   def twitterID(kloutID: String): Future[TwitterUser] = future(TwitterUser())
 }
