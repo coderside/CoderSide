@@ -1,0 +1,10 @@
+package actors
+
+import akka.actor.{ Actor, ActorRef, FSM }
+import scala.concurrent.util.duration._
+
+class GitHubNode extends Actor {
+  def receive = {
+    case a: Any =>
+  }
+}

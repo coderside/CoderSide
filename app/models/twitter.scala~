@@ -1,0 +1,10 @@
+package models.twitter
+
+trait TwitterAPI {
+  def timeline: Timeline
+}
+
+case class Timeline(tweets: Set[Tweet]) {
+}
+
+case class Tweet

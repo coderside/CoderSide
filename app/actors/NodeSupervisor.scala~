@@ -1,0 +1,40 @@
+package actors
+
+import akka.actor.{ Actor, ActorSystem, Props, ActorRef, ActorLogging }
+import models.github.GitHubUser
+import scala.concurrent.util.duration._
+
+class NodeSupervisor extends Actor with ActorLogging {
+  import NodeSupervisor._
+
+  def headNode = context.actorOf(Props[HeadNode])
+  def gathererNode(awaited: Int) = context.actorOf(Props(new GathererNode(awaited)))
+
+  def receive = {
+    case query @ Query(gitHubUsers) => {
+      log.debug("[NodeSupervisor] receiving an event")
+      gathererNode(gitHubUsers.size)
+      headNode ! query
+      sender ! "ok"
+    }
+  }
+
+  override def preStart() = {
+    log.debug("[NodeSupervisor] before starting...")
+  }
+
+  override def postStop() = {
+    log.debug("[NodeSupervisor] after stopping...")
+  }
+}
+
+object NodeSupervisor {
+  sealed trait Event
+  object Init extends Event
+  case class Query(profils: Set[GitHubUser]) extends Event
+
+  lazy val system = ActorSystem("SearchSystem")
+  lazy val ref = system.actorOf(Props[NodeSupervisor])
+
+  def stop = system.stop(ref)
+}
