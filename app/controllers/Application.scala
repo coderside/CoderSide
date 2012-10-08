@@ -19,9 +19,10 @@ object Application extends Controller {
     Logger.debug("[Application] Sending query ...")
     implicit val timeout = Timeout(20 second)
     Async {
-      (SupervisorNode.ref ? InitQuery(Set(GitHubUser()))).mapTo[QueryResult].asPromise.map { result =>
-        Ok(result.toString)
-      }
+      //(SupervisorNode.ref ? InitQuery(Set(GitHubUser()))).mapTo[QueryResult].asPromise.map { result =>
+        //Ok(result.toString)
+    //}
+      Promise.pure(Ok)
     }
   }
 
