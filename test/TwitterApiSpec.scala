@@ -32,5 +32,15 @@ class TwitterApiSpec extends Specification {
         user.isDefined  must equalTo(true)
       }
     }
+
+    "get tweets by twitter ID" in {
+      running(FakeApplication()) {
+        val timeline = TwitterAPI.timeline("srenaultcontact").await match {
+          case Redeemed(timeline) => Some(timeline)
+          case Thrown(e) => None
+        }
+        timeline.isDefined  must equalTo(true)
+      }
+    }
   }
 }

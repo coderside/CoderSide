@@ -3,6 +3,8 @@ package models.twitter
 import scala.concurrent.Future
 import scala.concurrent.future
 import java.net.URLEncoder
+import java.util.Date
+import java.text.SimpleDateFormat
 import play.api.libs.concurrent.execution.defaultContext
 import play.api.libs.ws._
 import play.api.libs.json._
@@ -29,11 +31,10 @@ object TwitterAPI {
   val readTweet = {
     (
       (__ \ 'text).read[String] and
-      (__ \ 'url).read[String] and
-      (__ \ 'description).read[String] and
+      (__ \ 'created_at).read[String] and
       (__ \ 'retweeted).read[Boolean] and
-      (__ \ 'in_reply_to_user_id).readOpt[String] and
-      (__ \ 'in_reply_to_status_id_str).readOpt[String]
+      (__ \ 'in_reply_to_user_id).read[Option[String]] and
+      (__ \ 'in_reply_to_status_id_str).readOpt[Option[String]]
     ) tupled
   }
 
@@ -59,18 +60,18 @@ object TwitterAPI {
   }
 
   def timeline(twitterID: String): Future[Timeline] = {
-    WS.url("https://api.twitter.com/1.1/statuses/user_timeline.json")
-      .withQueryString(
-        "user_id" -> twitterID,
-        "screen_name" -> twitterID
-      )
+    val dateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss Z yyyy")
+    val id = URLEncoder.encode(twitterID, "UTF-8")
+    val uri = "https://api.twitter.com/1.1/statuses/user_timeline.json?user_id=%s&screen_name=%s"
+              .format(id, id)
+    WS.url(uri)
       .sign(signatureCalc)
-      .get().map(_.json).map {
+      .get().map{ x => println(x.json); x.json}.map {
         case JsArray(tweets) => Timeline(
           tweets.flatMap { tweetOpt =>
             readTweet.reads(tweetOpt).asOpt.map {
-              case (text, url, description, retweeted, inReplyToStatus, inReplyToUser) =>
-                Tweet(text, url, description, retweeted, inReplyToStatus.isDefined, inReplyToUser.isDefined)
+              case (text, createdAt, retweeted, inReplyToStatus, inReplyToUser) =>
+                Tweet(text, dateFormat.parse(createdAt), retweeted, inReplyToStatus.isDefined, inReplyToUser.isDefined)
             }
           }.toSet
         )
@@ -79,7 +80,9 @@ object TwitterAPI {
   }
 }
 
-case class Timeline(tweets: Set[Tweet])
-case class Tweet(text: String, url: String, description: String, retweeted: Boolean, inReplyToUser: Boolean, inReplyToStatus: Boolean)
+case class Timeline(tweets: Set[Tweet]) {
+  lazy val retweets: Set[Tweet] = tweets.filter(_.retweeted)
+}
+case class Tweet(text: String, createdAt: Date, retweeted: Boolean, inReplyToUser: Boolean, inReplyToStatus: Boolean)
 case class TwitterUser(name: String, description: String, followers: Int)
 case class TwitterApiException(message: String) extends Exception
