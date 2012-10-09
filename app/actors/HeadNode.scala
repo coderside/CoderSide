@@ -2,20 +2,24 @@ package actors
 
 import akka.actor.{ Actor, ActorRef, Props, ActorLogging }
 import scala.concurrent.util.duration._
+import Messages._
 
 class HeadNode() extends Actor with ActorLogging {
-  import HeadNode.{ NodeQuery, HeadQuery }
 
-  def gathererNode(awaited: Int, client: ActorRef) = context.actorOf(Props(new GathererNode(awaited, client)))
-  lazy val  gitHubNode = context.actorOf(Props[GitHubNode])
+  def gathererNode(client: ActorRef) = context.actorOf(Props(new GathererNode(client)))
+
+  lazy val gitHubNode = context.actorOf(Props[GitHubNode])
+  lazy val linkedInNode = context.actorOf(Props[LinkedInNode])
+  lazy val twitterNode = context.actorOf(Props[TwitterNode])
+  lazy val kloutNode = context.actorOf(Props[KloutNode])
 
   def receive = {
-    case HeadQuery(gitHubUsers, client) => {
-      log.debug("[HeadNode] receiving new init query : " + gitHubUsers)
-      val gathererRef = gathererNode(gitHubUsers.size, client)
-      gitHubUsers.foreach { gitHubUser =>
-        gitHubNode ! NodeQuery(gitHubUser, gathererRef)
-      }
+    case HeadQuery(gitHubUser, client) => {
+      log.debug("[HeadNode] receiving new init query : " + gitHubUser)
+      val gathererRef = gathererNode(client)
+      gitHubNode ! NodeQuery(gitHubUser, gathererRef)
+      linkedInNode ! NodeQuery(gitHubUser, gathererRef)
+      twitterNode ! TwitterNodeQuery(gitHubUser, kloutNode, gathererRef)
     }
   }
 
@@ -26,11 +30,4 @@ class HeadNode() extends Actor with ActorLogging {
   override def postStop() = {
     log.debug("[HeadNode] after stopping...")
   }
-}
-
-object HeadNode {
-  import models.github.GitHubUser
-
-  case class HeadQuery(gitHubUsers: Set[GitHubUser], client: ActorRef)
-  case class NodeQuery(gitHubUser: GitHubUser, gatherer: ActorRef)
 }

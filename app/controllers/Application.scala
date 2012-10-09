@@ -8,20 +8,23 @@ import akka.pattern.ask
 import akka.util.Timeout
 import akka.util.duration._
 import actors.{ SupervisorNode, GathererNode }
-import models.github.GitHubUser
+import actors.Messages.InitQuery
+import models.github.{ GitHubAPI, GitHubUser }
+import models.CoderGuy
 
 object Application extends Controller {
 
   def index = Action {
-    import SupervisorNode.InitQuery
-    import GathererNode.QueryResult
-
     Logger.debug("[Application] Sending query ...")
     implicit val timeout = Timeout(20 second)
     Async {
-      //(SupervisorNode.ref ? InitQuery(Set(GitHubUser()))).mapTo[QueryResult].asPromise.map { result =>
-        //Ok(result.toString)
-    //}
+      GitHubAPI.searchByFullname("Sébastien Renault").flatMap { gitHubUsers =>
+        (SupervisorNode.ref ? InitQuery(gitHubUsers.head)).mapTo[CoderGuy].asPromise.map { coderGuy =>
+          Ok(coderGuy.toString)
+        }.recover {
+          case e: Exception => InternalServerError(e.getMessage)
+        }
+      }
       Promise.pure(Ok)
     }
   }

@@ -1,4 +1,4 @@
-package models.twitter
+package models.linkedin
 
 import scala.concurrent.Future
 import scala.concurrent.future
@@ -29,13 +29,11 @@ object LinkedInAPI {
   }
 
   def searchByFullname(firstname: String, lastname: String): Future[Set[LinkedInUser]] = {
-    WS.url("http://api.linkedin.com/v1/people-search:(people:(headline,first-name,last-name,id,picture-url))")//?first-name=S%C3%A9bastien&last-name=Renault&sort=connections&format=json")
-   .withQueryString(
-     "format" -> "json",
-     "first-name" -> firstname,
-     "last-name" -> lastname,
-     "sort" -> "connections"
-   )
+    val uri = "http://api.linkedin.com/v1/people-search:(people:(headline,first-name,last-name,id,picture-url))"
+    val params = "?first-name=%s&last-name=%s&sort=connections&format=json"
+                 .format(URLEncoder.encode(firstname, "UTF-8"), URLEncoder.encode(lastname, "UTF-8"))
+
+    WS.url(uri + params)
    .sign(signatureCalc)
    .get().map(_.json \ "people" \ "values").map {
        case JsArray(users) => users.flatMap { user =>

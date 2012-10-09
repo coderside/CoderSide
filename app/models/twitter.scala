@@ -22,6 +22,7 @@ object TwitterAPI {
 
   val readUser: Reads[TwitterUser] = {
     (
+      (__ \ 'screen_name).read[String] and
       (__ \ 'name).read[String] and
       (__ \ 'description).read[String] and
       (__ \ 'followers_count).read[Int]
@@ -59,30 +60,31 @@ object TwitterAPI {
    .get().map(response => readUser.reads(response.json).asOpt)
   }
 
-  def timeline(twitterID: String): Future[Timeline] = {
+  def timeline(twitterID: String): Future[Option[TwitterTimeline]] = {
     val dateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss Z yyyy")
     val id = URLEncoder.encode(twitterID, "UTF-8")
     val uri = "https://api.twitter.com/1.1/statuses/user_timeline.json?user_id=%s&screen_name=%s"
               .format(id, id)
     WS.url(uri)
       .sign(signatureCalc)
-      .get().map{ x => println(x.json); x.json}.map {
-        case JsArray(tweets) => Timeline(
+      .get().map(_.json).map {
+        case JsArray(tweets) => Some(TwitterTimeline(
           tweets.flatMap { tweetOpt =>
             readTweet.reads(tweetOpt).asOpt.map {
               case (text, createdAt, retweeted, inReplyToStatus, inReplyToUser) =>
                 Tweet(text, dateFormat.parse(createdAt), retweeted, inReplyToStatus.isDefined, inReplyToUser.isDefined)
             }
           }.toSet
-        )
-        case _ => throw new TwitterApiException("Failed getting tweets for user: " + twitterID)
+        ))
+        case _ => None
       }
   }
 }
 
-case class Timeline(tweets: Set[Tweet]) {
+case class TwitterTimeline(tweets: Set[Tweet]) {
   lazy val retweets: Set[Tweet] = tweets.filter(_.retweeted)
+  lazy val pureTweets: Set[Tweet] = tweets.filter(t => !t.inReplyToUser && !t.inReplyToStatus)
 }
 case class Tweet(text: String, createdAt: Date, retweeted: Boolean, inReplyToUser: Boolean, inReplyToStatus: Boolean)
-case class TwitterUser(name: String, description: String, followers: Int)
+case class TwitterUser(screenName: String, name: String, description: String, followers: Int)
 case class TwitterApiException(message: String) extends Exception

@@ -53,7 +53,18 @@ object GitHubAPI {
 
 case class GitHubApiException(message: String) extends Exception
 
-case class GitHubUser(username: String, language: String, followers: Int)
+case class GitHubUser(username: String, language: String, followers: Int) {
+
+  val firstname: String = {
+    val str = username.split(" ")
+    if(str.size == 2) str(0) else ""
+  }
+
+  val lastname: String = {
+    val str = username.split(" ")
+    if(str.size == 2) str(1) else ""
+  }
+}
 
 case class GitHubRepository(
   name: String,

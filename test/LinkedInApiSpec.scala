@@ -9,7 +9,7 @@ import play.api.libs.concurrent._
 import play.api.libs.concurrent.execution.defaultContext
 import play.api.test._
 import play.api.test.Helpers._
-import models.twitter.LinkedInAPI
+import models.linkedin.LinkedInAPI
 
 class LinkedInApiSpec extends Specification {
   "LinkedIn API implementations " should {

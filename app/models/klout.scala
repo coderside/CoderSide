@@ -38,7 +38,7 @@ object KloutAPI {
     }
   }
 
-  def influence(kloutID: String): Future[(Set[KloutUser], Set[KloutUser])] = {
+  def influence(kloutID: String): Future[Influence] = {
     val uri = "http://api.klout.com/v2/user.json/%s/influence".format(kloutID)
     WS.url(uri)
       .withQueryString("key" -> Config.klout.key)
@@ -49,11 +49,11 @@ object KloutAPI {
         val influencees = (influence \ "myInfluencees" \\ "entity").flatMap { influencee =>
           readUser.reads(influencee).asOpt
         }.toSet
-        influencers -> influencees
+        Influence(influencers, influencees)
     }
   }
 }
 
 case class KloutUser(id: String, nick: String, score: Double)
-case class Influence(influencers: Set[KloutUser] = Set.empty, influencees: Set[KloutUser] = Set.empty)
+case class Influence(influencers: Set[KloutUser], influencees: Set[KloutUser])
 case class KloutApiException(message: String) extends Exception
