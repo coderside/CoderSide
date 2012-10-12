@@ -1,0 +1,40 @@
+@()
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>CoderGuy</title>
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+        <!-- Vendors -->
+        <script type="text/javascript" src="@routes.Assets.at("javascripts/libs/jquery-1.7.1.min.js")"></script>
+        <script type="text/javascript" src="@routes.Assets.at("javascripts/libs/underscore-min.js")"></script>
+    </head>
+    <body>
+      <header>
+        <h2>CoderGuy</h2>
+      </header>
+      <section class="content">
+        <fieldset>
+          <legend>Search</legend>
+          <form name="search_coderguy">
+            <input type="search" placeholder="Look for a great coder" />
+            <button>Search</button>
+          </form>
+        </fieldset>
+        <fieldset class="result">
+          <legend>Results</legend>
+        </fieldset>
+      </section>
+      <footer>
+        CoderGuy - 2012
+      </footer>
+      <!-- Javascript templates -->
+      @tmpl.twitter()
+      @tmpl.linkedin()
+      @tmpl.klout()
+      @tmpl.github()
+      <!-- Javascript App -->
+      <script type="text/javascript" src="@routes.Assets.at("javascripts/coderguy.js")"></script>
+    </body>
+</html>

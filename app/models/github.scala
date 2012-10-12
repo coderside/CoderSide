@@ -14,6 +14,7 @@ object GitHubAPI {
   val readUser: Reads[GitHubUser] = {
     (
       (__ \ 'username).read[String] and
+      (__ \ 'fullname).read[String] and
       (__ \ 'language).read[String] and
       (__ \ 'followers).read[Int]
     )(GitHubUser)
@@ -53,15 +54,15 @@ object GitHubAPI {
 
 case class GitHubApiException(message: String) extends Exception
 
-case class GitHubUser(username: String, language: String, followers: Int) {
+case class GitHubUser(username: String, fullname: String, language: String, followers: Int) {
 
   val firstname: String = {
-    val str = username.split(" ")
+    val str = fullname.split(" ")
     if(str.size == 2) str(0) else ""
   }
 
   val lastname: String = {
-    val str = username.split(" ")
+    val str = fullname.split(" ")
     if(str.size == 2) str(1) else ""
   }
 }

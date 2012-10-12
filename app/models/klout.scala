@@ -2,6 +2,7 @@ package models.klout
 
 import scala.concurrent.Future
 import scala.concurrent.future
+import scala.util.control.Exception._
 import play.api.libs.ws._
 import play.api.libs.json._
 import play.api.libs.json.Reads._
@@ -26,7 +27,11 @@ object KloutAPI {
         "screenName" -> twitterID,
         "key" -> Config.klout.key
       )
-      .get().map(response => (response.json \ "id").asOpt[String])
+      .get().map { response =>
+        catching(classOf[Exception]).opt(response.json).flatMap { json =>
+          (json \ "id").asOpt[String]
+        }
+      }
   }
 
   def topics(kloutID: String): Future[Set[String]] = {

@@ -16,6 +16,11 @@ object Application extends Controller {
 
   def index = Action {
     Logger.debug("[Application] Sending query ...")
+    Ok(views.html.index())
+  }
+
+  def search(keywords: String) = Action {
+    Logger.debug("[Application] Searching coder guy with " + keywords.mkString(" / "))
     implicit val timeout = Timeout(20 second)
     Async {
       GitHubAPI.searchByFullname("Sébastien Renault").flatMap { gitHubUsers =>
@@ -25,11 +30,6 @@ object Application extends Controller {
           case e: Exception => InternalServerError(e.getMessage)
         }
       }
-      Promise.pure(Ok)
     }
-  }
-
-  def search(keywords: List[String]) = Action {
-    Ok
   }
 }
