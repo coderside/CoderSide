@@ -4,6 +4,8 @@ import play.api._
 import play.api.mvc._
 import play.api.libs.concurrent._
 import play.api.libs.concurrent.execution.defaultContext
+import play.api.libs.json._
+import play.api.libs.json.Json._
 import akka.pattern.ask
 import akka.util.Timeout
 import akka.util.duration._
@@ -15,7 +17,7 @@ import models.CoderGuy
 object Application extends Controller {
 
   def index = Action {
-    Logger.debug("[Application] Sending query ...")
+    Logger.debug("[Application] Welcome !")
     Ok(views.html.index())
   }
 
@@ -23,12 +25,14 @@ object Application extends Controller {
     Logger.debug("[Application] Searching coder guy with " + keywords.mkString(" / "))
     implicit val timeout = Timeout(20 second)
     Async {
-      GitHubAPI.searchByFullname("Sébastien Renault").flatMap { gitHubUsers =>
-        (SupervisorNode.ref ? InitQuery(gitHubUsers.head)).mapTo[CoderGuy].asPromise.map { coderGuy =>
-          Ok(coderGuy.toString)
-        }.recover {
-          case e: Exception => InternalServerError(e.getMessage)
-        }
+      GitHubAPI.searchByFullname(keywords).flatMap { gitHubUsers =>
+        if(gitHubUsers.size > 0) {
+          (SupervisorNode.ref ? InitQuery(gitHubUsers.head)).mapTo[CoderGuy].asPromise.map { coderGuy =>
+            Ok(toJson(coderGuy))
+          }.recover {
+            case e: Exception => InternalServerError(e.getMessage)
+          }
+        } else Promise.pure(BadRequest)
       }
     }
   }

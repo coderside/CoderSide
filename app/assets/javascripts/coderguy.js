@@ -16,21 +16,27 @@ $(document).ready(function() {
         linkedin: _.template($("#linkedin_tmpl").html())
     };
 
-    var renderResult = function() {
+    var renderResult = function(coderGuy) {
         dom.$result.append(tmpl.linkedin({
+            user: coderGuy.linkedInUser
         }));
 
         dom.$result.append(tmpl.github({
+            repositories: coderGuy.repositories
         }));
 
         dom.$result.append(tmpl.twitter({
+            user: coderGuy.twitterUser,
+            timeline: coderGuy.twitterTimeline
         }));
 
         dom.$result.append(tmpl.klout({
+            influencers: coderGuy.influencers,
+            influencees: coderGuy.influencees
         }));
     };
 
-    var requests = {
+    var server = {
         search: function(success) {
             var keywords = dom.$search.val();
             return $.ajax({
@@ -48,12 +54,12 @@ $(document).ready(function() {
         var isEnterKey = function(key) { return key === 13; };
         if(isEnterKey(e.which)) {
             e.preventDefault();
-            requests.search().then(renderResult);
+            server.search().then(renderResult);
         }
     });
 
     dom.$submit.on('click', function(e) {
         e.preventDefault();
-        requests.search().then(renderResult);
+        server.search().then(renderResult);
     });
 });

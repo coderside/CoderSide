@@ -10,7 +10,7 @@ class GitHubNode extends Actor with ActorLogging {
   def receive = {
     case NodeQuery(gitHubUser, gathererRef) => {
       log.debug("[GitHubNode] receiving new head query : " + gitHubUser)
-      GitHubAPI.repositories("id").onComplete {
+      GitHubAPI.repositories(gitHubUser.username).onComplete {
         case Right(repositories) => gathererRef ! GitHubResult(repositories)
         case Left(e) => {
           log.error("[GitHubNode] Error while fetching repositories")

@@ -3,5 +3,14 @@
 <script id="github_tmpl" type="text/html">
   <div class="github">
     <h3>GitHub</h3>
+    <ul>
+      <% _(repositories).each(function(repository) { %>
+      <li>
+        <a href="<%= repository.url %>"><%= repository.name %></a>
+        <span><%= repository.description %></span>
+        <span><%= repository.language %></span>
+      </li>
+      <% }) %>
+    </ul>
   </div>
 </script>

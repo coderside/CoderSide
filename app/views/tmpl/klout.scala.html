@@ -3,5 +3,32 @@
 <script id="klout_tmpl" type="text/html">
   <div class="klout">
     <h3>Klout</h3>
+    <h4>Influencers</h4>
+    <ul class="influencers">
+      <% _(influencers).each(function(influencer) { %>
+      <li>
+        <dl>
+          <dt>Name</dt><dd><%= influencer.name %></dd>
+          <dt>Screen name</dt><dd><%= influencer.screenName %></dd>
+          <dt>Description</dt><dd><%= influencer.description %></dd>
+          <dt>Followers</dt><dd><%= influencer.followers %></dd>
+        </dl>
+      </li>
+      <% }) %>
+    </ul>
+    <hr/>
+    <h4>Influencees</h4>
+    <ul class="influencees">
+      <% _(influencees).each(function(influencee) { %>
+      <li>
+        <dl>
+          <dt>Name</dt><dd><%= influencee.name %></dd>
+          <dt>Screen name</dt><dd><%= influencee.screenName %></dd>
+          <dt>Description</dt><dd><%= influencee.description %></dd>
+          <dt>Followers</dt><dd><%= influencee.followers %></dd>
+        </dl>
+      </li>
+      <% }) %>
+    </ul>
   </div>
 </script>

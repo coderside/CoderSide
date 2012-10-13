@@ -83,8 +83,9 @@ object TwitterAPI {
 
 case class TwitterTimeline(tweets: Set[Tweet]) {
   lazy val retweets: Set[Tweet] = tweets.filter(_.retweeted)
-  lazy val pureTweets: Set[Tweet] = tweets.filter(t => !t.inReplyToUser && !t.inReplyToStatus)
+  lazy val pureTweets: Set[Tweet] = tweets.filter(t => !t.inReplyToUser)
 }
+
 case class Tweet(text: String, createdAt: Date, retweeted: Boolean, inReplyToUser: Boolean, inReplyToStatus: Boolean)
 case class TwitterUser(screenName: String, name: String, description: String, followers: Int)
 case class TwitterApiException(message: String) extends Exception

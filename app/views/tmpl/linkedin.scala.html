@@ -3,5 +3,13 @@
 <script id="linkedin_tmpl" type="text/html">
   <div class="linkedin">
     <h3>LinkedIn</h3>
+    <% if(user) { %>
+    <dl>
+      <img src="<%= user.pictureUrl %>" />
+      <dt>First name</dt><dd><%= user.firstname %></dd>
+      <dt>Last name</dt><dd><%= user.lastname %></dd>
+      <dt>Headline</dt><dd><%= user.headline %></dd>
+    </dl>
+    <% } %>
   </div>
 </script>
