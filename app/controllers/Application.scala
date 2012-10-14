@@ -22,7 +22,7 @@ object Application extends Controller {
   }
 
   def search(keywords: String) = Action {
-    Logger.debug("[Application] Searching coder guy with " + keywords.mkString(" / "))
+    Logger.debug("[Application] Searching coder guy with " + keywords)
     implicit val timeout = Timeout(20 second)
     Async {
       GitHubAPI.searchByFullname(keywords).flatMap { gitHubUsers =>
@@ -32,7 +32,7 @@ object Application extends Controller {
           }.recover {
             case e: Exception => InternalServerError(e.getMessage)
           }
-        } else Promise.pure(BadRequest)
+        } else Promise.pure(NotFound)
       }
     }
   }

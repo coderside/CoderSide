@@ -23,7 +23,7 @@ class GathererNode(client: ActorRef) extends Actor with ActorLogging {
     }
 
     case CheckResult => if(waited == 0) {
-      log.info("[GathererNode] Gathering done")
+      log.info("[GathererNode] Gathering done !")
       client ! CoderGuy(
         gitHubResult map(gr => gr.repositories) getOrElse Set.empty,
         linkedInResult.map(lr => lr.profil),
@@ -32,6 +32,7 @@ class GathererNode(client: ActorRef) extends Actor with ActorLogging {
         kloutResult map(kr => kr.influencers) getOrElse Set.empty,
         kloutResult map(kr => kr.influencees) getOrElse Set.empty
       )
+      context.stop(self)
     }
 
     case NotFound => {
