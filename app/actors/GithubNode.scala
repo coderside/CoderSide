@@ -1,6 +1,7 @@
 package actors
 
 import scala.concurrent.util.duration._
+import scala.util.{ Success, Failure }
 import akka.actor.{ Actor, ActorRef, ActorLogging }
 import play.api.libs.concurrent.execution.defaultContext
 import models.github._
@@ -11,8 +12,8 @@ class GitHubNode extends Actor with ActorLogging {
     case NodeQuery(gitHubUser, gathererRef) => {
       log.debug("[GitHubNode] receiving new head query : " + gitHubUser)
       GitHubAPI.repositories(gitHubUser.username).onComplete {
-        case Right(repositories) => gathererRef ! GitHubResult(repositories)
-        case Left(e) => {
+        case Success(repositories) => gathererRef ! GitHubResult(repositories)
+        case Failure(e) => {
           log.error("[GitHubNode] Error while fetching repositories")
           gathererRef ! ErrorQuery(e)
         }

@@ -1,5 +1,6 @@
 package controllers
 
+import scala.concurrent.util.duration._
 import play.api._
 import play.api.mvc._
 import play.api.libs.concurrent._
@@ -8,7 +9,6 @@ import play.api.libs.json._
 import play.api.libs.json.Json._
 import akka.pattern.ask
 import akka.util.Timeout
-import akka.util.duration._
 import actors.{ SupervisorNode, GathererNode }
 import actors.Messages.InitQuery
 import models.github.{ GitHubAPI, GitHubUser }
@@ -23,11 +23,11 @@ object Application extends Controller {
 
   def search(keywords: String) = Action {
     Logger.debug("[Application] Searching coder guy with " + keywords)
-    implicit val timeout = Timeout(20 second)
+    implicit val timeout = Timeout(20.seconds)
     Async {
       GitHubAPI.searchByFullname(keywords).flatMap { gitHubUsers =>
         if(gitHubUsers.size > 0) {
-          (SupervisorNode.ref ? InitQuery(gitHubUsers.head)).mapTo[CoderGuy].asPromise.map { coderGuy =>
+          (SupervisorNode.ref ? InitQuery(gitHubUsers.head)).mapTo[CoderGuy].map { coderGuy =>
             Ok(toJson(coderGuy))
           }.recover {
             case e: Exception => InternalServerError(e.getMessage)

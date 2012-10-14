@@ -2,6 +2,7 @@ package actors
 
 import scala.concurrent.Future
 import scala.concurrent.util.duration._
+import scala.util.{ Success, Failure }
 import akka.actor.{ Actor, ActorRef, ActorLogging }
 import play.api.libs.concurrent.execution.defaultContext
 import play.api.libs.concurrent.Promise
@@ -14,9 +15,9 @@ class KloutNode extends Actor with ActorLogging {
     case KloutNodeQuery(twitterUser, gathererRef) => {
       log.debug("[KloutNode] receiving new query : " + twitterUser)
       KloutAPI.kloutID(twitterUser.screenName).onComplete {
-        case Right(Some(kloutID)) => self ! KloutUserQuery(kloutID, gathererRef)
-        case Right(None) => gathererRef ! NotFound
-        case Left(e) => {
+        case Success(Some(kloutID)) => self ! KloutUserQuery(kloutID, gathererRef)
+        case Success(None) => gathererRef ! NotFound
+        case Failure(e) => {
           log.error("[KloutNode] Error while getting klout ID: " + e.getMessage)
           gathererRef ! ErrorQuery(e)
         }
@@ -26,23 +27,23 @@ class KloutNode extends Actor with ActorLogging {
       log.debug("[KloutNode] Getting profil influence with: " + kloutID)
 
       KloutAPI.influence(kloutID).onComplete {
-        case Right(Influence(influencers, influencees)) => {
+        case Success(Influence(influencers, influencees)) => {
           def splitInfluence(influence: Set[TwitterUser]) = {
             influence.partition(twitterUser => influencers.find(_.nick == twitterUser.screenName).isDefined)
           }
           Promise.sequence(
             (influencers ++ influencees).map( k => TwitterAPI.show(k.nick))
           ).onComplete {
-            case Right(influence) => splitInfluence(influence.flatten) match {
+            case Success(influence) => splitInfluence(influence.flatten) match {
               case (influencers, influencees) => gathererRef ! KloutResult(influencers, influencees)
             }
-            case Left(e) => {
+            case Failure(e) => {
               log.error("[KloutNode] Error while getting influence (second part): " + e.getMessage)
               gathererRef ! ErrorQuery(e)
             }
           }
         }
-        case Left(e) => {
+        case Failure(e) => {
           log.error("[KloutNode] Error while getting influence ID (first part): " + e.getMessage)
           gathererRef ! ErrorQuery(e)
         }
