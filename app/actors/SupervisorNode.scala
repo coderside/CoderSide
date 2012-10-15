@@ -9,10 +9,12 @@ class SupervisorNode extends Actor with ActorLogging {
   lazy val headNode = context.actorOf(Props[HeadNode])
 
   def receive = {
-    case query @ InitQuery(gitHubUsers) => {
+    case query @ InitQuery(request, gitHubUsers) => {
       log.debug("[NodeSupervisor] receiving an event")
-      headNode ! HeadQuery(gitHubUsers, sender)
+      headNode ! HeadQuery(request, gitHubUsers, sender)
     }
+
+    case askProgress: AskProgress => headNode forward askProgress
   }
 
   override def preStart() = {

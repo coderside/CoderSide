@@ -36,6 +36,10 @@ $(document).ready(function() {
         }));
     };
 
+    var updateProgress = function(event) {
+        console.log(event);
+    };
+
     var server = {
         search: function(success) {
             var keywords = dom.$search.val();
@@ -47,6 +51,15 @@ $(document).ready(function() {
                     alert('Error while searching the specified coder guy !');
                 }
             });
+        },
+        progress: function(onReceived) {
+            var keywords = dom.$search.val(),
+                uri = '/progress?' + $.param({ keywords: keywords }),
+                source = new EventSource(uri);
+            source.onmessage = onReceived;
+            source.onerror = function() {
+                alert('Error while getting progress update');
+            };
         }
     };
 
@@ -55,6 +68,7 @@ $(document).ready(function() {
         if(isEnterKey(e.which)) {
             e.preventDefault();
             server.search().then(renderResult);
+            server.progress(updateProgress);
         }
     });
 

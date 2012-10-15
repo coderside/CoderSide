@@ -9,9 +9,9 @@ object Messages {
   //Node to Gatherer
   case class ErrorQuery(e: Throwable)
   //Application to Supervisor.
-  case class InitQuery(profil: GitHubUser)
+  case class InitQuery(request: String, profil: GitHubUser)
   //Supervisor to Head
-  case class HeadQuery(gitHubUser: GitHubUser, client: ActorRef)
+  case class HeadQuery(request: String, gitHubUser: GitHubUser, client: ActorRef)
   //Head to Children
   case class NodeQuery(gitHubUser: GitHubUser, gatherer: ActorRef)
   //Head to Twitter Node
@@ -38,4 +38,8 @@ object Messages {
   object Decrement
   //Node to Gatherer
   object NotFound
+  case class Progress(request: String)
+  object AskProgress
+  case class AskProgress(request: String)
+  case class NewClient(client: ActorRef)
 }
