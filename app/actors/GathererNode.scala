@@ -6,11 +6,11 @@ import play.api.libs.iteratee.Concurrent
 import models.CoderGuy
 import Messages._
 
-class GathererNode(headNode: ActorRef, client: ActorRef) extends Actor with ActorLogging {
+class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
   self =>
 
   lazy val progress = Concurrent.broadcast[Float]
-  private var otherClients: List[ActorRef] = Nil
+  private var clients: List[ActorRef] = Nil
 
   private var waited = 4
   private var gitHubResult: Option[GitHubResult] = None
@@ -30,7 +30,7 @@ class GathererNode(headNode: ActorRef, client: ActorRef) extends Actor with Acto
 
     case NewClient(client) => {
       log.debug("[GathererNode] New client")
-      otherClients = otherClients :+ client
+      clients = clients :+ client
     }
 
     case Decrement => {
@@ -51,8 +51,7 @@ class GathererNode(headNode: ActorRef, client: ActorRef) extends Actor with Acto
         kloutResult map(kr => kr.influencers) getOrElse Set.empty,
         kloutResult map(kr => kr.influencees) getOrElse Set.empty
       )
-      client ! coderGuy
-      otherClients.foreach(client => client ! coderGuy)
+      clients.foreach(client => client ! coderGuy)
       headNode ! End(self)
     }
 
@@ -63,29 +62,29 @@ class GathererNode(headNode: ActorRef, client: ActorRef) extends Actor with Acto
 
     case ErrorQuery(e) => {
       log.info("[GathererNode] Error well received.")
-      client ! e
+      clients.foreach(client => client ! e)
     }
 
     case gr @ GitHubResult(repositories) => {
-      log.debug("[GathererNode] receiving github repositories: " + repositories)
+      log.debug("[GathererNode] receiving github repositories")
       gitHubResult = Some(gr)
       self ! Decrement
     }
 
     case lr @ LinkedInResult(profil) => {
-      log.debug("[GathererNode] receiving linkedIn profil: " + profil)
+      log.debug("[GathererNode] receiving linkedIn profil")
       linkedInResult = Some(lr)
       self ! Decrement
     }
 
     case kr @ KloutResult(influencers, influencees) => {
-      log.debug("[GathererNode] receiving klout influence: " + kr)
+      log.debug("[GathererNode] receiving klout influence")
       kloutResult = Some(kr)
       self ! Decrement
     }
 
     case tr @ TwitterResult(profil, timeline) => {
-      log.debug("[GathererNode] receiving twitter profil & timeline: " + tr)
+      log.debug("[GathererNode] receiving twitter profil & timeline")
       twitterResult = Some(tr)
       self ! Decrement
     }

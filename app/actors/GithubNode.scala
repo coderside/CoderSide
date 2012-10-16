@@ -10,7 +10,7 @@ import Messages._
 class GitHubNode extends Actor with ActorLogging {
   def receive = {
     case NodeQuery(gitHubUser, gathererRef) => {
-      log.debug("[GitHubNode] receiving new head query : " + gitHubUser)
+      log.debug("[GitHubNode] receiving new head query")
       GitHubAPI.repositories(gitHubUser.username).onComplete {
         case Success(repositories) => gathererRef ! GitHubResult(repositories)
         case Failure(e) => {

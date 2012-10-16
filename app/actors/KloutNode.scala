@@ -13,7 +13,7 @@ import Messages._
 class KloutNode extends Actor with ActorLogging {
   def receive = {
     case KloutNodeQuery(twitterUser, gathererRef) => {
-      log.debug("[KloutNode] receiving new query : " + twitterUser)
+      log.debug("[KloutNode] receiving new query")
       KloutAPI.kloutID(twitterUser.screenName).onComplete {
         case Success(Some(kloutID)) => self ! KloutUserQuery(kloutID, gathererRef)
         case Success(None) => gathererRef ! NotFound
@@ -24,8 +24,7 @@ class KloutNode extends Actor with ActorLogging {
       }
     }
     case KloutUserQuery(kloutID, gathererRef) => {
-      log.debug("[KloutNode] Getting profil influence with: " + kloutID)
-
+      log.debug("[KloutNode] Getting profil influence")
       KloutAPI.influence(kloutID).onComplete {
         case Success(Influence(influencers, influencees)) => {
           def splitInfluence(influence: Set[TwitterUser]) = {

@@ -24,6 +24,7 @@ object Application extends Controller {
   }
 
   def progress(keywords: String) = Action {
+    Logger.debug("[Application] Asking progress")
     Async {
       implicit val timeout = Timeout(20.seconds)
       (SupervisorNode.ref ? AskProgress(keywords)).mapTo[Enumerator[Float]].map { progress =>

@@ -12,7 +12,7 @@ import Messages._
 class HeadNode() extends Actor with ActorLogging {
 
   var requests: Map[String, ActorRef] = Map.empty
-  def gathererNode(client: ActorRef) = context.actorOf(Props(new GathererNode(self, client)))
+  def gathererNode(client: ActorRef) = context.actorOf(Props(new GathererNode(self)))
 
   lazy val gitHubNode = context.actorOf(Props[GitHubNode])
   lazy val linkedInNode = context.actorOf(Props[LinkedInNode])
@@ -21,19 +21,20 @@ class HeadNode() extends Actor with ActorLogging {
 
   def receive = {
     case HeadQuery(request, gitHubUser, client) => {
-      log.debug("[HeadNode] receiving new init query : " + gitHubUser)
+      log.debug("[HeadNode] receiving new init query")
       val gathererRef = gathererNode(client)
+      println(requests)
+      println(request)
+      println(requests.get(request))
       if(!requests.get(request).isDefined) {
         log.debug("[HeadNode] Request added")
-        gathererRef ! NewClient(client)
         requests += (request -> gathererRef)
         gitHubNode   ! NodeQuery(gitHubUser, gathererRef)
         linkedInNode ! NodeQuery(gitHubUser, gathererRef)
         twitterNode  ! TwitterNodeQuery(gitHubUser, kloutNode, gathererRef)
-      } else {
-        requests.get(request).foreach { gathererRef =>
-          gathererRef ! NewClient(client)
-        }
+      }
+      requests.get(request).foreach { gathererRef =>
+        gathererRef ! NewClient(client)
       }
     }
 
@@ -57,7 +58,7 @@ class HeadNode() extends Actor with ActorLogging {
         } getOrElse {
           if(retries > 0) {
             log.debug("[HeadNode] Retrying to get progress channel: " + retries)
-            context.system.scheduler.scheduleOnce(2.seconds)(requestProgress(retries - 1))
+            context.system.scheduler.scheduleOnce(1.seconds)(requestProgress(retries - 1))
           } else s ! new Exception("Can't find progress channel")
         }
       }
@@ -68,9 +69,7 @@ class HeadNode() extends Actor with ActorLogging {
       log.debug("[HeadNode] End received !")
       val found  = requests.find(_._2 == gathererRef)
       if(found.isDefined) {
-        log.debug("[HeadNode] Before remove ref from requests: " + requests)
         requests = requests.filter(_._2 != gathererRef)
-        log.debug("[HeadNode] After remove ref from requests: " + requests)
         context.stop(gathererRef)
       }
     }

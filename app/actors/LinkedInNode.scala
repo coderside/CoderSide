@@ -10,7 +10,7 @@ import Messages._
 class LinkedInNode extends Actor with ActorLogging {
   def receive = {
     case NodeQuery(gitHubUser, gathererRef) => {
-      log.debug("[LinkedInNode] receiving new head query : " + gitHubUser)
+      log.debug("[LinkedInNode] receiving new head query")
       LinkedInAPI.searchByFullname(gitHubUser.firstname, gitHubUser.lastname).onComplete {
         case Success(profils) if(profils.size > 0) => gathererRef ! LinkedInResult(profils.head)
         case Success(profils) if(profils.size == 0) => gathererRef ! NotFound
