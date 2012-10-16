@@ -5,6 +5,7 @@
 $(document).ready(function() {
     var dom = {
         $search: $('.content form input[type=search]'),
+        $progress: $('.content form progress'),
         $submit: $('.content form button'),
         $result: $('.content .result')
     };
@@ -36,39 +37,55 @@ $(document).ready(function() {
         }));
     };
 
-    var updateProgress = function(event) {
-        console.log(event);
+    var updateProgress = function(onStop) {
+        return function(event) {
+            dom.$progress.val(event.data);
+            if(event.data == 100) {
+                onStop();
+            }
+        };
     };
 
-    var server = {
-        search: function(success) {
+    var server = new (function() {
+        var self = this;
+        this.eventSource = null;
+
+        this.search = function(success) {
             var keywords = dom.$search.val();
             return $.ajax({
                 url: '/search',
                 data: $.param({ keywords: keywords }),
                 success: success,
                 error: function() {
-                    alert('Error while searching the specified coder guy !');
+                    console.log('Error while searching the specified coder guy !');
+                    self.close();
                 }
             });
-        },
-        progress: function(onReceived) {
+        };
+
+        this.progress = function(onReceived) {
             var keywords = dom.$search.val(),
-                uri = '/progress?' + $.param({ keywords: keywords }),
-                source = new EventSource(uri);
-            source.onmessage = onReceived;
-            source.onerror = function() {
-                alert('Error while getting progress update');
+                uri = '/progress?' + $.param({ keywords: keywords });
+
+            self.eventSource = new EventSource(uri);
+            self.eventSource.onmessage = onReceived;
+            self.eventSource.onerror = function() {
+                console.log('Error while getting progress update');
+                self.close();
             };
-        }
-    };
+        };
+
+        this.close = function() {
+            self.eventSource.close();
+        };
+    })();
 
     dom.$search.on('keydown', function(e) {
         var isEnterKey = function(key) { return key === 13; };
         if(isEnterKey(e.which)) {
             e.preventDefault();
             server.search().then(renderResult);
-            server.progress(updateProgress);
+            server.progress(updateProgress(server.close));
         }
     });
 

@@ -6,24 +6,23 @@ import play.api.libs.iteratee.Concurrent
 import models.CoderGuy
 import Messages._
 
-class GathererNode(client: ActorRef) extends Actor with ActorLogging {
+class GathererNode(headNode: ActorRef, client: ActorRef) extends Actor with ActorLogging {
   self =>
 
   lazy val progress = Concurrent.broadcast[Float]
-
   private var otherClients: List[ActorRef] = Nil
+
   private var waited = 4
   private var gitHubResult: Option[GitHubResult] = None
   private var linkedInResult: Option[LinkedInResult] = None
   private var kloutResult: Option[KloutResult] = None
   private var twitterResult: Option[TwitterResult] = None
 
-  def computeProgress(): Float = 100 - ((waited / 4) * 100)
+  def computeProgress(): Float = 100 - ((waited / 4F) * 100)
 
   def receive = {
-
     case AskProgress => {
-      log.debug("[GathererNode] Ask progressz")
+      log.debug("[GathererNode] Ask progress")
       progress match {
         case (broadcaster, _) => sender ! broadcaster
       }
@@ -31,7 +30,7 @@ class GathererNode(client: ActorRef) extends Actor with ActorLogging {
 
     case NewClient(client) => {
       log.debug("[GathererNode] New client")
-      otherClients :+ client
+      otherClients = otherClients :+ client
     }
 
     case Decrement => {
@@ -54,7 +53,7 @@ class GathererNode(client: ActorRef) extends Actor with ActorLogging {
       )
       client ! coderGuy
       otherClients.foreach(client => client ! coderGuy)
-      context.stop(self)
+      headNode ! End(self)
     }
 
     case NotFound => {

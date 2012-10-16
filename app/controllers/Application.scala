@@ -30,6 +30,8 @@ object Application extends Controller {
         implicit val progressPulling = Comet.CometMessage[Float](_.toString)
         Ok.stream(progress &> EventSource())
           .withHeaders(CONTENT_TYPE -> "text/event-stream")
+      } recover {
+        case e: Exception => InternalServerError(e.getMessage)
       }
     }
   }
@@ -42,7 +44,7 @@ object Application extends Controller {
         if(gitHubUsers.size > 0) {
           (SupervisorNode.ref ? InitQuery(keywords, gitHubUsers.head)).mapTo[CoderGuy].map { coderGuy =>
             Ok(toJson(coderGuy))
-          }.recover {
+          } recover {
             case e: Exception => InternalServerError(e.getMessage)
           }
         } else Promise.pure(NotFound)

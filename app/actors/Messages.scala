@@ -42,4 +42,5 @@ object Messages {
   object AskProgress
   case class AskProgress(request: String)
   case class NewClient(client: ActorRef)
+  case class End(headNode: ActorRef)
 }

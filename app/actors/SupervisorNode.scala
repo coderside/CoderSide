@@ -1,7 +1,14 @@
 package actors
 
-import akka.actor.{ Actor, ActorSystem, Props, ActorRef, ActorLogging }
 import scala.concurrent.util.duration._
+import play.api.libs.concurrent.execution.defaultContext
+import akka.pattern.ask
+import akka.util.Timeout
+import scala.util.{ Success, Failure }
+import akka.actor.{ Actor, ActorSystem, Props, ActorRef, ActorLogging }
+import akka.util.Timeout
+import play.api.libs.concurrent.execution.defaultContext
+import play.api.libs.iteratee.Enumerator
 import Messages._
 
 class SupervisorNode extends Actor with ActorLogging {
@@ -13,7 +20,6 @@ class SupervisorNode extends Actor with ActorLogging {
       log.debug("[NodeSupervisor] receiving an event")
       headNode ! HeadQuery(request, gitHubUsers, sender)
     }
-
     case askProgress: AskProgress => headNode forward askProgress
   }
 
