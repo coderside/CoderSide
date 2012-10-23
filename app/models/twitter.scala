@@ -15,12 +15,12 @@ import utils.Config
 
 object TwitterAPI {
 
-  lazy val signatureCalc = OAuthCalculator(
+  val signatureCalc = OAuthCalculator(
     ConsumerKey(Config.twitter.consumerKey, Config.twitter.consumerSecret),
     RequestToken(Config.twitter.accessToken, Config.twitter.accessTokenSecret)
   )
 
-  val readUser: Reads[TwitterUser] = {
+  implicit val readUser: Reads[TwitterUser] = {
     (
       (__ \ 'screen_name).read[String] and
       (__ \ 'name).read[String] and
@@ -29,7 +29,7 @@ object TwitterAPI {
     )(TwitterUser)
   }
 
-  val readTweet = {
+  implicit val readTweet = {
     (
       (__ \ 'text).read[String] and
       (__ \ 'created_at).read[String] and
@@ -65,6 +65,7 @@ object TwitterAPI {
     val id = URLEncoder.encode(twitterID, "UTF-8")
     val uri = "https://api.twitter.com/1.1/statuses/user_timeline.json?user_id=%s&screen_name=%s"
               .format(id, id)
+
     WS.url(uri)
       .sign(signatureCalc)
       .get().map(_.json).map {

@@ -13,12 +13,12 @@ import utils.Config
 
 object LinkedInAPI {
 
-  lazy val signatureCalc = OAuthCalculator(
+  val signatureCalc = OAuthCalculator(
     ConsumerKey(Config.linkedIn.key, Config.linkedIn.secretKey),
     RequestToken(Config.linkedIn.userToken, Config.linkedIn.userSecret)
   )
 
-  val readUser: Reads[LinkedInUser] = {
+  implicit val readUser: Reads[LinkedInUser] = {
     (
       (__ \ 'id).read[String] and
       (__ \ 'firstName).read[String] and
@@ -29,6 +29,7 @@ object LinkedInAPI {
   }
 
   def searchByFullname(firstname: String, lastname: String): Future[Set[LinkedInUser]] = {
+
     val uri = "http://api.linkedin.com/v1/people-search:(people:(headline,first-name,last-name,id,picture-url))"
     val params = "?first-name=%s&last-name=%s&sort=connections&format=json"
                  .format(URLEncoder.encode(firstname, "UTF-8"), URLEncoder.encode(lastname, "UTF-8"))

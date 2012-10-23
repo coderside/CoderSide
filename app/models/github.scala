@@ -11,7 +11,7 @@ import java.net.URLEncoder
 
 object GitHubAPI {
 
-  val readUser: Reads[GitHubUser] = {
+  implicit val readUser: Reads[GitHubUser] = {
     (
       (__ \ 'username).read[String] and
       (__ \ 'fullname).read[String] and
@@ -20,7 +20,18 @@ object GitHubAPI {
     )(GitHubUser)
   }
 
-  val readRepository: Reads[GitHubRepository] = {
+  implicit val gitHubUserWrites = new Writes[GitHubUser] {
+    def writes(gu: GitHubUser): JsValue = {
+      Json.obj(
+        "username" -> gu.username,
+        "fullname" -> gu.fullname,
+        "language" -> gu.language,
+        "followers" -> gu.followers
+      )
+    }
+  }
+
+  implicit val readRepository: Reads[GitHubRepository] = {
     (
       (__ \ 'name).read[String] and
       (__ \ 'description).read[String] and
@@ -55,7 +66,6 @@ object GitHubAPI {
 case class GitHubApiException(message: String) extends Exception
 
 case class GitHubUser(username: String, fullname: String, language: String, followers: Int) {
-
   val firstname: String = {
     val str = fullname.split(" ")
     if(str.size == 2) str(0) else ""

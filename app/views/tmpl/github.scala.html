@@ -1,7 +1,23 @@
 @()
 
-<script id="github_tmpl" type="text/html">
-  <div class="github">
+<script id="github_presearch_tmpl" type="text/html">
+  <div class="github-presearch">
+    <h3>GitHub</h3>
+    <ul>
+      <% _(gitHubUsers).each(function(gitHubUser) { %>
+      <li>
+        <span class="username"><%= gitHubUser.username %></span>
+        <span class="fullname"><%= gitHubUser.fullname %></span>
+        <span class="language"><%= gitHubUser.language %></span>
+        <span class="followers"><%= gitHubUser.followers %></span>
+      </li>
+      <% }) %>
+    </ul>
+  </div>
+</script>
+
+<script id="github_search_tmpl" type="text/html">
+  <div class="github-search">
     <h3>GitHub</h3>
     <ul>
       <% _(repositories).each(function(repository) { %>

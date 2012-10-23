@@ -13,7 +13,7 @@ import utils.Config
 
 object KloutAPI {
 
-  val readUser: Reads[KloutUser] = {
+  implicit val readUser: Reads[KloutUser] = {
     (
       (__ \ 'payload \ 'kloutId).read[String] and
       (__ \ 'payload \ 'nick).read[String] and

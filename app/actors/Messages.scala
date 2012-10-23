@@ -9,9 +9,9 @@ object Messages {
   //Node to Gatherer
   case class ErrorQuery(e: Throwable)
   //Application to Supervisor.
-  case class InitQuery(request: String, profil: GitHubUser)
+  case class InitQuery(profil: GitHubUser)
   //Supervisor to Head
-  case class HeadQuery(request: String, gitHubUser: GitHubUser, client: ActorRef)
+  case class HeadQuery(gitHubUser: GitHubUser, client: ActorRef)
   //Head to Children
   case class NodeQuery(gitHubUser: GitHubUser, gatherer: ActorRef)
   //Head to Twitter Node
@@ -32,15 +32,20 @@ object Messages {
   case class TwitterUserQuery(gitHubUser: GitHubUser, klout: ActorRef, gatherer: ActorRef)
   //Twitter to Twitter
   case class TwitterTimelineQuery(twitterUser: TwitterUser, gatherer: ActorRef)
-  //For Gatherer only. Check if the gatering is complete.
+  //For Gatherer only. Check if the gatering is complete
   object CheckResult
-  //For Gatherer only. Decrement the rest of waited sub results.
+  //For Gatherer only. Decrement the rest of waited sub results
   object Decrement
   //Node to Gatherer
   object NotFound
+  //Gatherer Node to client
   case class Progress(request: String)
+  //Head Node to gatherer node
   object AskProgress
-  case class AskProgress(request: String)
+  //Supervisor Node to head node
+  case class AskProgress(gitHubUser: GitHubUser)
+  //Supervisor Node to head node
   case class NewClient(client: ActorRef)
+  //Children to Head
   case class End(headNode: ActorRef)
 }

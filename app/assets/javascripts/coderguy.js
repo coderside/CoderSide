@@ -4,34 +4,46 @@
 
 $(document).ready(function() {
     var dom = {
-        $search: $('.content form input[type=search]'),
+        $preSearch: $('.content form input[type=search]'),
+        $gitHubUsers: $('.content .githubusers'),
         $progress: $('.content form progress'),
         $submit: $('.content form button'),
         $result: $('.content .result')
     };
 
     var tmpl = {
-        twitter: _.template($("#twitter_tmpl").html()),
-        github: _.template($("#github_tmpl").html()),
-        klout: _.template($("#klout_tmpl").html()),
-        linkedin: _.template($("#linkedin_tmpl").html())
+        preSearch : {
+            github: _.template($("#github_presearch_tmpl").html())
+        },
+        search : {
+            twitter: _.template($("#twitter_search_tmpl").html()),
+            github: _.template($("#github_search_tmpl").html()),
+            klout: _.template($("#klout_search_tmpl").html()),
+            linkedin: _.template($("#linkedin_search_tmpl").html())
+        }
+    };
+
+    var renderGitHubUsers = function(gitHubUsers) {
+        dom.$gitHubUsers.append(tmpl.preSearch.github({
+            gitHubUsers: gitHubUsers
+        }));
     };
 
     var renderResult = function(coderGuy) {
-        dom.$result.append(tmpl.linkedin({
+        dom.$result.append(tmpl.search.linkedin({
             user: coderGuy.linkedInUser
         }));
 
-        dom.$result.append(tmpl.github({
+        dom.$result.append(tmpl.search.github({
             repositories: coderGuy.repositories
         }));
 
-        dom.$result.append(tmpl.twitter({
+        dom.$result.append(tmpl.search.twitter({
             user: coderGuy.twitterUser,
             timeline: coderGuy.twitterTimeline
         }));
 
-        dom.$result.append(tmpl.klout({
+        dom.$result.append(tmpl.search.klout({
             influencers: coderGuy.influencers,
             influencees: coderGuy.influencees
         }));
@@ -50,12 +62,21 @@ $(document).ready(function() {
         var self = this;
         this.eventSource = null;
 
-        this.search = function(success) {
-            var keywords = dom.$search.val();
+        this.preSearch = function(keywords) {
+            return $.ajax({
+                url: '/preSearch',
+                data: $.param({ keywords: keywords }),
+                error: function() {
+                    console.log('Error while pre-searching the specified coder guy !');
+                    self.close();
+                }
+            });
+        };
+
+        this.search = function(gitHubUser) {
             return $.ajax({
                 url: '/search',
-                data: $.param({ keywords: keywords }),
-                success: success,
+                data: $.param(gitHubUser),
                 error: function() {
                     console.log('Error while searching the specified coder guy !');
                     self.close();
@@ -63,10 +84,8 @@ $(document).ready(function() {
             });
         };
 
-        this.progress = function(onReceived) {
-            var keywords = dom.$search.val(),
-                uri = '/progress?' + $.param({ keywords: keywords });
-
+        this.progress = function(gitHubUser, onReceived) {
+            var uri = '/progress?' + $.param(gitHubUser);
             self.eventSource = new EventSource(uri);
             self.eventSource.onmessage = onReceived;
             self.eventSource.onerror = function() {
@@ -80,17 +99,30 @@ $(document).ready(function() {
         };
     })();
 
-    dom.$search.on('keydown', function(e) {
+    dom.$preSearch.on('keydown', function(e) {
         var isEnterKey = function(key) { return key === 13; };
         if(isEnterKey(e.which)) {
             e.preventDefault();
-            server.search().then(renderResult);
-            server.progress(updateProgress(server.close));
+            var keywords = dom.$preSearch.val();
+            server.preSearch(keywords).then(renderGitHubUsers);
         }
+    });
+
+    dom.$gitHubUsers.on('click', 'li', function(e) {
+        var $gitHubUser = $(e.currentTarget),
+            gitHubUser = {
+                username: $gitHubUser.find('.username').text(),
+                fullname: $gitHubUser.find('.fullname').text(),
+                language: $gitHubUser.find('.language').text(),
+                followers: $gitHubUser.find('.followers').text()
+            };
+        server.search(gitHubUser).then(renderResult);
+        server.progress(gitHubUser, updateProgress(server.close));
     });
 
     dom.$submit.on('click', function(e) {
         e.preventDefault();
-        server.search().then(renderResult);
+        var keywords = dom.$preSearch.val();
+        server.preSearch(keywords).then(renderGitHubUsers);
     });
 });

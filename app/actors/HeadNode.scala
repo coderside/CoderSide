@@ -7,11 +7,12 @@ import akka.pattern.ask
 import akka.util.Timeout
 import play.api.libs.concurrent.execution.defaultContext
 import play.api.libs.iteratee.Enumerator
+import models.github.GitHubUser
 import Messages._
 
 class HeadNode() extends Actor with ActorLogging {
 
-  var requests: Map[String, ActorRef] = Map.empty
+  var requests: Map[GitHubUser, ActorRef] = Map.empty
   def gathererNode(client: ActorRef) = context.actorOf(Props(new GathererNode(self)))
 
   lazy val gitHubNode = context.actorOf(Props[GitHubNode])
@@ -20,30 +21,27 @@ class HeadNode() extends Actor with ActorLogging {
   lazy val kloutNode = context.actorOf(Props[KloutNode])
 
   def receive = {
-    case HeadQuery(request, gitHubUser, client) => {
+    case HeadQuery(gitHubUser, client) => {
       log.debug("[HeadNode] receiving new init query")
       val gathererRef = gathererNode(client)
-      println(requests)
-      println(request)
-      println(requests.get(request))
-      if(!requests.get(request).isDefined) {
+      if(!requests.get(gitHubUser).isDefined) {
         log.debug("[HeadNode] Request added")
-        requests += (request -> gathererRef)
+        requests += (gitHubUser -> gathererRef)
         gitHubNode   ! NodeQuery(gitHubUser, gathererRef)
         linkedInNode ! NodeQuery(gitHubUser, gathererRef)
         twitterNode  ! TwitterNodeQuery(gitHubUser, kloutNode, gathererRef)
       }
-      requests.get(request).foreach { gathererRef =>
+      requests.get(gitHubUser).foreach { gathererRef =>
         gathererRef ! NewClient(client)
       }
     }
 
-    case AskProgress(request) => {
+    case AskProgress(gitHubUser) => {
       implicit val timeout = Timeout(20.seconds)
       val s = sender
       log.debug("[HeadNode] AskProgress received")
       def requestProgress(retries: Int) {
-        requests.get(request).map { gathererRef =>
+        requests.get(gitHubUser).map { gathererRef =>
           log.debug("[HeadNode] Ok, ask for progress channel")
           (gathererRef ? AskProgress).mapTo[Enumerator[Float]].onComplete {
             case Success(progress: Enumerator[Float]) => {
