@@ -3,42 +3,38 @@
 <!DOCTYPE html>
 
 <html>
-    <head>
-        <title>CoderGuy</title>
-        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
-        <!-- Vendors -->
-        <script type="text/javascript" src="@routes.Assets.at("javascripts/libs/jquery-1.7.1.min.js")"></script>
-        <script type="text/javascript" src="@routes.Assets.at("javascripts/libs/underscore-min.js")"></script>
-    </head>
-    <body>
-      <header>
-        <h2>CoderGuy</h2>
-      </header>
-      <section class="content">
-        <fieldset>
-          <legend>Search</legend>
-          <form name="search_coderguy">
-            <input type="search" placeholder="Look for a great coder" />
-            <button>Search</button>
-            <progress value="0" max="100" />
-          </form>
-        </fieldset>
-        <fieldset class="githubusers">
-          <legend>Pre-searching</legend>
-        </fieldset>
-        <fieldset class="result">
-          <legend>Results</legend>
-        </fieldset>
-      </section>
-      <footer>
-        CoderGuy - 2012
-      </footer>
-      <!-- Javascript templates -->
-      @tmpl.twitter()
-      @tmpl.linkedin()
-      @tmpl.klout()
-      @tmpl.github()
-      <!-- Javascript App -->
-      <script type="text/javascript" src="@routes.Assets.at("javascripts/coderguy.js")"></script>
-    </body>
+  <head>
+    <title>CoderGuy</title>
+    <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/coderguy.css")">
+    <!-- Vendors -->
+    <script type="text/javascript" src="@routes.Assets.at("javascripts/libs/jquery-1.7.1.min.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.at("javascripts/libs/underscore-min.js")"></script>
+  </head>
+  <body>
+    <header>
+      <h1>CoderGuy</h1>
+    </header>
+    <section class="content">
+      <div class="search">
+        <h2>Step 1 - Search a coder guy on GitHub</h2>
+        <form name="search_coderguy">
+          <input type="search" placeholder="Look for a great coder" />
+          <button>Search</button>
+        </form>
+      </div>
+      <div class="result">
+      </div>
+    </section>
+    <footer>
+      CoderGuy - 2012
+    </footer>
+    <!-- Javascript templates -->
+    @tmpl.twitter()
+    @tmpl.linkedin()
+    @tmpl.klout()
+    @tmpl.github()
+    <!-- Javascript App -->
+    <script type="text/javascript" src="@routes.Assets.at("javascripts/coderguy.js")"></script>
+  </body>
 </html>

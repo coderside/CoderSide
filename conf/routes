@@ -4,8 +4,8 @@
 
 # Home page
 GET     /                           controllers.Application.index
-GET     /preSearch                  controllers.Application.preSearch(keywords: String)
-GET     /search                     controllers.Application.search(username: String, fullname: String, language: String, followers: Int)
+GET     /search                     controllers.Application.search(keywords: String)
+GET     /overview                   controllers.Application.overview(username: String, fullname: String, language: String, followers: Int)
 GET     /progress                   controllers.Application.progress(username: String, fullname: String, language: String, followers: Int)
 
 # Map static resources from the /public folder to the /assets URL path

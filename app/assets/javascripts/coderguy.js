@@ -4,46 +4,50 @@
 
 $(document).ready(function() {
     var dom = {
-        $preSearch: $('.content form input[type=search]'),
-        $gitHubUsers: $('.content .githubusers'),
-        $progress: $('.content form progress'),
+        $search: $('.content .search'),
+        $gitHubSearch: function() { return $('.content .github-search'); },
+        $gitHubUsers: $('.content .github-users'),
+        $keywords: $('.content .search form input[type=search]'),
+        $progress: function() { return $('.content progress'); },
         $submit: $('.content form button'),
         $result: $('.content .result')
     };
 
     var tmpl = {
-        preSearch : {
-            github: _.template($("#github_presearch_tmpl").html())
-        },
         search : {
-            twitter: _.template($("#twitter_search_tmpl").html()),
-            github: _.template($("#github_search_tmpl").html()),
-            klout: _.template($("#klout_search_tmpl").html()),
-            linkedin: _.template($("#linkedin_search_tmpl").html())
+            github: _.template($("#github-search-tmpl").html())
+        },
+        result : {
+            twitter: _.template($("#twitter-result-tmpl").html()),
+            github: _.template($("#github-result-tmpl").html()),
+            klout: _.template($("#klout-result-tmpl").html()),
+            linkedin: _.template($("#linkedin-result-tmpl").html())
         }
     };
 
     var renderGitHubUsers = function(gitHubUsers) {
-        dom.$gitHubUsers.append(tmpl.preSearch.github({
+        dom.$gitHubSearch().remove();
+        dom.$search.append(tmpl.search.github({
             gitHubUsers: gitHubUsers
         }));
     };
 
     var renderResult = function(coderGuy) {
-        dom.$result.append(tmpl.search.linkedin({
+        dom.$result.empty();
+        dom.$result.append(tmpl.result.linkedin({
             user: coderGuy.linkedInUser
         }));
 
-        dom.$result.append(tmpl.search.github({
+        dom.$result.append(tmpl.result.github({
             repositories: coderGuy.repositories
         }));
 
-        dom.$result.append(tmpl.search.twitter({
+        dom.$result.append(tmpl.result.twitter({
             user: coderGuy.twitterUser,
             timeline: coderGuy.twitterTimeline
         }));
 
-        dom.$result.append(tmpl.search.klout({
+        dom.$result.append(tmpl.result.klout({
             influencers: coderGuy.influencers,
             influencees: coderGuy.influencees
         }));
@@ -51,7 +55,7 @@ $(document).ready(function() {
 
     var updateProgress = function(onStop) {
         return function(event) {
-            dom.$progress.val(event.data);
+            dom.$progress().val(event.data);
             if(event.data == 100) {
                 onStop();
             }
@@ -62,9 +66,9 @@ $(document).ready(function() {
         var self = this;
         this.eventSource = null;
 
-        this.preSearch = function(keywords) {
+        this.search = function(keywords) {
             return $.ajax({
-                url: '/preSearch',
+                url: '/search',
                 data: $.param({ keywords: keywords }),
                 error: function() {
                     console.log('Error while pre-searching the specified coder guy !');
@@ -73,9 +77,9 @@ $(document).ready(function() {
             });
         };
 
-        this.search = function(gitHubUser) {
+        this.overview = function(gitHubUser) {
             return $.ajax({
-                url: '/search',
+                url: '/overview',
                 data: $.param(gitHubUser),
                 error: function() {
                     console.log('Error while searching the specified coder guy !');
@@ -99,16 +103,22 @@ $(document).ready(function() {
         };
     })();
 
-    dom.$preSearch.on('keydown', function(e) {
+    dom.$search.on('keydown', function(e) {
         var isEnterKey = function(key) { return key === 13; };
         if(isEnterKey(e.which)) {
             e.preventDefault();
-            var keywords = dom.$preSearch.val();
-            server.preSearch(keywords).then(renderGitHubUsers);
+            var keywords = dom.$keywords.val();
+            server.search(keywords).then(renderGitHubUsers);
         }
     });
 
-    dom.$gitHubUsers.on('click', 'li', function(e) {
+    dom.$submit.on('click', function(e) {
+        e.preventDefault();
+        var keywords = dom.$keywords.val();
+        server.search(keywords).then(renderGitHubUsers);
+    });
+
+    dom.$search.on('click', '.github-search li', function(e) {
         var $gitHubUser = $(e.currentTarget),
             gitHubUser = {
                 username: $gitHubUser.find('.username').text(),
@@ -116,13 +126,7 @@ $(document).ready(function() {
                 language: $gitHubUser.find('.language').text(),
                 followers: $gitHubUser.find('.followers').text()
             };
-        server.search(gitHubUser).then(renderResult);
+        server.overview(gitHubUser).then(renderResult);
         server.progress(gitHubUser, updateProgress(server.close));
-    });
-
-    dom.$submit.on('click', function(e) {
-        e.preventDefault();
-        var keywords = dom.$preSearch.val();
-        server.preSearch(keywords).then(renderGitHubUsers);
     });
 });

@@ -1,8 +1,9 @@
 @()
 
-<script id="github_presearch_tmpl" type="text/html">
-  <div class="github-presearch">
-    <h3>GitHub</h3>
+<script id="github-search-tmpl" type="text/html">
+  <div class="github-search">
+    <h2>Step 2 - Select a GitHub user</h2>
+    <progress value="0" max="100" />
     <ul>
       <% _(gitHubUsers).each(function(gitHubUser) { %>
       <li>
@@ -16,8 +17,8 @@
   </div>
 </script>
 
-<script id="github_search_tmpl" type="text/html">
-  <div class="github-search">
+<script id="github-result-tmpl" type="text/html">
+  <div class="github-result">
     <h3>GitHub</h3>
     <ul>
       <% _(repositories).each(function(repository) { %>

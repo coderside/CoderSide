@@ -23,7 +23,7 @@ object Application extends Controller {
     Ok(views.html.index())
   }
 
-  def preSearch(keywords: String) = Action {
+  def search(keywords: String) = Action {
     import GitHubAPI._
     Logger.debug("[Application] Pre-searching coder guy")
     Async {
@@ -35,7 +35,7 @@ object Application extends Controller {
     }
   }
 
-  def search(username: String, fullname: String, language: String, followers: Int) = Action {
+  def overview(username: String, fullname: String, language: String, followers: Int) = Action {
     Logger.debug("[Application] Searching coder guy")
     val gitHubUser = GitHubUser(username, fullname, language, followers)
     implicit val timeout = Timeout(20.seconds)
