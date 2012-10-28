@@ -4,20 +4,18 @@
 
 $(document).ready(function() {
     var dom = {
-        $search: $('.content .search'),
-        $gitHubSearch: function() { return $('.content .github-search'); },
-        $gitHubUsers: $('.content .github-users'),
-        $keywords: $('.content .search form input[type=search]'),
-        $progress: function() { return $('.content progress'); },
-        $submit: $('.content form button'),
-        $result: $('.content .result')
+        $step1 : $('#step-1'),
+        $step2 : $('#step-2'),
+        $step3 : $('#step-3'),
+        $content: $('#content'),
+        $keywords: function() { return $('#content #step-1 form input[type=search]'); },
+        $progress: function() { return $('#content progress'); }
     };
 
     var tmpl = {
-        search : {
-            github: _.template($("#github-search-tmpl").html())
-        },
-        result : {
+        gitHubSearch: _.template($("#github-search-tmpl").html()),
+        gitHubUsers: _.template($("#github-users-tmpl").html()),
+        result: {
             twitter: _.template($("#twitter-result-tmpl").html()),
             github: _.template($("#github-result-tmpl").html()),
             klout: _.template($("#klout-result-tmpl").html()),
@@ -25,29 +23,36 @@ $(document).ready(function() {
         }
     };
 
+    /**
+     * Views
+     */
+    var renderGitHubSearch = function() {
+        dom.$step1.html(tmpl.gitHubSearch({
+        }));
+    };
+
     var renderGitHubUsers = function(gitHubUsers) {
-        dom.$gitHubSearch().remove();
-        dom.$search.append(tmpl.search.github({
+        dom.$step2.html(tmpl.gitHubUsers({
             gitHubUsers: gitHubUsers
         }));
     };
 
     var renderResult = function(coderGuy) {
-        dom.$result.empty();
-        dom.$result.append(tmpl.result.linkedin({
+        dom.$step3.empty();
+        dom.$step3.append(tmpl.result.linkedin({
             user: coderGuy.linkedInUser
         }));
 
-        dom.$result.append(tmpl.result.github({
+        dom.$step3.append(tmpl.result.github({
             repositories: coderGuy.repositories
         }));
 
-        dom.$result.append(tmpl.result.twitter({
+        dom.$step3.append(tmpl.result.twitter({
             user: coderGuy.twitterUser,
             timeline: coderGuy.twitterTimeline
         }));
 
-        dom.$result.append(tmpl.result.klout({
+        dom.$step3.append(tmpl.result.klout({
             influencers: coderGuy.influencers,
             influencees: coderGuy.influencees
         }));
@@ -62,6 +67,9 @@ $(document).ready(function() {
         };
     };
 
+    /**
+     * Server requests.
+     */
     var server = new (function() {
         var self = this;
         this.eventSource = null;
@@ -103,22 +111,25 @@ $(document).ready(function() {
         };
     })();
 
-    dom.$search.on('keydown', function(e) {
+    /**
+     * DOM bindings.
+     */
+    dom.$content.on('keydown', '#step-1 .github-search input[type=search]', function(e) {
         var isEnterKey = function(key) { return key === 13; };
         if(isEnterKey(e.which)) {
             e.preventDefault();
-            var keywords = dom.$keywords.val();
-            server.search(keywords).then(renderGitHubUsers);
+            var keywords = dom.$keywords().val();
+            server.search(keywords).then(renderGitHubUsers).then(slider.next);
         }
     });
 
-    dom.$submit.on('click', function(e) {
+    dom.$content.on('click', '#step-1 .github-search button', function(e) {
         e.preventDefault();
-        var keywords = dom.$keywords.val();
-        server.search(keywords).then(renderGitHubUsers);
+        var keywords = dom.$keywords().val();
+        server.search(keywords).then(renderGitHubUsers).then(slider.next);
     });
 
-    dom.$search.on('click', '.github-search li', function(e) {
+    dom.$content.on('click', '#step-2 .github-users li', function(e) {
         var $gitHubUser = $(e.currentTarget),
             gitHubUser = {
                 username: $gitHubUser.find('.username').text(),
@@ -126,7 +137,13 @@ $(document).ready(function() {
                 language: $gitHubUser.find('.language').text(),
                 followers: $gitHubUser.find('.followers').text()
             };
-        server.overview(gitHubUser).then(renderResult);
+        server.overview(gitHubUser).then(renderResult).then(slider.next);
         server.progress(gitHubUser, updateProgress(server.close));
     });
+
+    /**
+     * Starting app
+     */
+    renderGitHubSearch();
+    var slider = new Slider();
 });
