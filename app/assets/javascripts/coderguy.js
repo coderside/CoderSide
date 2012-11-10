@@ -26,6 +26,11 @@ $(document).ready(function() {
     /**
      * Views
      */
+    var loadings = {
+        github: function() {
+        }
+    };
+
     var renderGitHubSearch = function() {
         dom.$step1.html(tmpl.gitHubSearch({
         }));

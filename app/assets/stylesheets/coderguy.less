@@ -2,12 +2,24 @@
     position: relative;
 
     .step {
+        text-align: center;
         padding: 10px;
-        width: 95%;
+        width: 100%;
         position: absolute;
-        top: 0;
-        left: 0;
-        border: 1px solid black;
+    }
+
+    #step-1 {
+        input[type=search] {
+            vertical-align: -2px;
+            width: 30%;
+            height: 40px;
+            border-radius: 7px;
+            font-size: 1.2em;
+        }
+
+        button {
+            margin-left: 12px;
+        }
     }
 
     .search {
@@ -15,8 +27,4 @@
             cursor: pointer;
         }
     }
-}
-
-footer {
-    margin-top: 25px;
 }
