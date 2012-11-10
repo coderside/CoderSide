@@ -24,16 +24,43 @@ $(document).ready(function() {
     };
 
     /**
-     * Views
+     * Spinner
      */
-    var loadings = {
-        github: function() {
-        }
+    var Loader = function(target) {
+        var $target = $(target);
+        var spinner = new Spinner({
+            lines: 9,
+            length: 7,
+            width: 3,
+            radius: 10,
+            corners: 1,
+            rotate: 0,
+            color: '#000',
+            speed: 1,
+            trail: 60,
+            shadow: false,
+            hwaccel: false,
+            className: 'spinner',
+            zIndex: 2e9,
+            top: 'auto',
+            left: 'auto'
+        });
+
+        this.show = function() {
+            spinner.spin($target[0]);
+        };
+
+        this.hide = function() {
+            $target.find('.spinner').remove();
+        };
     };
 
+    /**
+     * Views
+     */
+
     var renderGitHubSearch = function() {
-        dom.$step1.html(tmpl.gitHubSearch({
-        }));
+        dom.$step1.html(tmpl.gitHubSearch({}));
     };
 
     var renderGitHubUsers = function(gitHubUsers) {
@@ -124,7 +151,9 @@ $(document).ready(function() {
         if(isEnterKey(e.which)) {
             e.preventDefault();
             var keywords = dom.$keywords().val();
-            server.search(keywords).then(renderGitHubUsers).then(slider.next);
+            var loader = new Loader('.loading');
+            loader.show();
+            server.search(keywords).then(renderGitHubUsers).then(slider.next).then(loader.hide);
         }
     });
 
