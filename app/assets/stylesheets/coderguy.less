@@ -3,7 +3,6 @@
 
     .step {
         text-align: center;
-        padding: 10px;
         width: 100%;
         position: absolute;
     }
@@ -27,9 +26,79 @@
         }
     }
 
-    .search {
-        .github-search li {
+    #step-2 {
+        .progress-container {
+            height: 50px;
+
+            .progress {
+                height: 100%;
+                width: 0%;
+                background: #62B847;
+            }
+        }
+        .github-users li {
+            padding: 5px;
             cursor: pointer;
+            border-bottom: 1px solid grey;
+
+            span {
+                padding: 2px;
+            }
+
+            .fullname {
+                font-weight: bold;
+            }
+
+            &:nth-child(even) {
+                background-color: #F3F3F3;
+            }
+
+            &:hover {
+                background-color: #F0F7FC;
+            }
+        }
+    }
+
+    #step-3 {
+        text-align: left;
+        dl {
+            margin: auto;
+            width: 50%;
+            dt, dd {
+                padding: 2px;
+                width: 49%;
+                display: inline-block;
+            }
+        }
+
+        .linkedin-result {
+            padding: 10px;
+            color: whitesmoke;
+            background: #83A9BD;
+            font-weight: bold;
+            overflow: hidden;
+
+            img {
+                float: left;
+            }
+        }
+
+        .github-result {
+            padding: 10px;
+            background: #E7E7E7;
+
+            dl {
+                width: 50%;
+            }
+        }
+
+        .twitter-result {
+            background-color: #FFF9EA;
+
+            .pure-tweets {
+                width: 60%;
+                margin: auto;
+            }
         }
     }
 }

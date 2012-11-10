@@ -1,18 +1,16 @@
 @()
 
 <script id="twitter-result-tmpl" type="text/html">
-  <div class="twitter">
+  <div class="twitter-result">
     <h3>Twitter</h3>
     <% if(user) { %>
     <dl>
-      <dt>Name</dt><dd><%= user.name %></dd>
       <dt>Screen name</dt><dd><%= user.screenName %></dd>
       <dt>Description</dt><dd><%= user.description %></dd>
       <dt>Followers</dt><dd><%= user.followers %></dd>
     </dl>
     <% } %>
     <hr/>
-    <h4>Timeline</h4>
     <% if(timeline) { %>
     <ul class="pure-tweets">
       <% _(timeline.tweets).each(function(tweet) { %>

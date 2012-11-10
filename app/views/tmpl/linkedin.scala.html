@@ -2,10 +2,9 @@
 
 <script id="linkedin-result-tmpl" type="text/html">
   <div class="linkedin-result">
-    <h3>LinkedIn</h3>
     <% if(user) { %>
+    <img src="<%= user.pictureUrl %>" />
     <dl>
-      <img src="<%= user.pictureUrl %>" />
       <dt>First name</dt><dd><%= user.firstname %></dd>
       <dt>Last name</dt><dd><%= user.lastname %></dd>
       <dt>Headline</dt><dd><%= user.headline %></dd>

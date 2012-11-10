@@ -8,8 +8,8 @@ $(document).ready(function() {
         $step2 : $('#step-2'),
         $step3 : $('#step-3'),
         $content: $('#content'),
-        $keywords: function() { return $('#content #step-1 form input[type=search]'); },
-        $progress: function() { return $('#content progress'); }
+        $keywords: function() { return $('#content #step-1 .github-search input[type=search]'); },
+        $progress: function() { return $('#content #step-2 .github-users .progress'); }
     };
 
     var tmpl = {
@@ -92,7 +92,7 @@ $(document).ready(function() {
 
     var updateProgress = function(onStop) {
         return function(event) {
-            dom.$progress().val(event.data);
+            dom.$progress().css('width', event.data + '%');
             if(event.data == 100) {
                 onStop();
             }
@@ -166,7 +166,7 @@ $(document).ready(function() {
     dom.$content.on('click', '#step-2 .github-users li', function(e) {
         var $gitHubUser = $(e.currentTarget),
             gitHubUser = {
-                username: $gitHubUser.find('.username').text(),
+                username: $gitHubUser.find('.username a').text(),
                 fullname: $gitHubUser.find('.fullname').text(),
                 language: $gitHubUser.find('.language').text(),
                 followers: $gitHubUser.find('.followers').text()

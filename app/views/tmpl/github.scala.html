@@ -12,15 +12,20 @@
 
 <script id="github-users-tmpl" type="text/html">
   <div class="github-users">
-    <h2>Step 2 - Select a GitHub user</h2>
-    <progress value="0" max="100" />
+    <div class="progress-container">
+      <div class="progress"></div>
+    </div>
     <ul>
       <% _(gitHubUsers).each(function(gitHubUser) { %>
       <li>
-        <span class="username"><%= gitHubUser.username %></span>
-        <span class="fullname"><%= gitHubUser.fullname %></span>
-        <span class="language"><%= gitHubUser.language %></span>
-        <span class="followers"><%= gitHubUser.followers %></span>
+        <div><span class="fullname"><%= gitHubUser.fullname %></span></div>
+        <div>
+          <span class="username">
+            <a href="http://github.com/<%= gitHubUser.username %>"><%= gitHubUser.username %></a>
+          </span>
+        </div>
+        <div><span class="language"><%= gitHubUser.language %></span> guy</div>
+        <div><span class="followers"><%= gitHubUser.followers %></span> followers</div>
       </li>
       <% }) %>
     </ul>
@@ -29,15 +34,12 @@
 
 <script id="github-result-tmpl" type="text/html">
   <div class="github-result">
-    <h3>GitHub</h3>
-    <ul>
+    <h3>Github repositories</h3>
+    <dl>
       <% _(repositories).each(function(repository) { %>
-      <li>
-        <a href="<%= repository.url %>"><%= repository.name %></a>
-        <span><%= repository.description %></span>
-        <span><%= repository.language %></span>
-      </li>
+      <dt><a href="<%= repository.url %>"><%= repository.name %></a></dt>
+      <dd><%= repository.description %></dd>
       <% }) %>
-    </ul>
+    </dl>
   </div>
 </script>
