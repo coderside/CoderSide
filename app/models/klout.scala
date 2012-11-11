@@ -10,8 +10,9 @@ import play.api.libs.json.util._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import models.twitter.TwitterUser
 import utils.Config
+import models.URLEncoder
 
-object KloutAPI {
+object KloutAPI extends URLEncoder {
 
   implicit val readUser: Reads[KloutUser] = {
     (
@@ -35,7 +36,7 @@ object KloutAPI {
   }
 
   def topics(kloutID: String): Future[Set[String]] = {
-    val uri = "http://api.klout.com/v2/user.json/%s/topics".format(kloutID)
+    val uri = "http://api.klout.com/v2/user.json/%s/topics".format(encode(kloutID))
     WS.url(uri)
       .withQueryString("key" -> Config.klout.key)
       .get().map { response =>
@@ -44,7 +45,7 @@ object KloutAPI {
   }
 
   def influence(kloutID: String): Future[Influence] = {
-    val uri = "http://api.klout.com/v2/user.json/%s/influence".format(kloutID)
+    val uri = "http://api.klout.com/v2/user.json/%s/influence".format(encode(kloutID))
     WS.url(uri)
       .withQueryString("key" -> Config.klout.key)
       .get().map(_.json).map { influence =>

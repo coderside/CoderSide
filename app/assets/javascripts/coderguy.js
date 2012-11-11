@@ -9,7 +9,12 @@ $(document).ready(function() {
         $step3 : $('#step-3'),
         $content: $('#content'),
         $keywords: function() { return $('#content #step-1 .github-search input[type=search]'); },
-        $progress: function() { return $('#content #step-2 .github-users .progress'); }
+        $progress: function() { return $('#content #step-2 .github-users .progress'); },
+        resizeContent: function($container) {
+            return function() {
+                $('#content').height($container.height());
+            };
+        }
     };
 
     var tmpl = {
@@ -153,14 +158,22 @@ $(document).ready(function() {
             var keywords = dom.$keywords().val();
             var loader = new Loader('.loading');
             loader.show();
-            server.search(keywords).then(renderGitHubUsers).then(slider.next).then(loader.hide);
+            server.search(keywords).then(renderGitHubUsers)
+                                   .then(dom.resizeContent(dom.$step2))
+                                   .then(slider.next)
+                                   .then(loader.hide);
         }
     });
 
     dom.$content.on('click', '#step-1 .github-search button', function(e) {
         e.preventDefault();
         var keywords = dom.$keywords().val();
-        server.search(keywords).then(renderGitHubUsers).then(slider.next);
+        var loader = new Loader('.loading');
+        loader.show();
+        server.search(keywords).then(renderGitHubUsers)
+                               .then(dom.resizeContent(dom.$step2))
+                               .then(slider.next)
+                               .then(loader.hide);
     });
 
     dom.$content.on('click', '#step-2 .github-users li', function(e) {
@@ -171,7 +184,9 @@ $(document).ready(function() {
                 language: $gitHubUser.find('.language').text(),
                 followers: $gitHubUser.find('.followers').text()
             };
-        server.overview(gitHubUser).then(renderResult).then(slider.next);
+        server.overview(gitHubUser).then(renderResult)
+                                   .then(dom.resizeContent(dom.$step3))
+                                   .then(slider.next);
         server.progress(gitHubUser, updateProgress(server.close));
     });
 

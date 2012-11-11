@@ -2,7 +2,6 @@ package models.twitter
 
 import scala.concurrent.Future
 import scala.concurrent.future
-import java.net.URLEncoder
 import java.util.Date
 import java.text.SimpleDateFormat
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -12,8 +11,9 @@ import play.api.libs.json.Reads._
 import play.api.libs.json.util._
 import play.api.libs.oauth.{ OAuthCalculator, ConsumerKey, RequestToken }
 import utils.Config
+import models.URLEncoder
 
-object TwitterAPI {
+object TwitterAPI extends URLEncoder {
 
   val signatureCalc = OAuthCalculator(
     ConsumerKey(Config.twitter.consumerKey, Config.twitter.consumerSecret),
@@ -40,7 +40,7 @@ object TwitterAPI {
   }
 
   def searchByFullname(fullname: String): Future[Set[TwitterUser]] = {
-    WS.url("https://api.twitter.com/1/users/search.json?q=" + URLEncoder.encode(fullname, "UTF-8"))
+    WS.url("https://api.twitter.com/1/users/search.json?q=" + encode(fullname))
    .sign(signatureCalc)
    .get().map(_.json).map {
        case JsArray(users) => users.flatMap { user =>
@@ -62,9 +62,8 @@ object TwitterAPI {
 
   def timeline(twitterID: String): Future[Option[TwitterTimeline]] = {
     val dateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss Z yyyy")
-    val id = URLEncoder.encode(twitterID, "UTF-8")
-    val uri = "https://api.twitter.com/1.1/statuses/user_timeline.json?user_id=%s&screen_name=%s"
-              .format(id, id)
+    val id = encode(twitterID)
+    val uri = "https://api.twitter.com/1.1/statuses/user_timeline.json?user_id=%s&screen_name=%s".format(id, id)
 
     WS.url(uri)
       .sign(signatureCalc)

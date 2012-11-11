@@ -7,9 +7,9 @@ import play.api.libs.ws._
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.json.util._
-import java.net.URLEncoder
+import models.URLEncoder
 
-object GitHubAPI {
+object GitHubAPI extends URLEncoder {
 
   implicit val readUser: Reads[GitHubUser] = {
     (
@@ -43,7 +43,7 @@ object GitHubAPI {
   }
 
   def searchByFullname(fullname: String): Future[Set[GitHubUser]] = {
-    WS.url("https://api.github.com/legacy/user/search/" + URLEncoder.encode(fullname, "UTF-8"))
+    WS.url("https://api.github.com/legacy/user/search/" + encode(fullname))
    .get().map(_.json \ "users").map {
        case JsArray(users) => users.flatMap { user =>
          readUser.reads(user).asOpt
@@ -53,7 +53,7 @@ object GitHubAPI {
   }
 
   def repositories(username: String): Future[Set[GitHubRepository]] = {
-    WS.url("https://api.github.com/users/%s/repos".format(URLEncoder.encode(username, "UTF-8")))
+    WS.url("https://api.github.com/users/%s/repos".format(encode(username)))
    .get().map(_.json).map {
      case JsArray(reps) => reps.flatMap { rep =>
        readRepository.reads(rep).asOpt
