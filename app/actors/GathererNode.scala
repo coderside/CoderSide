@@ -1,7 +1,6 @@
 package actors
 
 import akka.actor.{ Actor, ActorRef, ActorLogging }
-import scala.concurrent.util.duration._
 import play.api.libs.iteratee.Concurrent
 import models.CoderGuy
 import Messages._

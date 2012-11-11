@@ -5,7 +5,7 @@ import scala.concurrent.future
 import java.net.URLEncoder
 import java.util.Date
 import java.text.SimpleDateFormat
-import play.api.libs.concurrent.execution.defaultContext
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.ws._
 import play.api.libs.json._
 import play.api.libs.json.Reads._

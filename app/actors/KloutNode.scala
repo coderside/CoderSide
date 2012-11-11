@@ -1,10 +1,9 @@
 package actors
 
 import scala.concurrent.Future
-import scala.concurrent.util.duration._
 import scala.util.{ Success, Failure }
 import akka.actor.{ Actor, ActorRef, ActorLogging }
-import play.api.libs.concurrent.execution.defaultContext
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.concurrent.Promise
 import models.klout._
 import models.twitter._

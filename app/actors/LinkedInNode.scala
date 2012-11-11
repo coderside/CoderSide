@@ -1,9 +1,8 @@
 package actors
 
-import scala.concurrent.util.duration._
 import scala.util.{ Success, Failure }
 import akka.actor.{ Actor, ActorRef, ActorLogging }
-import play.api.libs.concurrent.execution.defaultContext
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import models.linkedin._
 import Messages._
 

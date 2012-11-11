@@ -3,7 +3,7 @@ package models.linkedin
 import scala.concurrent.Future
 import scala.concurrent.future
 import java.net.URLEncoder
-import play.api.libs.concurrent.execution.defaultContext
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.ws._
 import play.api.libs.json._
 import play.api.libs.json.Reads._

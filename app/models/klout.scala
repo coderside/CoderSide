@@ -7,7 +7,7 @@ import play.api.libs.ws._
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.json.util._
-import play.api.libs.concurrent.execution.defaultContext
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import models.twitter.TwitterUser
 import utils.Config
 

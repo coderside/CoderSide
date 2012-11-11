@@ -1,11 +1,11 @@
 package actors
 
 import scala.util.{ Success, Failure }
-import scala.concurrent.util.duration._
+import scala.concurrent.duration._
 import akka.actor.{ Actor, ActorRef, Props, ActorLogging }
 import akka.pattern.ask
 import akka.util.Timeout
-import play.api.libs.concurrent.execution.defaultContext
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.iteratee.Enumerator
 import models.github.GitHubUser
 import Messages._
@@ -37,7 +37,7 @@ class HeadNode() extends Actor with ActorLogging {
     }
 
     case AskProgress(gitHubUser) => {
-      implicit val timeout = Timeout(20.seconds)
+      implicit val timeout = Timeout(20 seconds)
       val s = sender
       log.debug("[HeadNode] AskProgress received")
       def requestProgress(retries: Int) {
