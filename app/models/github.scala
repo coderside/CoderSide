@@ -52,12 +52,12 @@ object GitHubAPI extends URLEncoder {
     }
   }
 
-  def repositories(username: String): Future[Set[GitHubRepository]] = {
+  def repositories(username: String): Future[List[GitHubRepository]] = {
     WS.url("https://api.github.com/users/%s/repos".format(encode(username)))
    .get().map(_.json).map {
      case JsArray(reps) => reps.flatMap { rep =>
        readRepository.reads(rep).asOpt
-     }.toSet
+     }.toList
      case r => throw new GitHubApiException("Failed getting repositories for : " + username)
     }
   }

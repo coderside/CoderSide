@@ -26,7 +26,7 @@ class KloutNode extends Actor with ActorLogging {
       log.debug("[KloutNode] Getting profil influence")
       KloutAPI.influence(kloutID).onComplete {
         case Success(Influence(influencers, influencees)) => {
-          def splitInfluence(influence: Set[TwitterUser]) = {
+          def splitInfluence(influence: List[TwitterUser]) = {
             influence.partition(twitterUser => influencers.find(_.nick == twitterUser.screenName).isDefined)
           }
           Promise.sequence(

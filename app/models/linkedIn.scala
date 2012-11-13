@@ -28,7 +28,7 @@ object LinkedInAPI extends URLEncoder {
     )(LinkedInUser)
   }
 
-  def searchByFullname(firstname: String, lastname: String): Future[Set[LinkedInUser]] = {
+  def searchByFullname(firstname: String, lastname: String): Future[List[LinkedInUser]] = {
 
     val uri = "http://api.linkedin.com/v1/people-search:(people:(headline,first-name,last-name,id,picture-url))"
     val params = "?first-name=%s&last-name=%s&sort=connections&format=json".format(encode(firstname), encode(lastname))
@@ -38,7 +38,7 @@ object LinkedInAPI extends URLEncoder {
    .get().map(_.json \ "people" \ "values").map {
        case JsArray(users) => users.flatMap { user =>
          readUser.reads(user).asOpt
-       }.toSet
+       }.toList
        case _ => throw new LinkedInApiException("Failed seaching linkedIn user by fullname : " + firstname + " " + lastname)
     }
   }

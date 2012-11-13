@@ -43,12 +43,12 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
     case CheckResult => if(waited == 0) {
       log.info("[GathererNode] Gathering done !")
       val coderGuy = CoderGuy(
-        gitHubResult map(gr => gr.repositories) getOrElse Set.empty,
+        gitHubResult map(gr => gr.repositories) getOrElse Nil,
         linkedInResult.map(lr => lr.profil),
         twitterResult.map(tr => tr.profil),
         twitterResult.map(tr => tr.timeline),
-        kloutResult map(kr => kr.influencers) getOrElse Set.empty,
-        kloutResult map(kr => kr.influencees) getOrElse Set.empty
+        kloutResult map(kr => kr.influencers) getOrElse Nil,
+        kloutResult map(kr => kr.influencees) getOrElse Nil
       )
       clients.foreach(client => client ! coderGuy)
       headNode ! End(self)

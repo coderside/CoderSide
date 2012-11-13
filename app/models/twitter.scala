@@ -12,6 +12,7 @@ import play.api.libs.json.util._
 import play.api.libs.oauth.{ OAuthCalculator, ConsumerKey, RequestToken }
 import utils.Config
 import models.URLEncoder
+import models.github.GitHubUser
 
 object TwitterAPI extends URLEncoder {
 
@@ -39,25 +40,25 @@ object TwitterAPI extends URLEncoder {
     ) tupled
   }
 
-  def searchByFullname(fullname: String): Future[Set[TwitterUser]] = {
+  def searchByFullname(fullname: String): Future[List[TwitterUser]] = {
     WS.url("https://api.twitter.com/1/users/search.json?q=" + encode(fullname))
-   .sign(signatureCalc)
-   .get().map(_.json).map {
-       case JsArray(users) => users.flatMap { user =>
-         readUser.reads(user).asOpt
-       }.toSet
-       case _ => throw new TwitterApiException("Failed seaching twitter user by fullname : " + fullname)
+    .sign(signatureCalc)
+    .get().map(_.json).map {
+      case JsArray(users) => users.flatMap { user =>
+        readUser.reads(user).asOpt
+                                          }.toList
+      case _ => throw new TwitterApiException("Failed seaching twitter user by fullname : " + fullname)
     }
   }
 
   def show(twitterID: String): Future[Option[TwitterUser]] = {
     WS.url("https://api.twitter.com/1/users/show.json")
-   .withQueryString(
-     "user_id" -> twitterID,
-     "screen_name" -> twitterID
-   )
-   .sign(signatureCalc)
-   .get().map(response => readUser.reads(response.json).asOpt)
+    .withQueryString(
+      "user_id" -> twitterID,
+      "screen_name" -> twitterID
+    )
+    .sign(signatureCalc)
+    .get().map(response => readUser.reads(response.json).asOpt)
   }
 
   def timeline(twitterID: String): Future[Option[TwitterTimeline]] = {
@@ -66,24 +67,58 @@ object TwitterAPI extends URLEncoder {
     val uri = "https://api.twitter.com/1.1/statuses/user_timeline.json?user_id=%s&screen_name=%s".format(id, id)
 
     WS.url(uri)
-      .sign(signatureCalc)
-      .get().map(_.json).map {
-        case JsArray(tweets) => Some(TwitterTimeline(
-          tweets.flatMap { tweetOpt =>
-            readTweet.reads(tweetOpt).asOpt.map {
-              case (text, createdAt, retweeted, inReplyToStatus, inReplyToUser) =>
-                Tweet(text, dateFormat.parse(createdAt), retweeted, inReplyToStatus.isDefined, inReplyToUser.isDefined)
-            }
-          }.toSet
-        ))
-        case _ => None
-      }
+    .sign(signatureCalc)
+    .get().map(_.json).map {
+      case JsArray(tweets) => Some(TwitterTimeline(
+        tweets.flatMap { tweetOpt =>
+          readTweet.reads(tweetOpt).asOpt.map {
+            case (text, createdAt, retweeted, inReplyToStatus, inReplyToUser) =>
+              Tweet(text, dateFormat.parse(createdAt), retweeted, inReplyToStatus.isDefined, inReplyToUser.isDefined)
+          }
+                      }.toList
+      ))
+      case _ => None
+    }
   }
 }
 
-case class TwitterTimeline(tweets: Set[Tweet]) {
-  lazy val retweets: Set[Tweet] = tweets.filter(_.retweeted)
-  lazy val pureTweets: Set[Tweet] = tweets.filter(t => !t.inReplyToUser)
+case class TwitterTimeline(tweets: List[Tweet]) {
+  lazy val retweets: List[Tweet] = tweets.filter(_.retweeted)
+  lazy val pureTweets: List[Tweet] = tweets.filter(t => !t.inReplyToUser)
+}
+
+object Twitter {
+
+  def matchUser(gitHubUser: GitHubUser, twitterUsers: List[TwitterUser]): Option[TwitterUser] = {
+
+    val matchPseudo = (user: TwitterUser)      => user.screenName.toLowerCase.trim == gitHubUser.username.toLowerCase.trim
+    def containsLanguage = (user: TwitterUser) => user.description.toLowerCase.contains(gitHubUser.language)
+    def containsGitHub = (user: TwitterUser)   => user.description.toLowerCase.contains("github")
+    val matchFullname = (user: TwitterUser) => {
+      val gitHubName = gitHubUser.fullname.toLowerCase.trim
+      user.name.toLowerCase.trim ==  gitHubName ||
+      user.name.split(" ").reverse.mkString(" ").toLowerCase.trim == gitHubName
+    }
+
+    val conditions = List(
+      matchFullname    -> 40,
+      matchPseudo      -> 40,
+      containsLanguage -> 10,
+      containsGitHub   -> 10
+    )
+
+    def scoring(user: TwitterUser, score: Int, tests: List[((TwitterUser) => Boolean, Int)]): Int = {
+      tests match {
+        case Nil => score
+        case (test, points) :: tail if test(user) => scoring(user, score + points, tail)
+        case head :: tail => scoring(user, score, tail)
+      }
+    }
+
+    twitterUsers.map { twitterUser =>
+      twitterUser -> scoring(twitterUser, 0, conditions)
+    }.sortBy (_._2).lastOption.map(_._1)
+  }
 }
 
 case class Tweet(text: String, createdAt: Date, retweeted: Boolean, inReplyToUser: Boolean, inReplyToStatus: Boolean)

@@ -21,11 +21,11 @@ object Messages {
   //Klout to Klout
   case class KloutUserQuery(kloutID: String, gathererRef: ActorRef)
   //GitHub to Gatherer
-  case class GitHubResult(repositories: Set[GitHubRepository])
+  case class GitHubResult(repositories: List[GitHubRepository])
   //LinkedIn to Gatherer
   case class LinkedInResult(profil: LinkedInUser)
   //Klout to Gatherer
-  case class KloutResult(influencers: Set[TwitterUser], influencees: Set[TwitterUser])
+  case class KloutResult(influencers: List[TwitterUser], influencees: List[TwitterUser])
   //Twitter to Gatherer
   case class TwitterResult(profil: TwitterUser, timeline: TwitterTimeline)
   //Twitter to Twitter

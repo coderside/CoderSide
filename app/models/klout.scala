@@ -35,12 +35,12 @@ object KloutAPI extends URLEncoder {
       }
   }
 
-  def topics(kloutID: String): Future[Set[String]] = {
+  def topics(kloutID: String): Future[List[String]] = {
     val uri = "http://api.klout.com/v2/user.json/%s/topics".format(encode(kloutID))
     WS.url(uri)
       .withQueryString("key" -> Config.klout.key)
       .get().map { response =>
-        (response.json \\ "displayName").flatMap(topic => topic.asOpt[String]).toSet
+        (response.json \\ "displayName").flatMap(topic => topic.asOpt[String]).toList
     }
   }
 
@@ -51,15 +51,15 @@ object KloutAPI extends URLEncoder {
       .get().map(_.json).map { influence =>
         val influencers = (influence \ "myInfluencers" \\ "entity").flatMap { influencer =>
           readUser.reads(influencer).asOpt
-        }.toSet
+        }.toList
         val influencees = (influence \ "myInfluencees" \\ "entity").flatMap { influencee =>
           readUser.reads(influencee).asOpt
-        }.toSet
+        }.toList
         Influence(influencers, influencees)
     }
   }
 }
 
 case class KloutUser(id: String, nick: String, score: Double)
-case class Influence(influencers: Set[KloutUser], influencees: Set[KloutUser])
+case class Influence(influencers: List[KloutUser], influencees: List[KloutUser])
 case class KloutApiException(message: String) extends Exception

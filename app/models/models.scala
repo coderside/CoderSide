@@ -6,12 +6,12 @@ import models.linkedin._
 import models.klout._
 
 case class CoderGuy(
-  repositories: Set[GitHubRepository],
+  repositories: List[GitHubRepository],
   linkedInUser: Option[LinkedInUser],
   twitterUser: Option[TwitterUser],
   twitterTimeline: Option[TwitterTimeline],
-  influencers: Set[TwitterUser],
-  influencees: Set[TwitterUser]
+  influencers: List[TwitterUser],
+  influencees: List[TwitterUser]
 ) {
   val hasTwitterAccount = twitterUser.isDefined
   val hasLinkedInAccont = linkedInUser.isDefined
