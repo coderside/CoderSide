@@ -88,9 +88,7 @@ case class TwitterTimeline(tweets: List[Tweet]) {
 }
 
 object Twitter {
-
   def matchUser(gitHubUser: GitHubUser, twitterUsers: List[TwitterUser]): Option[TwitterUser] = {
-
     val matchPseudo = (user: TwitterUser)      => user.screenName.toLowerCase.trim == gitHubUser.username.toLowerCase.trim
     def containsLanguage = (user: TwitterUser) => user.description.toLowerCase.contains(gitHubUser.language)
     def containsGitHub = (user: TwitterUser)   => user.description.toLowerCase.contains("github")

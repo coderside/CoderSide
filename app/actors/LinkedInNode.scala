@@ -11,8 +11,10 @@ class LinkedInNode extends Actor with ActorLogging {
     case NodeQuery(gitHubUser, gathererRef) => {
       log.debug("[LinkedInNode] receiving new head query")
       LinkedInAPI.searchByFullname(gitHubUser.firstname, gitHubUser.lastname).onComplete {
-        case Success(profils) if(profils.size > 0) => gathererRef ! LinkedInResult(profils.head)
-        case Success(profils) if(profils.size == 0) => gathererRef ! NotFound
+        case Success(Nil)  => gathererRef ! NotFound
+        case Success(profils) => LinkedIn.matchUser(gitHubUser, profils) foreach { found =>
+          gathererRef ! LinkedInResult(found)
+        }
         case Failure(e) => {
           log.error("[LinkedInNode] Error while fetching repositories")
           gathererRef ! ErrorQuery(e)
