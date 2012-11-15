@@ -10,6 +10,7 @@ case class CoderGuy(
   linkedInUser: Option[LinkedInUser],
   twitterUser: Option[TwitterUser],
   twitterTimeline: Option[TwitterTimeline],
+  kloutUser: Option[KloutUser],
   influencers: List[TwitterUser],
   influencees: List[TwitterUser]
 ) {
@@ -93,6 +94,7 @@ object CoderGuy {
         "linkedInUser"    -> cg.linkedInUser,
         "twitterUser"     -> cg.twitterUser,
         "twitterTimeline" -> cg.twitterTimeline,
+        "kloutUser"       -> cg.kloutUser,
         "influencers"     -> cg.influencers,
         "influencees"     -> cg.influencees
       )

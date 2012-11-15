@@ -3,6 +3,11 @@
 <script id="klout-result-tmpl" type="text/html">
   <div class="klout-result">
     <h3>Klout</h3>
+    <% if(user) { %>
+    <dl>
+      <dt>Score</dt><dd><%= user.score %></dd>
+    </dl>
+    <% } %>
     <h4>Influencers</h4>
     <ul class="influencers">
       <% _(influencers).each(function(influencer) { %>

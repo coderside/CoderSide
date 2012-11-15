@@ -90,6 +90,7 @@ $(document).ready(function() {
         }));
 
         dom.$step3.append(tmpl.result.klout({
+            user: coderGuy.kloutUser,
             influencers: coderGuy.influencers,
             influencees: coderGuy.influencees
         }));

@@ -43,14 +43,15 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
     case CheckResult => if(waited == 0) {
       log.info("[GathererNode] Gathering done !")
       val coderGuy = CoderGuy(
-        gitHubResult map(gr => gr.repositories) getOrElse Nil,
-        linkedInResult.map(lr => lr.profil),
-        twitterResult.map(tr => tr.profil),
-        twitterResult.map(tr => tr.timeline),
-        kloutResult map(kr => kr.influencers) getOrElse Nil,
-        kloutResult map(kr => kr.influencees) getOrElse Nil
+        gitHubResult map (_.repositories) getOrElse Nil,
+        linkedInResult map(_.profil),
+        twitterResult map (_.profil),
+        twitterResult map (_.timeline),
+        kloutResult map (_.profil),
+        kloutResult map (_.influencers) getOrElse Nil,
+        kloutResult map (_.influencees) getOrElse Nil
       )
-      clients.foreach(client => client ! coderGuy)
+      clients foreach (_ ! coderGuy)
       headNode ! End(self)
     }
 
@@ -76,7 +77,7 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
       self ! Decrement
     }
 
-    case kr @ KloutResult(influencers, influencees) => {
+    case kr @ KloutResult(user, influencers, influencees) => {
       log.debug("[GathererNode] receiving klout influence")
       kloutResult = Some(kr)
       self ! Decrement

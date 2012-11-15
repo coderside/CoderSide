@@ -14,11 +14,19 @@ import models.URLEncoder
 
 object KloutAPI extends URLEncoder {
 
-  implicit val readUser: Reads[KloutUser] = {
+  implicit val readInfluence: Reads[KloutUser] = {
     (
       (__ \ 'payload \ 'kloutId).read[String] and
       (__ \ 'payload \ 'nick).read[String] and
       (__ \ 'payload \ 'score \ 'score).read[Double]
+    )(KloutUser)
+  }
+
+  implicit val readUser: Reads[KloutUser] = {
+    (
+      (__ \ 'kloutId).read[String] and
+      (__ \ 'nick).read[String] and
+      (__ \ 'score \ 'score).read[Double]
     )(KloutUser)
   }
 
@@ -31,6 +39,16 @@ object KloutAPI extends URLEncoder {
       .get().map { response =>
         catching(classOf[Exception]).opt(response.json).flatMap { json =>
           (json \ "id").asOpt[String]
+        }
+      }
+  }
+
+  def kloutUser(kloutID: String): Future[Option[KloutUser]] = {
+    WS.url("http://api.klout.com/v2/user.json/" + encode(kloutID))
+      .withQueryString("key" -> Config.klout.key)
+      .get().map { response =>
+        catching(classOf[Exception]).opt(response.json).flatMap { json =>
+          readUser.reads(json).asOpt
         }
       }
   }
@@ -50,10 +68,10 @@ object KloutAPI extends URLEncoder {
       .withQueryString("key" -> Config.klout.key)
       .get().map(_.json).map { influence =>
         val influencers = (influence \ "myInfluencers" \\ "entity").flatMap { influencer =>
-          readUser.reads(influencer).asOpt
+          readInfluence.reads(influencer).asOpt
         }.toList
         val influencees = (influence \ "myInfluencees" \\ "entity").flatMap { influencee =>
-          readUser.reads(influencee).asOpt
+          readInfluence.reads(influencee).asOpt
         }.toList
         Influence(influencers, influencees)
     }
