@@ -36,7 +36,7 @@ object GitHubAPI extends URLEncoder {
       (__ \ 'name).read[String] and
       (__ \ 'description).read[String] and
       (__ \ 'language).read[String] and
-      (__ \ 'url).read[String] and
+      (__ \ 'html_url).read[String] and
       (__ \ 'owner \ 'login).read[String] and
       (__ \ 'forks_count).read[Int]
     )(GitHubRepository)
