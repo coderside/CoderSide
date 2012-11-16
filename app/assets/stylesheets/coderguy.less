@@ -1,3 +1,23 @@
+.back, .next {
+    position: fixed;
+    top: 25%;
+    width: 60px;
+    height: 120px;
+    z-index: 1000;
+    cursor: pointer;
+    display: none;
+
+    &.back {
+        left: 0;
+        background: url('/assets/images/slider/back.png') no-repeat;
+    }
+
+    &.next {
+        right: 0;
+        background: url('/assets/images/slider/next.png') no-repeat 10px 0;
+    }
+}
+
 #content {
     position: relative;
 

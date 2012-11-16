@@ -4,6 +4,8 @@
 
 $(document).ready(function() {
     var dom = {
+        $back : $('.back'),
+        $next : $('.next'),
         $step1 : $('#step-1'),
         $step2 : $('#step-2'),
         $step3 : $('#step-3'),
@@ -195,5 +197,8 @@ $(document).ready(function() {
      * Starting app
      */
     renderGitHubSearch();
-    var slider = new Slider();
+    var slider = new Slider({
+        $back: dom.$back,
+        $next: dom.$next
+    });
 });

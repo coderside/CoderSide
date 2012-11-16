@@ -4,8 +4,36 @@
  */
 
 (function($, Zanimo) {
-    window.Slider = function() {
+    window.Slider = function(buttons) {
         var self = this;
+
+        if(buttons) {
+            buttons.$back.on('click', function(e) {
+                self.previous();
+            });
+
+            buttons.$next.on('click', function(e) {
+                self.next();
+            });
+        }
+
+        var atFirstPage = function() {
+            return $('.step.current').attr('id') == 'step-1';
+        };
+
+        var atLastPage = function() {
+            return $('.step.current').attr('id') == 'step-3';
+        };
+
+        var updateButtons = function() {
+            if(!atFirstPage()) {
+                buttons.$back.show();
+            } else buttons.$back.hide();
+
+            if(!atLastPage()) {
+                buttons.$next.show();
+            } else buttons.$next.hide();
+        };
 
         var viewportWidth = function() {
             if(document.width) {
@@ -36,29 +64,35 @@
         };
 
         this.next = function() {
-            self.go(self.current().next(), false);
+            self.go(self.current().next(), false, function() {
+                updateButtons();
+            });
         };
 
         this.previous = function() {
-            self.go(self.current().prev(), true);
+            self.go(self.current().prev(), true, function() {
+                updateButtons();
+            });
         };
 
-        this.go = function($target, prev) {
+        this.go = function($target, prev, callback) {
             var $current = self.current();
             $target.css('opacity', 1);
 
-            var toLeft = prev ? '' : '-';
-
+            var way = prev ? '' : '-';
             var hideCurrent = function() {
                 return Zanimo.transition(
                     $current[0],
                     'transform',
-                    'translate3d('+ toLeft + viewportWidth() + 'px, 0px, 0px)',
-                    1000
+                    'translate3d('+ way + viewportWidth() + 'px, 0px, 0px)',
+                    750
                 ).then(function(success) {
                     $current.css('opacity', 0);
                     $current.removeClass('current');
                 }, function(failed) {
+                    console.log('[Slider] An error occured white making the transition : ' + failed);
+                    $current.css('opacity', 0);
+                    $current.removeClass('current');
                 });
             };
 
@@ -67,10 +101,14 @@
                     $target[0],
                     'transform',
                     'translate3d(0px, 0px, 0px)',
-                    1000
+                    750
                 ).then(function(success) {
                     $target.addClass('current');
+                    callback();
                 }, function(failed) {
+                    console.log('[Slider] An error occured white making the transition : ' + failed);
+                    $target.addClass('current');
+                    callback();
                 });
             };
 
