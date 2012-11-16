@@ -11,7 +11,8 @@ The Needs
 The Idea
 =============
 
-Create a Web Application that give to users a full overview of one coder guy in only two clicks.
+Create a Web Application that give to users a full overview of one coder guy.
+A "full overview" means try to understand his programmer life.
 
 How does it work ?
 ==================
@@ -23,11 +24,7 @@ This application is a mashup that takes data from several others web apps:
 - Twitter : Description, number of followers, timeline
 - Klout : score, influencers, influencees and Twitter accounts of each influencers/influencees.
 
-| CoderGuy assume that the searched coder guy must have a GitHub account.
-| This is the entry point of the application.
-
-| The challenge was to find the best way to match accounts between them.
-| CoderGuy doesn't always guarantee a fully valid result.
+CoderGuy assume that the searched coder guy must have a GitHub account. This is the entry point of the application.
 
 Process
 -------------------
@@ -36,9 +33,7 @@ The process of the application is quite short & simple :
 
 1. Search on GitHub the coder guy by his full name.
 2. The search can return more than one GitHub user. You have to select the good one.
-3. | Once selected, the searching process is launch.
-   | This can take some seconds to return a result.
-   | There is a lot of requests.
+3. Once selected, the searching process is launch. This can take some seconds to return a result (there is a lot of requests).
 
 Technical solution
 ------------------
@@ -56,7 +51,7 @@ Be asynchronous
  - Chain all the requests at the same place and build the result directly with all the promises returns by the WS API. The code would be a huge block hard to deal with it.
  - Use actors (Akka) to organize the WS calls and build the final result.
 
-Off course, I select the second one.
+Of course, I select the last one.
 Here how I design the actors model :
 
 
@@ -71,7 +66,7 @@ There are several web technologies to do realtime:
  - Server Send Event (Event Stream)
  - Websocket
 
-| I don't need websocket in my case. Websocket is bidirectional.
+| I don't need websocket in my case. Websocket is bidirectional (moreover, we can't be annoyed by proxy).
 | Long pooling is unidirectional, works with old browser but not efficient at all.
 | Server Sent Event is unidirectional, works with modern browsers, and efficient.
 
@@ -81,9 +76,21 @@ NB : To keep the compatibilities with old browsers, the best solution would be t
 
 Optimization
 ````````````
-In the case where several users make the same search at the same time,
-the app launchs only one searching process but all the users are subscribed to the response & the realtime progress stream.
+In the case where several users make the same search in the same period time, the searching process is launched only once.
+I don't want computing the same searchs at the same time :
+
 
 Drawbacks
 `````````
-The optimization doesn't fully works in a clustered environnement.
+| CoderGuy does'nt work like we would want in a clustered environnment.
+| Why ?
+
+First, the optimization I talk previously does'nt fully work properly :
+
+Each node have his own state of the current searchs. To have a complete optimization, we have two choises :
+
+ - Decentralized synchronization of the state.
+ - Centralized synchronization of the state.
+
+Second , each node manage its own streams. If one node goes down, the client will lost totally his stream.
+The second node don't have any data of the first dead node.

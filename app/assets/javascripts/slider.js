@@ -30,7 +30,7 @@
                 buttons.$back.show();
             } else buttons.$back.hide();
 
-            if(!atLastPage()) {
+            if(atLastPage()) {
                 buttons.$next.show();
             } else buttons.$next.hide();
         };
