@@ -1,5 +1,10 @@
-/* Helpers */
+/* Titles */
+h1 {
+    font-size: 1.5em;
+    font-weight: bold;
+}
 
+/* Helpers */
 .gradient(@from:#000, @to:#EEE) {
     background: @from;
     background-image: -webkit-gradient(linear, left top, left bottom, from(@from), to(@to));
@@ -36,6 +41,13 @@
     width: 100px;
     height: 38px;
     padding: 0;
+
+    &.disabled {
+        .gradient(#DDD, #F8F8F8);
+        &:hover {
+            .gradient(#DDD, #F8F8F8);
+        }
+    }
 }
 
 .gray {

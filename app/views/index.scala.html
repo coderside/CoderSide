@@ -15,18 +15,21 @@
     <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/coderguy.css")">
   </head>
   <body>
-    <header>
-      <h1>CoderGuy</h1>
-    </header>
-    <div class="back"></div>
-    <section id="content">
-      <div class="step current" id="step-1"></div>
-      <div class="step" id="step-2"></div>
-      <div class="step" id="step-3"></div>
-    </section>
-    <div class="next"></div>
+    <div class="overlay-loading"></div>
+    <div class="wrapper">
+      <header>
+        <h1>CoderGuy</h1>
+      </header>
+      <div class="back"></div>
+      <section id="content">
+        <div class="step current" id="step-1"></div>
+        <div class="step" id="step-2"></div>
+        <div class="step" id="step-3"></div>
+      </section>
+      <div class="next"></div>
+    </div>
     <footer>
-      CoderGuy - 2012
+      CoderGuy - 2012 - Typesafe Contest
     </footer>
     <!-- Javascript templates -->
     @tmpl.twitter()

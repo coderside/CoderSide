@@ -1,6 +1,17 @@
+.overlay-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1001;
+    opacity: 0;
+    height: 100%;
+    width: 100%;
+    display: none;
+}
+
 .back, .next {
     position: fixed;
-    top: 25%;
+    top: 30%;
     width: 60px;
     height: 120px;
     z-index: 1000;
@@ -28,6 +39,7 @@
     }
 
     #step-1 {
+        padding-top: 15%;
         input[type=search] {
             vertical-align: 9px;
             width: 30%;
@@ -47,6 +59,7 @@
     }
 
     #step-2 {
+        padding-top: 8%;
         .progress-container {
             height: 50px;
 

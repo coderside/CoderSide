@@ -1,11 +1,11 @@
 /**
  * Slider.js
- * Just a simple slider that use zanimo.
  */
 
 (function($, Zanimo) {
     window.Slider = function(buttons) {
-        var self = this;
+        var self = this,
+            duration = 300;
 
         if(buttons) {
             buttons.$back.on('click', function(e) {
@@ -26,13 +26,15 @@
         };
 
         var updateButtons = function() {
-            if(!atFirstPage()) {
-                buttons.$back.show();
-            } else buttons.$back.hide();
+            if(buttons) {
+                if(!atFirstPage()) {
+                    buttons.$back.show();
+                } else buttons.$back.hide();
 
-            if(atLastPage()) {
-                buttons.$next.show();
-            } else buttons.$next.hide();
+                if(!atLastPage()) {
+                    buttons.$next.show();
+                } else buttons.$next.hide();
+            }
         };
 
         var viewportWidth = function() {
@@ -85,14 +87,16 @@
                     $current[0],
                     'transform',
                     'translate3d('+ way + viewportWidth() + 'px, 0px, 0px)',
-                    750
+                    duration
                 ).then(function(success) {
                     $current.css('opacity', 0);
                     $current.removeClass('current');
+                    callback();
                 }, function(failed) {
                     console.log('[Slider] An error occured white making the transition : ' + failed);
                     $current.css('opacity', 0);
                     $current.removeClass('current');
+                    callback();
                 });
             };
 
@@ -101,14 +105,12 @@
                     $target[0],
                     'transform',
                     'translate3d(0px, 0px, 0px)',
-                    750
+                    duration
                 ).then(function(success) {
                     $target.addClass('current');
-                    callback();
                 }, function(failed) {
                     console.log('[Slider] An error occured white making the transition : ' + failed);
                     $target.addClass('current');
-                    callback();
                 });
             };
 
