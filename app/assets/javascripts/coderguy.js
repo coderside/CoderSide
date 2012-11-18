@@ -3,6 +3,23 @@
  */
 
 $(document).ready(function() {
+
+    var app = Sammy('.wrapper', function() {
+        this.get('#/', function() {
+            console.log('coderguy started');
+        });
+
+        this.get('#/github/:keywords', function() {
+            console.log('Searching on github ' + this.params['keywords']);
+        });
+
+        this.get('#/mashup/:user', function() {
+            console.log('Searching ' + this.params['user']);
+        });
+    });
+
+    app.run('#/');
+
     var dom = {
         $back : $('.back'),
         $next : $('.next'),

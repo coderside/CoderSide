@@ -19,6 +19,7 @@ class TwitterNode extends Actor with ActorLogging {
         case Success(Nil) => gathererRef ! NotFound
         case Success(profils) =>
           Twitter.matchUser(gitHubUser, profils) foreach { found =>
+            println("found ", found)
             self ! TwitterTimelineQuery(found, gathererRef)
             kloutRef ! KloutNodeQuery(found, gathererRef)
           }
@@ -32,8 +33,7 @@ class TwitterNode extends Actor with ActorLogging {
     case TwitterTimelineQuery(twitterUser, gathererRef) => {
       log.debug("[TwitterNode] Getting twitter timeline")
       TwitterAPI.timeline(twitterUser.screenName).onComplete {
-        case Success(Some(timeline)) => gathererRef ! TwitterResult(twitterUser, timeline)
-        case Success(None) => gathererRef ! NotFound
+        case Success(timeline) => gathererRef ! TwitterResult(twitterUser, timeline)
         case Failure(e) => {
           log.error("[TwitterNode] Error while fetching twitter user timeline")
           gathererRef ! ErrorQuery(e)

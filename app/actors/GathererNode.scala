@@ -46,7 +46,7 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
         gitHubResult map (_.repositories) getOrElse Nil,
         linkedInResult map(_.profil),
         twitterResult map (_.profil),
-        twitterResult map (_.timeline),
+        twitterResult flatMap (_.timeline),
         kloutResult map (_.profil),
         kloutResult map (_.influencers) getOrElse Nil,
         kloutResult map (_.influencees) getOrElse Nil

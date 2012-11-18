@@ -28,7 +28,7 @@ object Messages {
   //Klout to Gatherer
   case class KloutResult(profil: KloutUser, influencers: List[TwitterUser], influencees: List[TwitterUser])
   //Twitter to Gatherer
-  case class TwitterResult(profil: TwitterUser, timeline: TwitterTimeline)
+  case class TwitterResult(profil: TwitterUser, timeline: Option[TwitterTimeline])
   //Twitter to Twitter
   case class TwitterUserQuery(gitHubUser: GitHubUser, klout: ActorRef, gatherer: ActorRef)
   //Twitter to Twitter

@@ -46,7 +46,7 @@ object TwitterAPI extends URLEncoder {
     .get().map(_.json).map {
       case JsArray(users) => users.flatMap { user =>
         readUser.reads(user).asOpt
-                                          }.toList
+      }.toList
       case _ => throw new TwitterApiException("Failed seaching twitter user by fullname : " + fullname)
     }
   }
@@ -75,7 +75,7 @@ object TwitterAPI extends URLEncoder {
             case (text, createdAt, retweeted, inReplyToStatus, inReplyToUser) =>
               Tweet(text, dateFormat.parse(createdAt), retweeted, inReplyToStatus.isDefined, inReplyToUser.isDefined)
           }
-                      }.toList
+        }.toList
       ))
       case _ => None
     }
@@ -90,6 +90,7 @@ case class TwitterTimeline(tweets: List[Tweet]) {
 object Twitter {
   def matchUser(gitHubUser: GitHubUser, twitterUsers: List[TwitterUser]): Option[TwitterUser] = {
     val matchPseudo = (user: TwitterUser)      => user.screenName.toLowerCase.trim == gitHubUser.username.toLowerCase.trim
+    val matchPseudoPart = (user: TwitterUser)  => user.screenName.toLowerCase.trim.contains(gitHubUser.username.toLowerCase.trim)
     def containsLanguage = (user: TwitterUser) => user.description.toLowerCase.contains(gitHubUser.language)
     def containsGitHub = (user: TwitterUser)   => user.description.toLowerCase.contains("github")
     val matchFullname = (user: TwitterUser) => {
@@ -101,6 +102,7 @@ object Twitter {
     val conditions = List(
       matchFullname    -> 40,
       matchPseudo      -> 40,
+      matchPseudoPart  -> 20,
       containsLanguage -> 10,
       containsGitHub   -> 10
     )
@@ -112,6 +114,10 @@ object Twitter {
         case head :: tail => scoring(user, score, tail)
       }
     }
+
+    println("##################### ",     twitterUsers.map { twitterUser =>
+      twitterUser -> scoring(twitterUser, 0, conditions)
+    })
 
     twitterUsers.map { twitterUser =>
       twitterUser -> scoring(twitterUser, 0, conditions)
