@@ -115,10 +115,6 @@ object Twitter {
       }
     }
 
-    println("##################### ",     twitterUsers.map { twitterUser =>
-      twitterUser -> scoring(twitterUser, 0, conditions)
-    })
-
     twitterUsers.map { twitterUser =>
       twitterUser -> scoring(twitterUser, 0, conditions)
     }.sortBy (_._2).lastOption.map(_._1)

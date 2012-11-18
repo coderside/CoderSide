@@ -15,6 +15,7 @@
     <div class="progress-container">
       <div class="progress"></div>
     </div>
+    <% if(gitHubUsers.length) { %>
     <ul>
       <% _(gitHubUsers).each(function(gitHubUser) { %>
       <li>
@@ -29,6 +30,9 @@
       </li>
       <% }) %>
     </ul>
+    <% } else { %>
+    <p class="not-found">This guy doesn't seem to be on GitHub...</p>
+    <% } %>
   </div>
 </script>
 

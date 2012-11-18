@@ -31,7 +31,7 @@ object LinkedInAPI extends URLEncoder {
 
   def searchByFullname(firstname: String, lastname: String): Future[List[LinkedInUser]] = {
     val uri = "http://api.linkedin.com/v1/people-search:(people:(headline,first-name,last-name,id,picture-url))"
-    val params = "?first-name=%s&last-name=%s&sort=connections&format=json".format(encode(firstname), encode(lastname))
+    val params = "?first-name=%s&last-name=%s&facet=industry,4&sort=relevance&format=json".format(encode(firstname), encode(lastname))
 
     WS.url(uri + params)
    .sign(signatureCalc)
