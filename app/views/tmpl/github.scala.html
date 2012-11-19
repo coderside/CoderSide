@@ -18,7 +18,7 @@
     <% if(gitHubUsers.length) { %>
     <ul>
       <% _(gitHubUsers).each(function(gitHubUser) { %>
-      <li href="http://www.google.com">
+      <li>
         <div><span class="fullname"><%= gitHubUser.fullname %></span></div>
         <div>
           <span class="username">
@@ -38,11 +38,17 @@
 
 <script id="github-result-tmpl" type="text/html">
   <div class="github-result">
-    <h3>Github repositories</h3>
+    <header class="github_header">
+      <img src="@routes.Assets.at("images/github/logo.png")" height="30px" />
+    </header>
+    <h1>Repositories</h1>
     <dl>
       <% _(repositories).each(function(repository) { %>
-      <dt><a href="<%= repository.url %>"><%= repository.name %></a></dt>
-      <dd><%= repository.description %></dd>
+      <dt><h3><a href="<%= repository.url %>"><%= repository.name %></a></h3></dt>
+      <dd>
+        <span class="description"><%= repository.description %></span>
+        <span class="forks"><%= repository.forks %> forks</span>
+      </dd>
       <% }) %>
     </dl>
   </div>
