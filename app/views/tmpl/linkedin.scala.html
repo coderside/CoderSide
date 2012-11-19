@@ -2,13 +2,20 @@
 
 <script id="linkedin-result-tmpl" type="text/html">
   <div class="linkedin-result">
+    <header>
+      <img src="@routes.Assets.at("images/linkedin/logo.png")" height="22px" />
+    </header>
     <% if(user) { %>
-    <img src="<%= user.pictureUrl %>" />
-    <dl>
-      <dt>First name</dt><dd><%= user.firstname %></dd>
-      <dt>Last name</dt><dd><%= user.lastname %></dd>
-      <dt>Headline</dt><dd><%= user.headline %></dd>
-    </dl>
+    <div class="content">
+      <div class="avatar">
+        <img src="<%= user.pictureUrl %>" />
+      </div>
+      <dl>
+        <dt class="label">First name</dt><dd class="family-name"><%= user.firstname %></dd>
+        <dt class="label">Last name</dt><dd class="given-name"><%= user.lastname %></dd>
+        <dt class="label">Headline</dt><dd class="head-line"><%= user.headline %></dd>
+      </dl>
+    </div>
     <% } %>
   </div>
 </script>

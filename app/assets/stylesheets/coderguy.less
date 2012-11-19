@@ -115,14 +115,39 @@
         }
 
         .linkedin-result {
-            padding: 10px;
             color: whitesmoke;
-            background: #83A9BD;
             font-weight: bold;
             overflow: hidden;
+            color: black;
 
-            img {
-                float: left;
+            header {
+                padding: 10px;
+                .gradient(@linkedinHeaderFrom, @linkedinHeaderTo);
+            }
+
+            .content {
+                padding-top: 25px;
+                padding-bottom: 25px;
+                .avatar {
+                    float: left;
+                    margin-top: 10px;
+                    margin-left: 10px;
+                    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+                }
+
+                .family-name, .given-name {
+                    font-family: Georgia,serif;
+                    font-size: 27px;
+                }
+
+                .head-line {
+                    font-size: 17px;
+                }
+
+                .label {
+                    color: @linkedinSection;
+                    font-size: 16px;
+               }
             }
         }
 
