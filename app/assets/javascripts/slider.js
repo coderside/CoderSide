@@ -11,11 +11,11 @@
 
         if(buttons) {
             buttons.$back.on('click', function(e) {
-                self.previous();
+                history.back();
             });
 
             buttons.$next.on('click', function(e) {
-                self.next();
+                history.forward();
             });
         }
 
@@ -59,7 +59,7 @@
 
         this.goAsFunction = function(targetView, optButtons, succeed) {
             return function() {
-                return self.go(targetView, succeed);
+                return self.go(targetView, optButtons, succeed);
             };
         };
 
@@ -81,11 +81,13 @@
                         $current.css('opacity', 0);
                         $current.removeClass('current');
                         self.currentView = targetView;
+                        updateButtons(optButtons);
                         succeed && succeed();
                     }, function(err) {
                         $current.css('opacity', 0);
                         $current.removeClass('current');
                         self.currentView = targetView;
+                        updateButtons(optButtons);
                         succeed && succeed();
                     });
                 };

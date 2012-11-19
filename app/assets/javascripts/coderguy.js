@@ -6,7 +6,12 @@ $(document).ready(function() {
 
     window.CoderGuy = Sammy('.wrapper', function() {
         this.get('#/', function() {
-            CoderGuy.step1.render();
+            var step1  = CoderGuy.step1,
+                step2  = CoderGuy.step2,
+                slider = CoderGuy.slider;
+
+            if(step1.isEmpty()) CoderGuy.step1.render();
+            slider.go(step1, { back: false, next: !step2.isEmpty() });
         });
 
         this.get('#/github/search', function(context) {
@@ -27,7 +32,7 @@ $(document).ready(function() {
                      .fail(step1.toggleLoader)
                      .fail(step1.toggleSubmit);
             } else {
-                slider.go(step2.$el, { back: true, next: !step3.isEmpty() });
+                slider.go(step2, { back: true, next: !step3.isEmpty() });
             }
         });
 
@@ -52,7 +57,7 @@ $(document).ready(function() {
 
                 step2.progress(gitHubUser);
             } else {
-                slider.go(step3.$el, { back: true, next: false });
+                slider.go(step3, { back: true, next: false });
             }
         });
     });

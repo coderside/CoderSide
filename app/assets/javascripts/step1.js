@@ -44,7 +44,7 @@
         };
 
         this.isEmpty = function() {
-            return self.$el.children.length;
+            return !self.$el.children().length;
         };
 
         this.isEqual = function(otherView) {

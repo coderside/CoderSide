@@ -81,7 +81,7 @@
         };
 
         this.isEmpty = function() {
-            return self.$el.children.length;
+            return !self.$el.children().length;
         };
 
         this.isNewSearch = function(username) {
