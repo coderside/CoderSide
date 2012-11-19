@@ -3,9 +3,11 @@
  */
 
 (function($, Zanimo) {
-    window.Slider = function(buttons) {
+    window.Slider = function(startView, buttons) {
         var self = this,
             duration = 300;
+
+        this.currentView = startView;
 
         if(buttons) {
             buttons.$back.on('click', function(e) {
@@ -17,24 +19,14 @@
             });
         }
 
-        var atFirstPage = function() {
-            return $('.step.current').attr('id') == 'step-1';
-        };
+       var updateButtons = function(optButtons) {
+           if(optButtons.back) {
+               buttons.$back.show();
+           } else buttons.$back.hide();
 
-        var atLastPage = function() {
-            return $('.step.current').attr('id') == 'step-3';
-        };
-
-        var updateButtons = function() {
-            if(buttons) {
-                if(!atFirstPage()) {
-                    buttons.$back.show();
-                } else buttons.$back.hide();
-
-                if(!atLastPage()) {
-                    buttons.$next.show();
-                } else buttons.$next.hide();
-            }
+           if(optButtons.next) {
+               buttons.$next.show();
+           } else buttons.$next.hide();
         };
 
         var viewportWidth = function() {
@@ -45,7 +37,7 @@
 
         (function() {
             var $pages = $('.step'),
-                $current = $('.step:first'),
+                $current = self.currentView.$el,
                 $container = $('.content');
 
             $pages.each(function(index, page) {
@@ -65,57 +57,55 @@
             return $('.step.current');
         };
 
-        this.next = function() {
-            self.go(self.current().next(), false, function() {
-                updateButtons();
-            });
+        this.goAsFunction = function(targetView, optButtons, succeed) {
+            return function() {
+                return self.go(targetView, succeed);
+            };
         };
 
-        this.previous = function() {
-            self.go(self.current().prev(), true, function() {
-                updateButtons();
-            });
-        };
+        this.go = function(targetView, optButtons, succeed) {
+            var $current = this.currentView.$el,
+                $target = targetView.$el;
 
-        this.go = function($target, prev, callback) {
-            var $current = self.current();
-            $target.css('opacity', 1);
+            if(!this.currentView.isEqual(targetView)) {
+                var way = ($current.nextAll('#' + $target.attr('id')).length > 0) ? '-' : '';
+                $target.css('opacity', 1);
 
-            var way = prev ? '' : '-';
-            var hideCurrent = function() {
-                return Zanimo.transition(
-                    $current[0],
-                    'transform',
-                    'translate3d('+ way + viewportWidth() + 'px, 0px, 0px)',
-                    duration
-                ).then(function(success) {
-                    $current.css('opacity', 0);
-                    $current.removeClass('current');
-                    callback();
-                }, function(failed) {
-                    console.log('[Slider] An error occured white making the transition : ' + failed);
-                    $current.css('opacity', 0);
-                    $current.removeClass('current');
-                    callback();
-                });
-            };
+                var hideCurrent = function() {
+                    return Zanimo.transition(
+                        $current[0],
+                        'transform',
+                        'translate3d('+ way + viewportWidth() + 'px, 0px, 0px)',
+                        duration
+                    ).then(function(success) {
+                        $current.css('opacity', 0);
+                        $current.removeClass('current');
+                        self.currentView = targetView;
+                        succeed && succeed();
+                    }, function(err) {
+                        $current.css('opacity', 0);
+                        $current.removeClass('current');
+                        self.currentView = targetView;
+                        succeed && succeed();
+                    });
+                };
 
-            var showTarget = function() {
-                return Zanimo.transition(
-                    $target[0],
-                    'transform',
-                    'translate3d(0px, 0px, 0px)',
-                    duration
-                ).then(function(success) {
-                    $target.addClass('current');
-                }, function(failed) {
-                    console.log('[Slider] An error occured white making the transition : ' + failed);
-                    $target.addClass('current');
-                });
-            };
+                var showTarget = function() {
+                    return Zanimo.transition(
+                        $target[0],
+                        'transform',
+                        'translate3d(0px, 0px, 0px)',
+                        duration
+                    ).then(function(success) {
+                        $target.addClass('current');
+                    }, function(err) {
+                        $target.addClass('current');
+                    });
+                };
 
-            hideCurrent();
-            showTarget();
+                hideCurrent();
+                showTarget();
+            }
         };
     };
 })(jQuery, Zanimo);

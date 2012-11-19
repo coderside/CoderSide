@@ -4,258 +4,99 @@
 
 $(document).ready(function() {
 
-    var app = Sammy('.wrapper', function() {
+    window.CoderGuy = Sammy('.wrapper', function() {
         this.get('#/', function() {
-            console.log('coderguy started');
+            CoderGuy.step1.render();
         });
 
-        this.get('#/github/:keywords', function() {
-            console.log('Searching on github ' + this.params['keywords']);
+        this.get('#/github/search', function(context) {
+            var keywords = this.params['keywords'],
+                step1    = CoderGuy.step1,
+                step2    = CoderGuy.step2,
+                step3    = CoderGuy.step3,
+                slider   = CoderGuy.slider;
+
+            if(step2.isEmpty() || step1.isNewSearch(keywords)) {
+                step1.toggleSubmit();
+                step1.toggleLoader();
+                step1.search(keywords)
+                     .then(step2.render(context))
+                     .then(slider.goAsFunction(step2, { back: true, next: false }))
+                     .then(step1.toggleLoader)
+                     .then(step1.toggleSubmit)
+                     .fail(step1.toggleLoader)
+                     .fail(step1.toggleSubmit);
+            } else {
+                slider.go(step2.$el, { back: true, next: !step3.isEmpty() });
+            }
         });
 
-        this.get('#/mashup/:user', function() {
-            console.log('Searching ' + this.params['user']);
+        this.get('#/mashup/', function(context) {
+            var step2  = CoderGuy.step2,
+                step3  = CoderGuy.step3,
+                slider = CoderGuy.slider,
+                gitHubUser = {
+                    username: this.params['username'],
+                    fullname: this.params['fullname'],
+                    language: this.params['language'],
+                    followers: this.params['followers']
+                };
+
+            if(step3.isEmpty() || step2.isNewSearch(gitHubUser.username)) {
+                step2.toggleLoader();
+                step2.overview(gitHubUser)
+                     .then(step3.render)
+                     .then(slider.goAsFunction(step3, { back: true, next: false }))
+                     .then(step2.toggleLoader)
+                     .fail(step2.toggleLoader);
+
+                step2.progress(gitHubUser);
+            } else {
+                slider.go(step3.$el, { back: true, next: false });
+            }
         });
     });
 
-    app.run('#/');
-
-    var dom = {
-        $back : $('.back'),
-        $next : $('.next'),
-        $loading: $('.loading'),
-        $step1 : $('#step-1'),
-        $step2 : $('#step-2'),
-        $step3 : $('#step-3'),
-        $content: $('#content'),
-        $submitFirstStep: function() { return $('#step-1 .github-search button'); },
-        $keywords: function() { return $('#content #step-1 .github-search input[type=search]'); },
-        $progress: function() { return $('#content #step-2 .github-users .progress'); },
-        resizeContent: function($container) {
+    CoderGuy.commons = {
+        renderError: function(msg) {
+            alert(msg);
+        },
+        dom: function(selector) {
             return function() {
-                $('#content').height($container.height() + 100);
+                return $(selector);
             };
         }
     };
 
-    var tmpl = {
-        gitHubSearch: _.template($("#github-search-tmpl").html()),
-        gitHubUsers: _.template($("#github-users-tmpl").html()),
-        result: {
+    CoderGuy.step1 = new Step1(
+        '#content',
+        '#step-1',
+        _.template($("#github-search-tmpl").html())
+    );
+
+    CoderGuy.step2 = new Step2(
+        '#content',
+        '#step-2',
+        _.template($("#github-users-tmpl").html())
+    );
+
+    CoderGuy.step3 = new Step3(
+        '#content',
+        '#step-3', {
             twitter: _.template($("#twitter-result-tmpl").html()),
             github: _.template($("#github-result-tmpl").html()),
             klout: _.template($("#klout-result-tmpl").html()),
             linkedin: _.template($("#linkedin-result-tmpl").html())
         }
-    };
+    );
 
-    /**
-     * Spinner
-     */
-    var Loader = function(target, overlay) {
-        var $target = $(target),
-            $overlay = $(overlay);
-
-        var spinner = new Spinner({
-            lines: 9,
-            length: 7,
-            width: 3,
-            radius: 10,
-            corners: 1,
-            rotate: 0,
-            color: '#000',
-            speed: 1,
-            trail: 60,
-            shadow: false,
-            hwaccel: false,
-            className: 'spinner',
-            zIndex: 2e9,
-            top: 'auto',
-            left: 'auto'
-        });
-
-        this.show = function() {
-            spinner.spin($target[0]);
-            $overlay.show();
-        };
-
-        this.hide = function() {
-            $target.find('.spinner').remove();
-            $overlay.hide();
-        };
-    };
-
-    /**
-     * Views
-     */
-
-    var renderError = function(msg) {
-        alert(msg);
-    };
-
-    var renderGitHubSearch = function() {
-        dom.$step1.html(tmpl.gitHubSearch({}));
-    };
-
-    var renderGitHubUsers = function(gitHubUsers) {
-        dom.$step2.html(tmpl.gitHubUsers({
-            gitHubUsers: gitHubUsers
-        }));
-    };
-
-    var renderResult = function(coderGuy) {
-        dom.$step3.empty();
-        dom.$step3.append(tmpl.result.linkedin({
-            user: coderGuy.linkedInUser
-        }));
-
-        dom.$step3.append(tmpl.result.github({
-            repositories: coderGuy.repositories
-        }));
-
-        dom.$step3.append(tmpl.result.twitter({
-            user: coderGuy.twitterUser,
-            timeline: coderGuy.twitterTimeline
-        }));
-
-        dom.$step3.append(tmpl.result.klout({
-            user: coderGuy.kloutUser,
-            influencers: coderGuy.influencers,
-            influencees: coderGuy.influencees
-        }));
-    };
-
-    var updateProgress = function(onStop) {
-        return function(event) {
-            dom.$progress().css('width', event.data + '%');
-            if(event.data == 100) {
-                onStop();
-            }
-        };
-    };
-
-    var errorProgress = function() {
-        dom.$progress().css('background-color', 'red');
-        dom.$progress().fadeOut(2000);
-        dom.$progress().css('width', '0%');
-    };
-
-    /**
-     * Server requests.
-     */
-    var server = new (function() {
-        var self = this;
-        this.eventSource = null;
-
-        this.search = function(keywords) {
-            return $.ajax({
-                url: '/search',
-                data: $.param({ keywords: keywords }),
-                error: function() {
-                    console.log('Error while pre-searching the specified coder guy !');
-                    self.close();
-                    renderError("An error occurred : failed searching on gitHub");
-                }
-            });
-        };
-
-        this.overview = function(gitHubUser) {
-            return $.ajax({
-                url: '/overview',
-                data: $.param(gitHubUser),
-                error: function() {
-                    console.log('Error while searching the specified coder guy !');
-                    self.close();
-                    renderError("An error occurred : failed searching on gitHub");
-                }
-            });
-        };
-
-        this.progress = function(gitHubUser, onReceived, fail) {
-            var uri = '/progress?' + $.param(gitHubUser);
-            self.eventSource = new EventSource(uri);
-            self.eventSource.onmessage = onReceived;
-            self.eventSource.onerror = function() {
-                console.log('Error while getting progress update');
-                self.close();
-                fail && fail();
-            };
-        };
-
-        this.close = function() {
-            if(self.eventSource) self.eventSource.close();
-        };
-    })();
-
-    /**
-     * DOM bindings.
-     */
-
-    var disableSubmit = function() {
-        dom.$submitFirstStep().addClass('disabled');
-    };
-
-    var enableSubmit = function() {
-        dom.$submitFirstStep().removeClass('disabled');
-    };
-
-    dom.$content.on('keydown', '#step-1 .github-search input[type=search]', function(e) {
-        var isEnterKey = function(key) { return key === 13; };
-        if(isEnterKey(e.which)) {
-            e.preventDefault();
-            var keywords = dom.$keywords().val();
-            var loader = new Loader('.loading', 'overlay-loading');
-            loader.show();
-            disableSubmit();
-            server.search(keywords).then(renderGitHubUsers)
-                                   .then(dom.resizeContent(dom.$step2))
-                                   .then(slider.next)
-                                   .then(loader.hide)
-                                   .then(enableSubmit)
-                                   .fail(loader.hide);
+    CoderGuy.slider = new Slider(
+        CoderGuy.step1, {
+            $back: $('.back'),
+            $next: $('.next')
         }
-    });
+    );
 
-    dom.$content.on('click', '#step-1 .github-search button', function(e) {
-        e.preventDefault();
-        var keywords = dom.$keywords().val();
-        var loader = new Loader('.loading', 'overlay-loading');
-        loader.show();
-        disableSubmit();
-        server.search(keywords).then(renderGitHubUsers)
-                               .then(dom.resizeContent(dom.$step2))
-                               .then(slider.next)
-                               .then(loader.hide)
-                               .then(enableSubmit)
-                               .fail(loader.hide);
-    });
-
-    dom.$content.on('click', '#step-2 .github-users li', function(e) {
-        var $gitHubUser = $(e.currentTarget),
-            gitHubUser = {
-                username: $gitHubUser.find('.username a').text(),
-                fullname: $gitHubUser.find('.fullname').text(),
-                language: $gitHubUser.find('.language').text(),
-                followers: $gitHubUser.find('.followers').text()
-            };
-
-        var loader = new Loader('.progress-container', 'overlay-loading');
-        loader.show();
-        server.overview(gitHubUser).then(renderResult)
-                                   .then(dom.resizeContent(dom.$step3))
-                                   .then(slider.next)
-                                   .then(loader.hide)
-                                   .fail(loader.hide);
-
-        server.progress(gitHubUser, updateProgress(server.close), errorProgress);
-    });
-
-    /**
-     * Starting app
-     */
-    renderGitHubSearch();
-    var slider = new Slider({
-        $back: dom.$back,
-        $next: dom.$next
-    });
+    CoderGuy.run('#/');
+    console.log('CoderGuy started...');
 });

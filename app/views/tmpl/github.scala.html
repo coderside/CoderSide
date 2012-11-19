@@ -2,8 +2,8 @@
 
 <script id="github-search-tmpl" type="text/html">
   <div class="github-search">
-    <form name="search_coderguy">
-      <input type="search" placeholder="Type a coder guy name !" />
+    <form name="search_coderguy" method="GET" action="/#/github/search">
+      <input type="search" name="keywords" placeholder="Type a coder guy name !" />
       <button class="big-button gray">Search</button>
       <div class="loading"></div>
     </form>
@@ -18,7 +18,7 @@
     <% if(gitHubUsers.length) { %>
     <ul>
       <% _(gitHubUsers).each(function(gitHubUser) { %>
-      <li>
+      <li href="http://www.google.com">
         <div><span class="fullname"><%= gitHubUser.fullname %></span></div>
         <div>
           <span class="username">
