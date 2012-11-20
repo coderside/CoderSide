@@ -37,8 +37,9 @@
 </script>
 
 <script id="github-result-tmpl" type="text/html">
-  <div class="github-result">
-    <header class="github_header">
+  <% if(repositories.length) { %>
+  <div class="github result">
+    <header>
       <img src="@routes.Assets.at("images/github/logo.png")" height="30px" />
     </header>
     <h1>Repositories</h1>
@@ -52,4 +53,5 @@
       <% }) %>
     </dl>
   </div>
+  <% } %>
 </script>

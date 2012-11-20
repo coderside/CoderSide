@@ -1,0 +1,57 @@
+@import "../colors.less";
+@import "../helpers.less";
+
+#content {
+    #step-3 {
+        .twitter.result {
+            font-family: "Helvetica Neue",Arial,sans-serif;
+            font-size: 14px;
+
+            header {
+                color: white;
+                padding: 10px;
+                font-weight: bold;
+                font-size: 1.2em;
+                background: @twitterHeader;
+            }
+
+            dl {
+                margin-top: 15px;
+                margin-bottom: 15px;
+            }
+
+            .screen-name {
+                font-weight: bold;
+            }
+
+            .info {
+                color: @twitterTxtInfo;
+            }
+
+            a {
+                color: @twitterLink;
+            }
+
+            h1 {
+                font-size: 18px;
+                font-weight: bold;
+                color: @twitterH1;
+            }
+
+            .pure-tweets {
+                border: 1px solid grey;
+                border-radius: 15px;
+                width: 60%;
+                margin: auto;
+                padding: 25px;
+                background: whiteSmoke;
+
+                li {
+                    padding: 15px;
+                    border-bottom: 1px solid @twitterBorder;
+                    background: @twitterItem;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,60 @@
+@import "../colors.less";
+@import "../helpers.less";
+
+#content {
+    #step-3 {
+        .github.result {
+            font-family: Helvetica, arial, freesans, clean, sans-serif;
+
+            header {
+                padding: 10px;
+                .gradient(@githubHeaderFrom, @githubHeaderTo)
+            }
+
+            h1 {
+                font-size: 26px;
+                color: @githubH1;
+                margin-top: 10px;
+                margin-left: 10px;
+            }
+
+            a {
+                text-decoration: none;
+                color: @githubH3;
+                font-size: 20px;
+                font-weight: bold;
+
+                &:hover {
+                    text-decoration: initial;
+                }
+            }
+
+            dl {
+                width: 50%;
+
+                dt, dd {
+                    padding-top: 10px;
+                    padding-bottom: 10px;
+                    border-bottom: 1px solid @githubBorder;
+                }
+
+                .description {
+                    font-size: 14px;
+                    color: @githubTxt;
+                }
+
+                .forks {
+                    font-size: 11px;
+                    color: @githubTxtInfo;
+
+                    &:after {
+                        content: ')';
+                    }
+                    &:before {
+                        content : '(';
+                    }
+                }
+            }
+        }
+    }
+}

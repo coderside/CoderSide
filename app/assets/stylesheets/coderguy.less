@@ -1,5 +1,19 @@
-@import 'colors.less';
-@import 'common.less';
+@import "colors.less";
+@import "helpers.less";
+
+#content {
+    position: relative;
+
+    .step {
+        text-align: center;
+        width: 100%;
+        position: absolute;
+    }
+
+    .result {
+        margin-bottom: 50px;
+    }
+}
 
 .overlay-loading {
     position: absolute;
@@ -32,229 +46,32 @@
     }
 }
 
-#content {
-    position: relative;
+.big-button {
+    .button-common-properties;
+    font-size: 16px;
+    width: 100px;
+    height: 38px;
+    padding: 0;
 
-    .step {
-        text-align: center;
-        width: 100%;
-        position: absolute;
-    }
-
-    #step-1 {
-        padding-top: 50px;
-        input[type=search] {
-            vertical-align: 9px;
-            width: 30%;
-            height: 40px;
-            border-radius: 7px;
-            font-size: 1.2em;
-        }
-
-        button {
-            vertical-align: 12px;
-            margin-left: 12px;
-        }
-
-        .loading {
-            margin-left: 12px;
+    &.disabled {
+        .gradient(#DDD, #F8F8F8);
+        &:hover {
+            .gradient(#DDD, #F8F8F8);
         }
     }
+}
 
-    #step-2 {
-        padding-top: 8%;
-
-        .not-found {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #504040;
-        }
-
-        .progress-container {
-            height: 50px;
-
-            .progress {
-                height: 100%;
-                width: 0%;
-                background: #62B847;
-            }
-        }
-        .github-users li {
-            padding: 5px;
-            cursor: pointer;
-            border-bottom: 1px solid grey;
-
-            span {
-                padding: 2px;
-            }
-
-            .fullname {
-                font-weight: bold;
-            }
-
-            &:nth-child(even) {
-                background-color: #F3F3F3;
-            }
-
-            &:hover {
-                background-color: #F0F7FC;
-            }
-        }
+.gray {
+    .gradient(darken(@veryLightGray, 5%), darken(@lightGray, 15%));
+    border: 1px solid darken(@gray, 10%);
+    &:hover{
+        .gradient(@gray, @darkGray);
+        border: 1px solid @veryDarkGray;
     }
+}
 
-    #step-3 {
-        text-align: left;
-        dl {
-            margin: auto;
-            width: 50%;
-            dt, dd {
-                padding: 2px;
-                width: 49%;
-                display: inline-block;
-            }
-        }
-
-        .linkedin-result {
-            color: whitesmoke;
-            font-weight: bold;
-            overflow: hidden;
-            color: black;
-
-            header {
-                padding: 10px;
-                .gradient(@linkedinHeaderFrom, @linkedinHeaderTo);
-            }
-
-            .content {
-                padding-top: 25px;
-                padding-bottom: 25px;
-                .avatar {
-                    float: left;
-                    margin-top: 10px;
-                    margin-left: 10px;
-                    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
-                }
-
-                .family-name, .given-name {
-                    font-family: Georgia,serif;
-                    font-size: 27px;
-                }
-
-                .head-line {
-                    font-size: 17px;
-                }
-
-                .label {
-                    color: @linkedinSection;
-                    font-size: 16px;
-               }
-            }
-        }
-
-        .github-result {
-            font-family: Helvetica, arial, freesans, clean, sans-serif;
-
-            header {
-                padding: 10px;
-                .gradient(@githubHeaderFrom, @githubHeaderTo)
-            }
-
-            h1 {
-                font-size: 26px;
-                color: @githubH1;
-                margin-top: 10px;
-                margin-left: 10px;
-            }
-
-            a {
-                text-decoration: none;
-                color: @githubH3;
-                font-size: 20px;
-                font-weight: bold;
-
-                &:hover {
-                    text-decoration: initial;
-                }
-            }
-
-            dl {
-                width: 50%;
-                padding-bottom: 50px;
-
-                dt, dd {
-                    padding-top: 10px;
-                    padding-bottom: 10px;
-                    border-bottom: 1px solid @githubBorder;
-                }
-
-                .description {
-                    font-size: 14px;
-                    color: @githubTxt;
-                }
-
-                .forks {
-                    font-size: 11px;
-                    color: @githubTxtInfo;
-
-                    &:after {
-                        content: ')';
-                    }
-                    &:before {
-                        content : '(';
-                    }
-                }
-            }
-        }
-
-        .twitter-result {
-            font-family: "Helvetica Neue",Arial,sans-serif;
-            font-size: 14px;
-
-            header {
-                color: white;
-                padding: 10px;
-                font-weight: bold;
-                font-size: 1.2em;
-                background: @twitterHeader;
-            }
-
-            dl {
-                margin-top: 15px;
-                margin-bottom: 15px;
-            }
-
-            .screen-name {
-                font-weight: bold;
-            }
-
-            .info {
-                color: @twitterTxtInfo;
-            }
-
-            a {
-                color: @twitterLink;
-            }
-
-            h1 {
-                font-size: 18px;
-                font-weight: bold;
-                color: @twitterH1;
-            }
-
-            .pure-tweets {
-                border: 1px solid grey;
-                border-radius: 15px;
-                width: 60%;
-                margin: auto;
-                padding: 25px;
-                background: whiteSmoke;
-
-                li {
-                    padding: 15px;
-                    border-bottom: 1px solid @twitterBorder;
-                    background: @twitterItem;
-                }
-            }
-        }
-    }
+.loading {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
 }

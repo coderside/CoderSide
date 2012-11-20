@@ -1,11 +1,11 @@
 @()
 
 <script id="linkedin-result-tmpl" type="text/html">
-  <div class="linkedin-result">
+  <% if(user) { %>
+  <div class="linkedin result">
     <header>
       <img src="@routes.Assets.at("images/linkedin/logo.png")" height="22px" />
     </header>
-    <% if(user) { %>
     <div class="content">
       <div class="avatar">
         <img src="<%= user.pictureUrl %>" />
@@ -16,6 +16,6 @@
         <dt class="label">Headline</dt><dd class="head-line"><%= user.headline %></dd>
       </dl>
     </div>
-    <% } %>
   </div>
+  <% } %>
 </script>
