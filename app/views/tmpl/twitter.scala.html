@@ -2,12 +2,14 @@
 
 <script id="twitter-result-tmpl" type="text/html">
   <div class="twitter-result">
-    <h3>Twitter</h3>
+    <header>
+      Twitter
+    </header>
     <% if(user) { %>
     <dl>
-      <dt>Screen name</dt><dd><%= user.screenName %></dd>
-      <dt>Description</dt><dd><%= user.description %></dd>
-      <dt>Followers</dt><dd><%= user.followers %></dd>
+      <dt class="info">Screen name</dt><dd class="screen-name"><%= user.screenName %></dd>
+      <dt class="info">Description</dt><dd><%= user.description %></dd>
+      <dt class="info">Followers</dt><dd><%= user.followers %></dd>
     </dl>
     <% } %>
     <hr/>
