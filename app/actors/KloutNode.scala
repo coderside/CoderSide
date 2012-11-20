@@ -35,14 +35,27 @@ class KloutNode extends Actor with ActorLogging {
       log.debug("[KloutNode] Getting profil influence")
       KloutAPI.influence(kloutUser.id).onComplete {
         case Success(Influence(influencers, influencees)) => {
-          def splitInfluence(influence: List[TwitterUser]) = {
-            influence.partition(twitterUser => influencers.find(_.nick == twitterUser.screenName).isDefined)
+          def splitInfluence(influence: List[TwitterUser]): (List[TwitterUser], List[TwitterUser]) = {
+            influence.partition { twitterUser =>
+              influencers.find(_.nick == twitterUser.screenName).isDefined
+            }
           }
+          def zipWithKloutUser(twitterUsers: List[TwitterUser]): List[(KloutUser, TwitterUser)] = {
+            (influencers ++ influencers) flatMap { kloutUser =>
+              twitterUsers find (_.screenName == kloutUser.nick) map ( kloutUser -> _)
+            }
+          }
+
           Promise.sequence(
             (influencers ++ influencees).map(k => TwitterAPI.show(k.nick))
           ).onComplete {
             case Success(influence) => splitInfluence(influence.flatten) match {
-              case (influencers, influencees) => gathererRef ! KloutResult(kloutUser, influencers, influencees)
+              case (influencers, influencees) => 
+                gathererRef ! KloutResult(
+                  kloutUser,
+                  zipWithKloutUser(influencers),
+                  zipWithKloutUser(influencees)
+                )
             }
             case Failure(e) => {
               log.error("[KloutNode] Error while getting influence (second part): " + e.getMessage)

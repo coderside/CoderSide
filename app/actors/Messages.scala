@@ -26,7 +26,7 @@ object Messages {
   //LinkedIn to Gatherer
   case class LinkedInResult(profil: LinkedInUser)
   //Klout to Gatherer
-  case class KloutResult(profil: KloutUser, influencers: List[TwitterUser], influencees: List[TwitterUser])
+  case class KloutResult(profil: KloutUser, influencers: List[(KloutUser, TwitterUser)], influencees: List[(KloutUser, TwitterUser)])
   //Twitter to Gatherer
   case class TwitterResult(profil: TwitterUser, timeline: Option[TwitterTimeline])
   //Twitter to Twitter

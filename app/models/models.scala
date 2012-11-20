@@ -11,8 +11,8 @@ case class CoderGuy(
   twitterUser: Option[TwitterUser],
   twitterTimeline: Option[TwitterTimeline],
   kloutUser: Option[KloutUser],
-  influencers: List[TwitterUser],
-  influencees: List[TwitterUser]
+  influencers: List[(KloutUser, TwitterUser)],
+  influencees: List[(KloutUser, TwitterUser)]
 ) {
   val hasTwitterAccount = twitterUser.isDefined
   val hasLinkedInAccont = linkedInUser.isDefined
@@ -89,14 +89,32 @@ object CoderGuy {
 
   implicit val coderGuyWrites = new Writes[CoderGuy] {
     def writes(cg: CoderGuy): JsValue = {
+      val influencers = JsArray(
+        cg.influencers map { case (kloutUser, twitterUser) =>
+          Json.obj(
+            "klout" -> kloutUser,
+            "twitter" -> twitterUser
+          )
+        }
+      )
+
+      val influencees = JsArray(
+        cg.influencees map { case (kloutUser, twitterUser) =>
+          Json.obj(
+            "kloutUser" -> kloutUser,
+            "twitterUser" -> twitterUser
+          )
+        }
+      )
+
       Json.obj(
         "repositories"    -> cg.repositories,
         "linkedInUser"    -> cg.linkedInUser,
         "twitterUser"     -> cg.twitterUser,
         "twitterTimeline" -> cg.twitterTimeline,
         "kloutUser"       -> cg.kloutUser,
-        "influencers"     -> cg.influencers,
-        "influencees"     -> cg.influencees
+        "influencers"     -> influencers,
+        "influencees"     -> influencees
       )
     }
   }

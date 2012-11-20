@@ -14,11 +14,13 @@
       <% _(influencers).each(function(influencer) { %>
       <li class="text">
         <dl>
-          <dt class="label">Name</dt><dd><%= influencer.name %></dd>
-          <dt class="label">Screen name</dt><dd><%= influencer.screenName %></dd>
-          <dt class="label">Description</dt><dd><%= influencer.description %></dd>
-          <dt class="label">Followers</dt><dd><%= influencer.followers %></dd>
-          <dt class="label">Score</dt><dd class="score"><%= influencer.score %></dd>
+          <% if(influencer.twitter) { %>
+          <dt class="label">Name</dt><dd><%= influencer.twitter.name %></dd>
+          <dt class="label">Screen name</dt><dd><%= influencer.twitter.screenName %></dd>
+          <dt class="label">Description</dt><dd><%= influencer.twitter.description %></dd>
+          <dt class="label">Followers</dt><dd><%= influencer.twitter.followers %></dd>
+          <dt class="label">Score</dt><dd class="score"><%= influencer.klout.score %></dd>
+          <% } %>
         </dl>
       </li>
       <% }) %>
@@ -29,11 +31,13 @@
       <% _(influencees).each(function(influencee) { %>
       <li>
         <dl>
+          <% if(influencee.twitter) { %>
           <dt class="label">Name</dt><dd><%= influencee.name %></dd>
-          <dt class="label">Screen name</dt><dd><%= influencee.screenName %></dd>
-          <dt class="label">Description</dt><dd><%= influencee.description %></dd>
-          <dt class="label">Followers</dt><dd><%= influencee.followers %></dd>
-          <dt class="label">Score</dt><dd class="score"><%= influencee.score %></dd>
+          <dt class="label">Screen name</dt><dd><%= influencee.twitter.screenName %></dd>
+          <dt class="label">Description</dt><dd><%= influencee.twitter.description %></dd>
+          <dt class="label">Followers</dt><dd><%= influencee.twitter.followers %></dd>
+          <dt class="label">Score</dt><dd class="score"><%= influencee.klout.score %></dd>
+          <% } %>
         </dl>
       </li>
       <% }) %>
