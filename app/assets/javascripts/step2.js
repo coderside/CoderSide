@@ -20,20 +20,14 @@
             eventSource && eventSource.close();
         };
 
-        this.overview = function(gitHubUser) {
-            this.username = gitHubUser.username;
-            return $.ajax({
-                url: '/overview',
-                data: $.param(gitHubUser),
-                error: function() {
-                    console.log('Error while searching the specified coder guy !');
-                    closeStream();
-                    CoderGuy.commons.renderError("An error occurred : failed searching on gitHub");
-                }
+        var errorProgress = function() {
+            dom.$progress().css('background-color', 'red');
+            dom.$progress().fadeOut(2000, function() {
+                dom.$progress().css('width', '0%');
             });
         };
 
-        var updateProgress = function(onStop) {
+       var updateProgress = function(onStop) {
             return function(event) {
                 dom.$progress().css('width', event.data + '%');
                 if(event.data == 100) {
@@ -42,10 +36,17 @@
             };
         };
 
-        var errorProgress = function() {
-            dom.$progress().css('background-color', 'red');
-            dom.$progress().fadeOut(2000);
-            dom.$progress().css('width', '0%');
+        this.overview = function(gitHubUser) {
+            this.username = gitHubUser.username;
+            return $.ajax({
+                url: '/overview',
+                data: $.param(gitHubUser),
+                error: function() {
+                    closeStream();
+                    CoderGuy.commons.renderError("An error occurred : failed getting data");
+                    errorProgress();
+                }
+            });
         };
 
         this.progress = function(gitHubUser) {

@@ -9,6 +9,7 @@
     <dl>
       <dt>Score</dt><dd class="text score"><%= user.score %></dd>
     </dl>
+    <% if(influencers.length) { %>
     <h4>Influencers</h4>
     <ul class="influencers">
       <% _(influencers).each(function(influencer) { %>
@@ -25,7 +26,8 @@
       </li>
       <% }) %>
     </ul>
-    <hr/>
+    <% } %>
+    <% if(influencees.length) { %>
     <h4>Influencees</h4>
     <ul class="influencees">
       <% _(influencees).each(function(influencee) { %>
@@ -42,6 +44,7 @@
       </li>
       <% }) %>
     </ul>
+    <% } %>
   </div>
   <% } %>
 </script>

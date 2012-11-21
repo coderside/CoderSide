@@ -9,10 +9,10 @@ import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import play.api.libs.oauth.{ OAuthCalculator, ConsumerKey, RequestToken }
 import utils.Config
-import models.URLEncoder
+import models.{ URLEncoder, Debug }
 import models.github.GitHubUser
 
-object LinkedInAPI extends URLEncoder {
+object LinkedInAPI extends URLEncoder with Debug {
 
   val signatureCalc = OAuthCalculator(
     ConsumerKey(Config.linkedIn.key, Config.linkedIn.secretKey),
@@ -35,11 +35,14 @@ object LinkedInAPI extends URLEncoder {
 
     WS.url(uri + params)
    .sign(signatureCalc)
-   .get().map(_.json \ "people" \ "values") map {
-       case JsArray(users) => users.flatMap { user =>
+   .get().map(response => (response.json, response.json \ "people" \ "values")) map {
+       case (_, JsArray(users)) => users.flatMap { user =>
          readUser.reads(user).asOpt
        }.toList
-       case _ => throw new LinkedInApiException("Failed seaching linkedIn user by fullname : " + firstname + " " + lastname)
+       case (response, _) =>
+         if((response \ "people" \ "_total").asOpt[Int].filter(_ == 0).isDefined)
+           Nil
+         else throw new LinkedInApiException("Failed seaching linkedIn user by fullname : " + firstname + " " + lastname)
     }
   }
 }

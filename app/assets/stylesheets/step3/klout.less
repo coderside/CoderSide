@@ -6,23 +6,36 @@
         .klout.result {
             background-color: @kloutBackground;
             font-family: 'DINRegular','Helvetica Neue',Helvetica,Arial,sans-serif;
+            font-size: 14px;
+
             header {
                 padding: 10px;
                 background-color: @kloutHeader;
             }
+
             h4 {
                 font-size: 24px;
                 color: @kloutTitle;
                 margin-left: 10px;
             }
+
             .text {
                 color: @kloutTxt;
             }
+
             .score {
                 color: @kloutOrange;
             }
-            .label {
-                font-size: 14px;
+
+            .influencees, .influencers {
+                li {
+                    margin-top: 10px;
+                    dl {
+                        box-shadow: 1px 1px 3px 0 rgba(0, 0, 0, 0.3);
+                        background: white;
+                        padding: 10px;
+                    }
+                }
             }
         }
     }

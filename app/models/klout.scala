@@ -78,6 +78,30 @@ object KloutAPI extends URLEncoder {
   }
 }
 
+object Klout {
+  type KloutId = String
+
+  def flattenTwitterUsers(twitterUsers: List[(KloutId, Option[TwitterUser])]) =
+    twitterUsers collect {
+      case (kloutId, Some(twitterUser)) => (kloutId, twitterUser)
+    }
+
+  def splitInfluence(influencers: List[KloutUser], twitterUsers: List[(KloutId, TwitterUser)]) = {
+    val (twInfluencers, twInfluencees) = twitterUsers partition { case (kloutId, _) =>
+      influencers find (_.id == kloutId) isDefined
+    }
+
+    def zipWithKloutUser(twitterUsers: List[(KloutId, TwitterUser)]): List[(KloutUser, TwitterUser)] = {
+      twitterUsers flatMap { case (kloutId, twitterUser) =>
+        (influencers ++ influencers) collect {
+          case kloutUser if(kloutUser.id == kloutId) => (kloutUser -> twitterUser)
+        }
+      }
+    }
+    zipWithKloutUser(twInfluencers) -> zipWithKloutUser(twInfluencees)
+  }
+}
+
 case class KloutUser(id: String, nick: String, score: Double)
 case class Influence(influencers: List[KloutUser], influencees: List[KloutUser])
 case class KloutApiException(message: String) extends Exception
