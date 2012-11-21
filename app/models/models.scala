@@ -98,12 +98,11 @@ object CoderGuy {
         }
       )
 
-      println("influencees ", cg.influencees)
       val influencees = JsArray(
         cg.influencees map { case (kloutUser, twitterUser) =>
           Json.obj(
-            "kloutUser" -> kloutUser,
-            "twitterUser" -> twitterUser
+            "klout" -> kloutUser,
+            "twitter" -> twitterUser
           )
         }
       )

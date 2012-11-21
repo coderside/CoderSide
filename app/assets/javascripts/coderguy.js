@@ -54,10 +54,13 @@ $(document).ready(function() {
                      .then(slider.goAsFunction(step3, { back: true, next: false }))
                      .then(step2.toggleLoader)
                      .fail(step2.toggleLoader);
-
                 step2.progress(gitHubUser);
             } else {
-                slider.go(step3, { back: true, next: false });
+                if(step3.isEmpty()) {
+                    
+                } else {
+                    slider.go(step3, { back: true, next: false });
+                }
             }
         });
     });

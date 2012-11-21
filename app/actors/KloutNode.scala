@@ -36,10 +36,10 @@ class KloutNode extends Actor with ActorLogging {
       KloutAPI.influence(kloutUser.id).onComplete {
         case Success(Influence(influencers, influencees)) => {
           Promise.sequence(
-            (influencers ++ influencees).map(k => TwitterAPI.show(k.nick) map (k.nick -> _))
+            (influencers ++ influencees).map(k => TwitterAPI.show(k.nick) map (k.id -> _))
           ) onComplete {
             case Success(twitterUsers) =>
-              Klout.splitInfluence(influencers, Klout.flattenTwitterUsers(twitterUsers)) match {
+              Klout.splitInfluence(influencers, influencees, Klout.flattenTwitterUsers(twitterUsers)) match {
                 case (influencers, influencees) => gathererRef ! KloutResult(kloutUser,influencers, influencees)
               }
             case Failure(e) => {
