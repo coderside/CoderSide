@@ -66,14 +66,20 @@ object GitHubAPI extends URLEncoder {
 case class GitHubApiException(message: String) extends Exception
 
 case class GitHubUser(username: String, fullname: String, language: String, followers: Int) {
-  val firstname: String = {
-    val str = fullname.split(" ")
-    if(str.size == 2) str(0) else ""
+
+  private def escapeSpecialCaracters(fullname: String): String = {
+    val notSpecialCaracters = """[^\w \tÀÂÇÈÉÊËÎÔÙÛàâçèéêëîôùû]""".r
+    notSpecialCaracters.replaceAllIn(fullname, "").trim
   }
 
-  val lastname: String = {
-    val str = fullname.split(" ")
-    if(str.size == 2) str(1) else ""
+  val firstname: Option[String] = {
+    val str = escapeSpecialCaracters(fullname).split(" ")
+    if(str.size == 2) Some(str(0)) else None
+  }
+
+  val lastname: Option[String] = {
+    val str = escapeSpecialCaracters(fullname).split(" ")
+    if(str.size == 2) Some(str(1)) else None
   }
 }
 

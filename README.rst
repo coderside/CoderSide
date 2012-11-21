@@ -22,16 +22,18 @@ This application is a mashup that takes data from several others web apps:
 - LinkedIn : Current job (headline)
 - GitHub : Repositories, number of followers
 - Twitter : Description, number of followers, timeline
-- Klout : score, influencers, influencees and Twitter accounts of each influencers/influencees.
+- Klout : score, influencers, influencees and Twitter/Klout accounts of each influencers/influencees.
 
 CoderGuy assume that the searched coder guy must have a GitHub account. This is the entry point of the application.
+Fetching the Twitter account of each influencers/influences for each search makes a lot of requests to Twitter API.
+Twitter narrow the application to 150 requests per hour.
 
 Process
 -------------------
 
 The process of the application is quite short & simple :
 
-1. Search on GitHub the coder guy by his full name.
+1. Search on GitHub the coder guy by his full name (or others criteria like his pseudo).
 2. The search can return more than one GitHub user. You have to select the good one.
 3. Once selected, the searching process is launch. This can take some seconds to return a result (there is a lot of requests).
 
@@ -54,6 +56,21 @@ Be asynchronous
 Of course, I select the last one.
 Here how I design the actors model :
 
+SupervisorNode
+
+HeadNode
+
+GitHubNode
+
+LinkedInNode
+
+TwitterNode
+
+KloutNode
+
+GathererNode
+This is the only actor that is recreated for each request.
+Only one actor is recreated for each request : the 'GathererNode' actor.
 
 Be realtime
 ```````````
@@ -77,7 +94,9 @@ NB : To keep the compatibilities with old browsers, the best solution would be t
 Optimization
 ````````````
 In the case where several users make the same search in the same period time, the searching process is launched only once.
-I don't want computing the same searchs at the same time :
+All the users subscribe to the same result and have the same stream (progress bar).
+A state of the current requests is kept in the HeadNode actor.
+When the gatherer node finish to build the result, it asks the head node to remove the request.
 
 
 Drawbacks

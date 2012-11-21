@@ -11,10 +11,10 @@ import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import play.api.libs.oauth.{ OAuthCalculator, ConsumerKey, RequestToken }
 import utils.Config
-import models.URLEncoder
+import models.{ URLEncoder, Debug }
 import models.github.GitHubUser
 
-object TwitterAPI extends URLEncoder {
+object TwitterAPI extends URLEncoder with Debug {
 
   val signatureCalc = OAuthCalculator(
     ConsumerKey(Config.twitter.consumerKey, Config.twitter.consumerSecret),
@@ -40,8 +40,8 @@ object TwitterAPI extends URLEncoder {
     ) tupled
   }
 
-  def searchByFullname(fullname: String): Future[List[TwitterUser]] = {
-    WS.url("https://api.twitter.com/1/users/search.json?q=" + encode(fullname))
+  def searchByFullname(fullname: String, pseudo: String): Future[List[TwitterUser]] = {
+    WS.url("https://api.twitter.com/1/users/search.json?q=" + encode(fullname + " " + pseudo))
     .sign(signatureCalc)
     .get().map(_.json).map {
       case JsArray(users) => users.flatMap { user =>

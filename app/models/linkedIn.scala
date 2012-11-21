@@ -31,18 +31,19 @@ object LinkedInAPI extends URLEncoder with Debug {
 
   def searchByFullname(firstname: String, lastname: String): Future[List[LinkedInUser]] = {
     val uri = "http://api.linkedin.com/v1/people-search:(people:(headline,first-name,last-name,id,picture-url))"
-    val params = "?first-name=%s&last-name=%s&facet=industry,4&sort=relevance&format=json".format(encode(firstname), encode(lastname))
+    val params = "?first-name=%s&last-name=%s&facet=industry,3,4,5,6,8,96,106,109,114&sort=relevance&format=json".format(encode(firstname), encode(lastname))
 
     WS.url(uri + params)
    .sign(signatureCalc)
-   .get().map(response => (response.json, response.json \ "people" \ "values")) map {
+   .get().map(debug).map(response => (response.json, response.json \ "people" \ "values")) map {
        case (_, JsArray(users)) => users.flatMap { user =>
          readUser.reads(user).asOpt
        }.toList
        case (response, _) =>
          if((response \ "people" \ "_total").asOpt[Int].filter(_ == 0).isDefined)
            Nil
-         else throw new LinkedInApiException("Failed seaching linkedIn user by fullname : " + firstname + " " + lastname)
+         else
+           throw new LinkedInApiException("Failed seaching linkedIn user by fullname : " + firstname + " " + lastname)
     }
   }
 }
