@@ -23,7 +23,6 @@
                 data: $.param({ keywords: keywords }),
                 error: function() {
                     console.log('Error while pre-searching the specified coder guy !');
-                    self.close();
                     CoderGuy.commons.renderError("An error occurred : failed searching on gitHub");
                 }
             });
