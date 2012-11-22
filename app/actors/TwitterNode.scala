@@ -16,16 +16,19 @@ class TwitterNode extends Actor with ActorLogging {
     case TwitterUserQuery(gitHubUser, kloutRef, gathererRef) => {
       log.debug("[TwitterNode] Getting twitter profil")
       TwitterAPI.searchByFullname(gitHubUser.fullname, gitHubUser.username).onComplete {
-        case Success(Nil) => gathererRef ! NotFound
+        case Success(Nil) => {
+          gathererRef ! NotFound("twitter")
+          gathererRef ! NotFound("klout")
+        }
         case Success(profils) =>
           Twitter.matchUser(gitHubUser, profils) foreach { found =>
-            println("found ", found)
             self ! TwitterTimelineQuery(found, gathererRef)
             kloutRef ! KloutNodeQuery(found, gathererRef)
           }
         case Failure(e) => {
           log.error("[TwitterNode] Error while searching twitter user")
-          gathererRef ! ErrorQuery(e)
+          gathererRef ! ErrorQuery(e) //twitter
+          gathererRef ! ErrorQuery(e) //klout
         }
       }
     }

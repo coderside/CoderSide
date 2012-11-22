@@ -55,8 +55,8 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
       headNode ! End(self)
     }
 
-    case NotFound => {
-      log.info("[GathererNode] NotFound well received")
+    case NotFound(message) => {
+      log.info("[GathererNode] NotFound from %s well received".format(message))
       self ! Decrement
     }
 

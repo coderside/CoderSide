@@ -38,7 +38,7 @@ object Messages {
   //For Gatherer only. Decrement the rest of waited sub results
   object Decrement
   //Node to Gatherer
-  object NotFound
+  case class NotFound(message: String)
   //Gatherer Node to client
   case class Progress(request: String)
   //Head Node to gatherer node

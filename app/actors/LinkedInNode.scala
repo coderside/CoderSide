@@ -16,7 +16,7 @@ class LinkedInNode extends Actor with ActorLogging {
       } yield {
         log.debug("[LinkedInNode] ok, firstname & lastname are valid")
         LinkedInAPI.searchByFullname(firstname, lastname).onComplete {
-          case Success(Nil)  => gathererRef ! NotFound
+          case Success(Nil)  => gathererRef ! NotFound("linkedin")
           case Success(profils) => LinkedIn.matchUser(gitHubUser, profils) foreach { found =>
             gathererRef ! LinkedInResult(found)
           }
