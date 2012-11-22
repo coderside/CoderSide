@@ -19,9 +19,11 @@ $(document).ready(function() {
                 step1    = CoderGuy.step1,
                 step2    = CoderGuy.step2,
                 step3    = CoderGuy.step3,
-                slider   = CoderGuy.slider;
+                slider   = CoderGuy.slider,
+                commons  = CoderGuy.commons;
 
             if(step2.isEmpty() || step1.isNewSearch(keywords)) {
+                if(CoderGuy.isEmpty()) commons.loader.show();
                 step1.toggleSubmit();
                 step1.toggleLoader();
                 step1.search(keywords)
@@ -29,8 +31,10 @@ $(document).ready(function() {
                      .then(slider.goAsFunction(step2, { back: true, next: false }))
                      .then(step1.toggleLoader)
                      .then(step1.toggleSubmit)
+                     .then(commons.loader.hide)
                      .fail(step1.toggleLoader)
-                     .fail(step1.toggleSubmit);
+                     .fail(step1.toggleSubmit)
+                     .fail(commons.loader.hide);
             } else {
                 slider.go(step2, { back: true, next: !step3.isEmpty() });
             }
@@ -40,6 +44,7 @@ $(document).ready(function() {
             var step2  = CoderGuy.step2,
                 step3  = CoderGuy.step3,
                 slider = CoderGuy.slider,
+                commons  = CoderGuy.commons,
                 gitHubUser = {
                     username: this.params['username'],
                     fullname: this.params['fullname'],
@@ -48,12 +53,15 @@ $(document).ready(function() {
                 };
 
             if(step3.isEmpty() || step2.isNewSearch(gitHubUser.username)) {
+                if(CoderGuy.isEmpty()) commons.loader.show();
                 step2.toggleLoader();
                 step2.overview(gitHubUser)
                      .then(step3.render)
                      .then(slider.goAsFunction(step3, { back: true, next: false }))
                      .then(step2.toggleLoader)
-                     .fail(step2.toggleLoader);
+                     .then(commons.loader.hide)
+                     .fail(step2.toggleLoader)
+                     .fail(commons.loader.hide);
                 step2.progress(gitHubUser);
             } else {
                 if(step3.isEmpty()) {
@@ -65,15 +73,25 @@ $(document).ready(function() {
         });
     });
 
-    CoderGuy.commons = {
-        renderError: function(msg) {
+    CoderGuy.commons = new function() {
+        this.loader = new Loader(
+            '.coderguy-loader',
+            '.overlay-loading',
+            {
+                top: '-40px',
+                left: '15px'
+            }
+        );
+
+        this.renderError = function(msg) {
             alert(msg);
-        },
-        dom: function(selector) {
+        };
+
+        this.dom = function(selector) {
             return function() {
                 return $(selector);
             };
-        }
+        };
     };
 
     CoderGuy.step1 = new Step1(
@@ -97,6 +115,12 @@ $(document).ready(function() {
             linkedin: _.template($("#linkedin-result-tmpl").html())
         }
     );
+
+    CoderGuy.isEmpty = function() {
+        return CoderGuy.step1.isEmpty() &&
+            CoderGuy.step2.isEmpty() &&
+            CoderGuy.step3.isEmpty();
+    };
 
     CoderGuy.slider = new Slider(
         CoderGuy.step1, {

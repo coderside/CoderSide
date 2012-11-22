@@ -27,7 +27,7 @@ class LinkedInNode extends Actor with ActorLogging {
         }
       }) getOrElse {
         log.info("[LinkedInNode] NotFound ! The firstname & lastname aren't valid: " + gitHubUser)
-        gathererRef ! NotFound
+        gathererRef ! NotFound("linkedin")
       }
     }
   }

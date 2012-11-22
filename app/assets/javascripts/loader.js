@@ -2,11 +2,11 @@
  * loader.js
  */
 
-window.Loader = function(target, overlay) {
+window.Loader = function(target, overlay, options) {
     var $target = function() { return $(target); },
         $overlay = function() { return $(overlay); };
 
-    var spinner = new Spinner({
+    var dftOptions = {
         lines: 9,
         length: 7,
         width: 3,
@@ -22,12 +22,19 @@ window.Loader = function(target, overlay) {
         zIndex: 2e9,
         top: 'auto',
         left: 'auto'
-    });
+    };
+
+    options = options || {};
+
+    var spinner = new Spinner(
+        $.extend(dftOptions, options)
+    );
 
     var isShown = false;
 
     this.show = function() {
         spinner.spin($target()[0]);
+        $target().show();
         $overlay().show();
         isShown = true;
     };
@@ -35,6 +42,7 @@ window.Loader = function(target, overlay) {
     this.hide = function() {
         $target().find('.spinner').remove();
         $overlay().hide();
+        $target().hide();
         isShown = false;
     };
 

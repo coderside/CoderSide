@@ -12,7 +12,7 @@
       <dt class="info">Followers</dt><dd><%= user.followers %></dd>
     </dl>
     <hr/>
-    <% if(timeline) { %>
+    <% if(timeline && timeline.tweets.length) { %>
     <ul class="pure-tweets">
       <% _(timeline.tweets).each(function(tweet) { %>
       <li><%= tweet.text %></li>
