@@ -68,18 +68,18 @@ case class GitHubApiException(message: String) extends Exception
 case class GitHubUser(username: String, fullname: String, language: String, followers: Int) {
 
   private def escapeSpecialCaracters(fullname: String): String = {
-    val notSpecialCaracters = """[^\w \tÀÂÇÈÉÊËÎÔÙÛàâçèéêëîôùû]""".r
-    notSpecialCaracters.replaceAllIn(fullname, "").trim
+    val specialCaracters = """[^\w \tÀÂÇÈÉÊËÎÔÙÛàâçèéêëîôùû-]""".r
+    specialCaracters.replaceAllIn(fullname, "").trim
   }
 
   val firstname: Option[String] = {
     val str = escapeSpecialCaracters(fullname).split(" ")
-    if(str.size == 2) Some(str(0)) else None
+    if(str.size > 1) Some(str(0)) else None
   }
 
   val lastname: Option[String] = {
     val str = escapeSpecialCaracters(fullname).split(" ")
-    if(str.size == 2) Some(str(1)) else None
+    if(str.size > 1) Some(str.tail.mkString) else None
   }
 }
 
