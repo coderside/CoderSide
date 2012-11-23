@@ -37,7 +37,9 @@ object Application extends Controller {
 
   def overview(username: String, fullname: String, language: String, followers: Int) = Action {
     Logger.debug("[Application] Searching coder guy")
-    val gitHubUser = GitHubUser(username, fullname, language, followers)
+    val name = Option(fullname) filter (!_.trim.isEmpty)
+    val lang = Option(fullname) filter (!_.trim.isEmpty) orElse Some("n/a")
+    val gitHubUser = GitHubUser(username, name, lang, followers)
     implicit val timeout = Timeout(20.seconds)
     Async {
       (SupervisorNode.ref ? InitQuery(gitHubUser)).mapTo[CoderGuy].map { coderGuy =>
@@ -50,7 +52,9 @@ object Application extends Controller {
 
   def progress(username: String, fullname: String, language: String, followers: Int) = Action {
     Logger.debug("[Application] Asking progress")
-    val gitHubUser = GitHubUser(username, fullname, language, followers)
+    val name = Option(fullname) filter (!_.trim.isEmpty)
+    val lang = Option(fullname) filter (!_.trim.isEmpty) orElse Some("n/a")
+    val gitHubUser = GitHubUser(username, name, lang, followers)
     Async {
       implicit val timeout = Timeout(20.seconds)
       (SupervisorNode.ref ? AskProgress(gitHubUser)).mapTo[Enumerator[Float]].map { progress =>

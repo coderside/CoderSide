@@ -40,8 +40,9 @@ object TwitterAPI extends URLEncoder with Debug {
     ) tupled
   }
 
-  def searchByFullname(fullname: String, pseudo: String): Future[List[TwitterUser]] = {
-    WS.url("https://api.twitter.com/1/users/search.json?q=" + encode(fullname + " " + pseudo))
+  def searchByFullname(fullname: Option[String], pseudo: String): Future[List[TwitterUser]] = {
+    val query = fullname getOrElse pseudo
+    WS.url("https://api.twitter.com/1/users/search.json?q=" + encode(query))
     .sign(signatureCalc)
     .get().map(_.json).map {
       case JsArray(users) => users.flatMap { user =>
@@ -94,9 +95,11 @@ object Twitter {
     def containsLanguage = (user: TwitterUser) => user.description.toLowerCase.contains(gitHubUser.language)
     def containsGitHub = (user: TwitterUser)   => user.description.toLowerCase.contains("github")
     val matchFullname = (user: TwitterUser) => {
-      val gitHubName = gitHubUser.fullname.toLowerCase.trim
-      user.name.toLowerCase.trim ==  gitHubName ||
-      user.name.split(" ").reverse.mkString(" ").toLowerCase.trim == gitHubName
+      gitHubUser.fullname.map { name =>
+        val gitHubName = name.toLowerCase.trim
+        user.name.toLowerCase.trim ==  gitHubName ||
+        user.name.split(" ").reverse.mkString(" ").toLowerCase.trim == gitHubName
+      }.isDefined
     }
 
     val conditions = List(
@@ -124,3 +127,21 @@ object Twitter {
 case class Tweet(text: String, createdAt: Date, retweeted: Boolean, inReplyToUser: Boolean, inReplyToStatus: Boolean)
 case class TwitterUser(screenName: String, name: String, description: String, followers: Int)
 case class TwitterApiException(message: String) extends Exception
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

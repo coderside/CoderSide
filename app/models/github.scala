@@ -7,15 +7,20 @@ import play.api.libs.ws._
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
-import models.URLEncoder
+import models.{ URLEncoder, Debug }
 
-object GitHubAPI extends URLEncoder {
+object GitHubAPI extends URLEncoder with Debug {
 
   implicit val readUser: Reads[GitHubUser] = {
+    def handleJsNull(json: JsValue) = json match {
+      case JsNull => None
+      case json => json.asOpt[String]
+    }
+
     (
       (__ \ 'username).read[String] and
-      (__ \ 'fullname).read[String] and
-      (__ \ 'language).read[String] and
+      (__ \ 'fullname).json.pick.map(handleJsNull) and
+      (__ \ 'language).json.pick.map(handleJsNull)and
       (__ \ 'followers).read[Int]
     )(GitHubUser)
   }
@@ -65,20 +70,20 @@ object GitHubAPI extends URLEncoder {
 
 case class GitHubApiException(message: String) extends Exception
 
-case class GitHubUser(username: String, fullname: String, language: String, followers: Int) {
+case class GitHubUser(username: String, fullname: Option[String], language: Option[String], followers: Int) {
 
   private def escapeSpecialCaracters(fullname: String): String = {
     val specialCaracters = """[^\w \tÀÂÇÈÉÊËÎÔÙÛàâçèéêëîôùû-]""".r
     specialCaracters.replaceAllIn(fullname, "").trim
   }
 
-  val firstname: Option[String] = {
-    val str = escapeSpecialCaracters(fullname).split(" ")
+  val firstname: Option[String] = fullname.flatMap { name =>
+    val str = escapeSpecialCaracters(name).split(" ")
     if(str.size > 1) Some(str(0)) else None
   }
 
-  val lastname: Option[String] = {
-    val str = escapeSpecialCaracters(fullname).split(" ")
+  val lastname: Option[String] = fullname.flatMap { name =>
+    val str = escapeSpecialCaracters(name).split(" ")
     if(str.size > 1) Some(str.tail.mkString) else None
   }
 }

@@ -17,12 +17,12 @@ A "full overview" means try to understand his programmer life.
 How does it work ?
 ==================
 
-This application is a mashup that takes data from several others web apps:
+This application is a mashup that takes data from several others web apps :
 
-- LinkedIn : Current job (headline)
-- GitHub : repositories (name, forks), number of followers
-- Twitter : Description, number of followers, timeline
-- Klout : score, influencers, influencees and Twitter/Klout accounts of each influencers/influencees.
+- LinkedIn : current job (headline).
+- GitHub : repositories, number of followers & forks.
+- Twitter : description, number of followers, timeline.
+- Klout : score, influencers, influencees and their Twitter/Klout account.
 
 CoderGuy assume that the searched coder guy must have a GitHub account. This is the entry point of the application.
 
@@ -56,7 +56,7 @@ Be asynchronous
    | The code would be a huge block hard to deal with it.
  - Use actors (Akka) to organize the WS calls and build the final result.
 
-| Of course, I select the last one. We will talk about this later.
+| Of course, I select the last one.
 
 Be realtime
 ```````````
@@ -79,23 +79,29 @@ NB : To keep the compatibilities with old browsers, the best solution would be t
 
 Scatter-Gatherer Actor Design
 `````````````````````````````
+
+Here how I organize the searching process through the actors :
+
 image:: reader/scatter-gather.png
+
+For the next part, I will describe each actor.
 
 SupervisorNode
 ``````````````
 
 | The SupervisorNode have the role to create (at the start) the HeadNode.
-| It receives requests from clients and redirects them to the HeadNode.
+| SupervisorNode receives requests from clients and redirects them to the HeadNode.
 
 HeadNode
 ````````
+| The HeaderNode have the role to create (at the start) the GitHubNode, LinkedInNode TwitterNode & KloutNode.
+| HeadNode handles two types of requests come from the SupervisorNode :
 
-HeadNode handles two types of requests come from the SupervisorNode :
  - Launch the searching process.
  - Ask for a stream to have realtime information about the progression of the search.
 
 | When it receives a request for launching the search, it creates an instance of GathererNode and broadcasts the request to GitHubNode, LinkedInNode and TwitterNode.
-| After that, it waits for a message from GathererNode to stop the GathererNode.
+| After that, it waits for a message from GathererNode to stop itself.
 
 GitHubNode
 ``````````
@@ -132,23 +138,26 @@ GathererNode
 
 Optimization
 ````````````
-In the case where several users make the same search in the same period time, the searching process is launched only once.
-All the users subscribe to the same result and have the same stream (progress bar).
-A state of the current requests is kept in the HeadNode actor.
-When the gatherer node finish to build the result, it asks the head node to remove the request.
+| In the case where several users make the same search in the same period time, the searching process is launched only once.
+| All the users subscribe to the same result and have the same stream (progress bar).
+| A state of the current requests is kept in the HeadNode actor.
+| When the gatherer node finish to build the result, it asks the head node to update the state & remove the request.
 
+The purpose of this "feature" is to save the number of requests to Twitter API.
 
 Drawbacks
 `````````
-| CoderGuy does'nt work like we would want in a clustered environnment.
+| CoderGuy doesn't work like we would want in a clustered environnment.
 | Why ?
 
-First, the optimization I talk previously does'nt fully work properly :
+| There are two main issues.
+| The first is the optimization I talk previously.
+| Each node have his own state of the current searchs.
+| There will be no optimization is one search is made on the node N1 and the second is made on the node N2.
 
-Each node have his own state of the current searchs. To have a complete optimization, we have two choises :
 
- - Decentralized synchronization of the state.
- - Centralized synchronization of the state.
+| The second issue is with thre stream.
+| If one client get a stream from the node N1, and then this node goes down, the client will be disconnected from the node N1 and will try to have a new from the node N2.
+| But the node N2 have no data for the client.
 
-Second , each node manage its own streams. If one node goes down, the client will lost totally his stream.
-The second node don't have any data of the first dead node.
+To resolve those two concerns, we have to centralize the data through a database for instance.

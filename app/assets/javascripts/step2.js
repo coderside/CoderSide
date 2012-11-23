@@ -94,9 +94,16 @@
         };
 
         this.render = function(context) {
+
+            var sortByFollowers = function(gitHubUsers) {
+                return _(gitHubUsers).sortBy(function(user) {
+                    return -user.followers;
+                });
+            };
+
             return function(gitHubUsers) {
                 self.$el.html(tmpl({
-                    gitHubUsers: gitHubUsers
+                    gitHubUsers: sortByFollowers(gitHubUsers)
                 }));
                 self.bindItems(context);
                 self.resizeContent();

@@ -52,9 +52,11 @@ object LinkedIn {
   def matchUser(gitHubUser: GitHubUser, linkedInUsers: List[LinkedInUser]): Option[LinkedInUser] = {
     val matchPseudo = (user: LinkedInUser) => gitHubUser.username.toLowerCase.trim == user.id.toLowerCase.trim
     val matchFullname = (user: LinkedInUser) => {
-      val gitHubName = gitHubUser.fullname.toLowerCase.trim
-      user.fullName.toLowerCase.trim ==  gitHubName ||
-      user.fullName.split(" ").reverse.mkString(" ").toLowerCase.trim == gitHubName
+      gitHubUser.fullname.map { name =>
+        val gitHubName = name.toLowerCase.trim
+        user.fullName.toLowerCase.trim ==  gitHubName ||
+        user.fullName.split(" ").reverse.mkString(" ").toLowerCase.trim == gitHubName
+      }.isDefined
     }
 
     val conditions = List(
