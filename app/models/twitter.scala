@@ -41,7 +41,7 @@ object TwitterAPI extends URLEncoder with Debug {
   }
 
   def searchByFullname(fullname: Option[String], pseudo: String): Future[List[TwitterUser]] = {
-    val query = fullname getOrElse pseudo
+    val query = fullname getOrElse pseudo //HERE !!!!!
     WS.url("https://api.twitter.com/1/users/search.json?q=" + encode(query))
     .sign(signatureCalc)
     .get().map(_.json).map {
@@ -95,7 +95,7 @@ object Twitter {
     def containsLanguage = (user: TwitterUser) => user.description.toLowerCase.contains(gitHubUser.language)
     def containsGitHub = (user: TwitterUser)   => user.description.toLowerCase.contains("github")
     val matchFullname = (user: TwitterUser) => {
-      gitHubUser.fullname.map { name =>
+      gitHubUser.fullname.filter { name =>
         val gitHubName = name.toLowerCase.trim
         user.name.toLowerCase.trim ==  gitHubName ||
         user.name.split(" ").reverse.mkString(" ").toLowerCase.trim == gitHubName
@@ -127,21 +127,3 @@ object Twitter {
 case class Tweet(text: String, createdAt: Date, retweeted: Boolean, inReplyToUser: Boolean, inReplyToStatus: Boolean)
 case class TwitterUser(screenName: String, name: String, description: String, followers: Int)
 case class TwitterApiException(message: String) extends Exception
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

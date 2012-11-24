@@ -35,7 +35,7 @@ object LinkedInAPI extends URLEncoder with Debug {
 
     WS.url(uri + params)
    .sign(signatureCalc)
-   .get().map(response => (response.json, response.json \ "people" \ "values")) map {
+   .get().map(debug).map(response => (response.json, response.json \ "people" \ "values")) map {
        case (_, JsArray(users)) => users.flatMap { user =>
          readUser.reads(user).asOpt
        }.toList
@@ -50,18 +50,16 @@ object LinkedInAPI extends URLEncoder with Debug {
 
 object LinkedIn {
   def matchUser(gitHubUser: GitHubUser, linkedInUsers: List[LinkedInUser]): Option[LinkedInUser] = {
-    val matchPseudo = (user: LinkedInUser) => gitHubUser.username.toLowerCase.trim == user.id.toLowerCase.trim
     val matchFullname = (user: LinkedInUser) => {
-      gitHubUser.fullname.map { name =>
+      gitHubUser.fullname.filter { name =>
         val gitHubName = name.toLowerCase.trim
-        user.fullName.toLowerCase.trim ==  gitHubName ||
+        user.fullName.toLowerCase.trim == gitHubName ||
         user.fullName.split(" ").reverse.mkString(" ").toLowerCase.trim == gitHubName
       }.isDefined
     }
 
     val conditions = List(
-      matchFullname -> 50,
-      matchPseudo -> 50
+      matchFullname -> 50
     )
 
     def scoring(user: LinkedInUser, score: Int, tests: List[((LinkedInUser) => Boolean, Int)]): Int = {
