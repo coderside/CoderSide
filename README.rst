@@ -79,7 +79,7 @@ Scatter-Gatherer design
 
 Here how I organize the searching process through the actors :
 
-.. image:: CoderGuy/tree/master/readme/scatter-gather-small.png
+.. image:: CoderGuy/raw/master/readme/scatter-gather-small.png
 
 For the next part, I will describe each actor.
 
