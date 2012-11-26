@@ -79,7 +79,7 @@ Scatter-Gatherer design
 
 Here how I organize the searching process through the actors :
 
-.. image:: readme/scatter-gather-small.png
+.. image:: CoderGuy/readme/scatter-gather-small.png
 
 For the next part, I will describe each actor.
 
@@ -166,8 +166,8 @@ Drawbacks
 
 To resolve those two concerns, we could centralize the data through a database.
 
-Set Up
-======
+Setting Up
+==========
 
 To run CoderGuy, you only need the amazing playframework 2.1-RC1 (scala).
 
