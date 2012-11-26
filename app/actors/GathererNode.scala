@@ -1,17 +1,21 @@
 package actors
 
-import akka.actor.{ Actor, ActorRef, ActorLogging }
+import scala.concurrent.duration._
+import akka.actor.{ Actor, ActorRef, ActorLogging, ReceiveTimeout }
 import play.api.libs.iteratee.Concurrent
 import models.CoderGuy
+import utils.Config
 import Messages._
 
 class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
   self =>
 
-  lazy val progress = Concurrent.broadcast[Float]
+  context.setReceiveTimeout(Config.gathererTimeout)
+
+  val progress = Concurrent.broadcast[Float]
   private var clients: List[ActorRef] = Nil
 
-  private var waited = 4
+  private var waited = Config.gathererWaited
   private var gitHubResult: Option[GitHubResult] = None
   private var linkedInResult: Option[LinkedInResult] = None
   private var kloutResult: Option[KloutResult] = None
@@ -88,6 +92,12 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
       twitterResult = Some(tr)
       self ! Decrement
     }
+
+    case ReceiveTimeout => {
+      log.error("[GathererNode] Timeout...")
+      clients foreach (_ ! GathererException("Failed gathering all result : timeout"))
+      headNode ! End(self)
+    }
   }
 
   override def preStart() = {
@@ -98,3 +108,5 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
     log.debug("[GathererNode] after stopping...")
   }
 }
+
+case class GathererException(message: String) extends Exception

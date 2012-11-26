@@ -88,6 +88,7 @@ SupervisorNode
 
 | The SupervisorNode have the role to create (at the start) the HeadNode.
 | SupervisorNode receives requests from clients and redirects them to the HeadNode.
+| In the event of failure of the HeadNode, it's automatically restarted. It's the failure zone 1.
 
 HeadNode
 ^^^^^^^^
@@ -100,6 +101,7 @@ HeadNode
 
 | When it receives a request for launching a search, it creates an instance of GathererNode, then broadcasts it to GitHubNode, LinkedInNode and TwitterNode.
 | After that, it waits for a message to stop the GathererNode.
+| In the event of failure of one search node (GiHubNode, TwitterNode, KloutNode, LinkedInNode), it's automatically restarted. It's the failure zone 2.
 
 GitHubNode
 ^^^^^^^^^^
@@ -122,9 +124,9 @@ TwitterNode
 KloutNode
 ^^^^^^^^^
 
-| KlouNode is the only node that not receive directly the request from the HeadNode (blue arrow).
+| KlouNode is the only node that not receive directly the request from the HeadNode but TwitterNode (blue arrow).
 | This actor requires a twitter account to perform.
-| If it isn't found, this actor isn't used in the searching process.
+| If it doesn't found, this actor isn't used in the searching process.
 | The KloutNode plays the Klout API and the Twitter API to get back influencers/influencees data.
 
 GathererNode
@@ -134,6 +136,7 @@ GathererNode
 | It's role is to gather all the results come from GitHubNode, LinkedInNode, TwitterNode & KloutNode.
 | While building the final result, it sends through the stream (grey arrow from GathererNode to Client) the current progress of the searching process.
 | Once all results have been gathered, it sends the final result to client and closes the stream.
+| In the case where the GathererNode doesn't receive all the result within a duration, he asks the HeadNode to stop it.
 
 Optimization
 ------------
@@ -161,10 +164,16 @@ Drawbacks
 
 
  - | The second issue is about the stream.
-   | If one client get a stream from a node N1, and then this node goes down, the client will be disconnected from the node N1 and will try to have a new one from the node N2.
+   | If one client get a stream from a node N1, and then this node goes down.
+   | The client will be disconnected from the node N1 and will try to have a new one from the node N2.
    | But the node N2 doesn't know what data to send to the client.
 
 To resolve those two concerns, we could centralize the data through a database.
+
+Just some words
+===============
+
+I make everything myself in this application : the design, the font-end and the backend code.
 
 Setting Up
 ==========

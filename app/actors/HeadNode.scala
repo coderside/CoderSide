@@ -2,12 +2,15 @@ package actors
 
 import scala.util.{ Success, Failure }
 import scala.concurrent.duration._
+import akka.actor.OneForOneStrategy
+import akka.actor.SupervisorStrategy._
 import akka.actor.{ Actor, ActorRef, Props, ActorLogging }
 import akka.pattern.ask
 import akka.util.Timeout
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.iteratee.Enumerator
 import models.github.GitHubUser
+import utils.Config
 import Messages._
 
 class HeadNode() extends Actor with ActorLogging {
@@ -15,10 +18,10 @@ class HeadNode() extends Actor with ActorLogging {
   var requests: Map[GitHubUser, ActorRef] = Map.empty
   def gathererNode(client: ActorRef) = context.actorOf(Props(new GathererNode(self)))
 
-  lazy val gitHubNode = context.actorOf(Props[GitHubNode])
-  lazy val linkedInNode = context.actorOf(Props[LinkedInNode])
-  lazy val twitterNode = context.actorOf(Props[TwitterNode])
-  lazy val kloutNode = context.actorOf(Props[KloutNode])
+  val gitHubNode = context.actorOf(Props[GitHubNode])
+  val linkedInNode = context.actorOf(Props[LinkedInNode])
+  val twitterNode = context.actorOf(Props[TwitterNode])
+  val kloutNode = context.actorOf(Props[KloutNode])
 
   def receive = {
     case HeadQuery(gitHubUser, client) => {
@@ -56,7 +59,7 @@ class HeadNode() extends Actor with ActorLogging {
         } getOrElse {
           if(retries > 0) {
             log.debug("[HeadNode] Retrying to get progress channel: " + retries)
-            context.system.scheduler.scheduleOnce(1.seconds)(requestProgress(retries - 1))
+            context.system.scheduler.scheduleOnce(1 seconds)(requestProgress(retries - 1))
           } else s ! new Exception("Can't find progress channel")
         }
       }
@@ -72,6 +75,17 @@ class HeadNode() extends Actor with ActorLogging {
       }
     }
   }
+
+  override def supervisorStrategy =
+    OneForOneStrategy(
+      maxNrOfRetries = Config.headStrategyRetry,
+      withinTimeRange = Config.headStrategyWithin
+    ) {
+      case e: Exception => {
+        log.error("[HeadNode] catching exception : " + e.getMessage)
+        Restart
+      }
+    }
 
   override def preStart() = {
     log.debug("[HeadNode] before starting...")

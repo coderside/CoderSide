@@ -3,8 +3,51 @@ package utils
 import play.api.Logger
 import play.api.Play
 import play.api.Play.current
+import scala.concurrent.duration._
 
 object Config {
+
+  lazy val gathererWaited: Int = {
+    Play.configuration.getInt("gatherer.waited") getOrElse {
+      Logger.warn("[Config] Please provide GathererNode waited value")
+      throw new ConfigException("Please provide GathererNode waited value")
+    }
+  }
+
+  lazy val gathererTimeout: FiniteDuration = {
+    Play.configuration.getInt("gatherer.timeout").map(minutes => 1 minutes).getOrElse {
+      Logger.warn("[Config] Please provide GathererNode timeout value")
+      throw new ConfigException("Please provide GathererNode timeout value")
+    }
+  }
+
+  lazy val supervisorStrategyRetry: Int = {
+    Play.configuration.getInt("supervisor.strategy.retry").getOrElse {
+      Logger.warn("[Config] Please provide SupervisorNode strategy retries value")
+      throw new ConfigException("Please provide supervisor strategy retries value")
+    }
+  }
+
+  lazy val supervisorStrategyWithin: FiniteDuration = {
+    Play.configuration.getInt("supervisor.strategy.withinMinutes").map(minutes => 1 minutes).getOrElse {
+      Logger.warn("[Config] Please provide SupervisorNode strategy within value")
+      throw new ConfigException("Please provide SupervisorNode supervisor strategy within value")
+    }
+  }
+
+  lazy val headStrategyRetry: Int = {
+    Play.configuration.getInt("head.strategy.retry").getOrElse {
+      Logger.warn("[Config] Please provide HeadNode strategy retries value")
+      throw new ConfigException("Please provide HeadNode supervisor strategy retries value")
+    }
+  }
+
+  lazy val headStrategyWithin: FiniteDuration = {
+    Play.configuration.getInt("head.strategy.withinMinutes").map(minutes => 1 minutes).getOrElse {
+      Logger.warn("[Config] Please provide HeadNode strategy within value")
+      throw new ConfigException("Please provide HeadNode supervisor strategy within value")
+    }
+  }
 
   object linkedIn {
 
