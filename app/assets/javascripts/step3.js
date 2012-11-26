@@ -22,7 +22,6 @@
         };
 
         this.render = function(coderGuy) {
-            console.log(coderGuy);
             self.$el.empty();
 
             self.$el.append(tmpl.linkedin({

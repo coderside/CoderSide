@@ -41,8 +41,8 @@ object TwitterAPI extends URLEncoder with Debug {
   }
 
   def searchByFullname(fullname: Option[String], pseudo: String): Future[List[TwitterUser]] = {
-    val query = fullname getOrElse pseudo //HERE !!!!!
-    WS.url("https://api.twitter.com/1/users/search.json?q=" + encode(query))
+    val q = fullname getOrElse pseudo
+    WS.url("https://api.twitter.com/1/users/search.json?q=" + encode(q))
     .sign(signatureCalc)
     .get().map(_.json).map {
       case JsArray(users) => users.flatMap { user =>
