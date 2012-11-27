@@ -7,6 +7,20 @@ import scala.concurrent.duration._
 
 object Config {
 
+  lazy val twitterBtnUrl: String = {
+    Play.configuration.getString("twitter.btn.url") getOrElse {
+      Logger.warn("[Config] Please provide twitter button URL")
+      throw new ConfigException("Please provide twitter button URL")
+    }
+  }
+
+  lazy val twitterBtnTweet: String = {
+    Play.configuration.getString("twitter.btn.tweet") getOrElse {
+      Logger.warn("[Config] Please provide twitter button tweet text")
+      throw new ConfigException("Please provide twitter button tweet text")
+    }
+  }
+
   lazy val gathererWaited: Int = {
     Play.configuration.getInt("gatherer.waited") getOrElse {
       Logger.warn("[Config] Please provide GathererNode waited value")
@@ -50,7 +64,6 @@ object Config {
   }
 
   object linkedIn {
-
     lazy val key: String = {
       Play.configuration.getString("oauth.linkedin.key").getOrElse {
         Logger.warn("[Config] Please provide LinkedIn key")

@@ -23,10 +23,6 @@ This application is a mashup that takes data from several others web apps :
 
 CoderGuy assume that the searched coder guy must have a GitHub account. This is the entry point of the application.
 
-
-| Fetching the Twitter account of each influencers/influences for each search makes a lot of requests against Twitter API.
-| Twitter limits the application to 150 requests per hour.
-
 Process
 -------
 
@@ -36,12 +32,20 @@ The process of the application is quite short & simple :
 2. The search can return more than one GitHub user. You have to select the good one.
 3. Once selected, the searching process is launch. This can take some seconds to return a result (there is a lot of requests).
 
+Limitation
+----------
+
+| Fetching the Twitter account of each influencers/influences for each search makes a lot of requests against Twitter API.
+| Twitter limits the application to 150 requests per hour.
+
+
 Technical solution
 ==================
 
 The idea is to use the strengths of the typesafe stack in order to :
  - be asynchronous everywhere.
  - have a reactive (realtime) web application.
+ - focus simplicity.
 
 Be asynchronous
 ---------------
@@ -127,7 +131,7 @@ KloutNode
 | KlouNode is the only node that not receive directly the request from the HeadNode but TwitterNode (blue arrow).
 | This actor requires a twitter account to perform.
 | If it doesn't found, this actor isn't used in the searching process.
-| The KloutNode plays the Klout API and the Twitter API to get back influencers/influencees data.
+| The KloutNode plays with the Klout API and the Twitter API to get back influencers/influencees data.
 
 GathererNode
 ^^^^^^^^^^^^
@@ -136,7 +140,7 @@ GathererNode
 | It's role is to gather all the results come from GitHubNode, LinkedInNode, TwitterNode & KloutNode.
 | While building the final result, it sends through the stream (grey arrow from GathererNode to Client) the current progress of the searching process.
 | Once all results have been gathered, it sends the final result to client and closes the stream.
-| In the case where the GathererNode doesn't receive all the result within a duration, he asks the HeadNode to stop it.
+| In the case where the GathererNode doesn't receive all the result within a duration, he cancels the search and asks the HeadNode to stop it.
 
 Optimization
 ------------
@@ -169,11 +173,6 @@ Drawbacks
    | But the node N2 doesn't know what data to send to the client.
 
 To resolve those two concerns, we could centralize the data through a database.
-
-Just some words
-===============
-
-I make everything myself in this application : the design, the font-end and the backend code.
 
 Setting Up
 ==========
