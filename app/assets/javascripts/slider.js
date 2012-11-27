@@ -88,6 +88,7 @@
                         $current.removeClass('current');
                         self.currentView = targetView;
                         updateButtons(optButtons);
+                        targetView.resizeContent();
                         succeed && succeed();
                     });
                 };
@@ -100,8 +101,10 @@
                         duration
                     ).then(function(success) {
                         $target.addClass('current');
+                        targetView.resizeContent();
                     }, function(err) {
                         $target.addClass('current');
+                        targetView.resizeContent();
                     });
                 };
 

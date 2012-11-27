@@ -38,6 +38,10 @@
             loader.toggle();
         };
 
+        this.resizeContent = function() {
+            self.$container.height(self.$el.height());
+        };
+
         this.isNewSearch = function(keywords) {
             return this.keywords != keywords;
         };
