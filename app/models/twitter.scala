@@ -40,15 +40,14 @@ object TwitterAPI extends URLEncoder with Debug {
     ) tupled
   }
 
-  def searchByFullname(fullname: Option[String], pseudo: String): Future[List[TwitterUser]] = {
-    val q = fullname getOrElse pseudo
-    WS.url("https://api.twitter.com/1/users/search.json?q=" + encode(q))
-    .sign(signatureCalc)
-    .get().map(_.json).map {
+  def searchBy(criteria: String): Future[List[TwitterUser]] = {
+    WS.url("https://api.twitter.com/1/users/search.json?q=" + encode(criteria))
+      .sign(signatureCalc)
+      .get().map(_.json).map {
       case JsArray(users) => users.flatMap { user =>
         readUser.reads(user).asOpt
       }.toList
-      case _ => throw new TwitterApiException("Failed seaching twitter user by fullname : " + fullname)
+      case _ => throw new TwitterApiException("Failed seaching twitter user by : " + criteria)
     }
   }
 
