@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.10: http://docutils.sourceforge.net/" />
+<title>CoderGuy</title>
+<style type="text/css">
+
+/*
+:Author: David Goodger (goodger@python.org)
+:Id: $Id$
+:Copyright: This stylesheet has been placed in the public domain.
+
+Default cascading style sheet for the HTML output of Docutils.
+
+See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
+customize this style sheet.
+*/
+
+/* used to remove borders from tables and images */
+.borderless, table.borderless td, table.borderless th {
+  border: 0 }
+
+table.borderless td, table.borderless th {
+  /* Override padding for "table.docutils td" with "! important".
+     The right padding separates the table cells. */
+  padding: 0 0.5em 0 0 ! important }
+
+.first {
+  /* Override more specific margin styles with "! important". */
+  margin-top: 0 ! important }
+
+.last, .with-subtitle {
+  margin-bottom: 0 ! important }
+
+.hidden {
+  display: none }
+
+a.toc-backref {
+  text-decoration: none ;
+  color: black }
+
+blockquote.epigraph {
+  margin: 2em 5em ; }
+
+dl.docutils dd {
+  margin-bottom: 0.5em }
+
+object[type="image/svg+xml"], object[type="application/x-shockwave-flash"] {
+  overflow: hidden;
+}
+
+/* Uncomment (and remove this text!) to get bold-faced definition list terms
+dl.docutils dt {
+  font-weight: bold }
+*/
+
+div.abstract {
+  margin: 2em 5em }
+
+div.abstract p.topic-title {
+  font-weight: bold ;
+  text-align: center }
+
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
+  margin: 2em ;
+  border: medium outset ;
+  padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title, .code .error {
+  color: red ;
+  font-weight: bold ;
+  font-family: sans-serif }
+
+/* Uncomment (and remove this text!) to get reduced vertical space in
+   compound paragraphs.
+div.compound .compound-first, div.compound .compound-middle {
+  margin-bottom: 0.5em }
+
+div.compound .compound-last, div.compound .compound-middle {
+  margin-top: 0.5em }
+*/
+
+div.dedication {
+  margin: 2em 5em ;
+  text-align: center ;
+  font-style: italic }
+
+div.dedication p.topic-title {
+  font-weight: bold ;
+  font-style: normal }
+
+div.figure {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+div.footer, div.header {
+  clear: both;
+  font-size: smaller }
+
+div.line-block {
+  display: block ;
+  margin-top: 1em ;
+  margin-bottom: 1em }
+
+div.line-block div.line-block {
+  margin-top: 0 ;
+  margin-bottom: 0 ;
+  margin-left: 1.5em }
+
+div.sidebar {
+  margin: 0 0 0.5em 1em ;
+  border: medium outset ;
+  padding: 1em ;
+  background-color: #ffffee ;
+  width: 40% ;
+  float: right ;
+  clear: right }
+
+div.sidebar p.rubric {
+  font-family: sans-serif ;
+  font-size: medium }
+
+div.system-messages {
+  margin: 5em }
+
+div.system-messages h1 {
+  color: red }
+
+div.system-message {
+  border: medium outset ;
+  padding: 1em }
+
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: bold }
+
+div.topic {
+  margin: 2em }
+
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
+  margin-top: 0.4em }
+
+h1.title {
+  text-align: center }
+
+h2.subtitle {
+  text-align: center }
+
+hr.docutils {
+  width: 75% }
+
+img.align-left, .figure.align-left, object.align-left {
+  clear: left ;
+  float: left ;
+  margin-right: 1em }
+
+img.align-right, .figure.align-right, object.align-right {
+  clear: right ;
+  float: right ;
+  margin-left: 1em }
+
+img.align-center, .figure.align-center, object.align-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.align-left {
+  text-align: left }
+
+.align-center {
+  clear: both ;
+  text-align: center }
+
+.align-right {
+  text-align: right }
+
+/* reset inner alignment in figures */
+div.align-right {
+  text-align: inherit }
+
+/* div.align-center * { */
+/*   text-align: left } */
+
+ol.simple, ul.simple {
+  margin-bottom: 1em }
+
+ol.arabic {
+  list-style: decimal }
+
+ol.loweralpha {
+  list-style: lower-alpha }
+
+ol.upperalpha {
+  list-style: upper-alpha }
+
+ol.lowerroman {
+  list-style: lower-roman }
+
+ol.upperroman {
+  list-style: upper-roman }
+
+p.attribution {
+  text-align: right ;
+  margin-left: 50% }
+
+p.caption {
+  font-style: italic }
+
+p.credits {
+  font-style: italic ;
+  font-size: smaller }
+
+p.label {
+  white-space: nowrap }
+
+p.rubric {
+  font-weight: bold ;
+  font-size: larger ;
+  color: maroon ;
+  text-align: center }
+
+p.sidebar-title {
+  font-family: sans-serif ;
+  font-weight: bold ;
+  font-size: larger }
+
+p.sidebar-subtitle {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+p.topic-title {
+  font-weight: bold }
+
+pre.address {
+  margin-bottom: 0 ;
+  margin-top: 0 ;
+  font: inherit }
+
+pre.literal-block, pre.doctest-block, pre.math, pre.code {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+pre.code .ln { color: grey; } /* line numbers */
+pre.code, code { background-color: #eeeeee }
+pre.code .comment, code .comment { color: #5C6576 }
+pre.code .keyword, code .keyword { color: #3B0D06; font-weight: bold }
+pre.code .literal.string, code .literal.string { color: #0C5404 }
+pre.code .name.builtin, code .name.builtin { color: #352B84 }
+pre.code .deleted, code .deleted { background-color: #DEB0A1}
+pre.code .inserted, code .inserted { background-color: #A3D289}
+
+span.classifier {
+  font-family: sans-serif ;
+  font-style: oblique }
+
+span.classifier-delimiter {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+span.interpreted {
+  font-family: sans-serif }
+
+span.option {
+  white-space: nowrap }
+
+span.pre {
+  white-space: pre }
+
+span.problematic {
+  color: red }
+
+span.section-subtitle {
+  /* font-size relative to parent (h1..h6 element) */
+  font-size: 80% }
+
+table.citation {
+  border-left: solid 1px gray;
+  margin-left: 1px }
+
+table.docinfo {
+  margin: 2em 4em }
+
+table.docutils {
+  margin-top: 0.5em ;
+  margin-bottom: 0.5em }
+
+table.footnote {
+  border-left: solid 1px black;
+  margin-left: 1px }
+
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th {
+  padding-left: 0.5em ;
+  padding-right: 0.5em ;
+  vertical-align: top }
+
+table.docutils th.field-name, table.docinfo th.docinfo-name {
+  font-weight: bold ;
+  text-align: left ;
+  white-space: nowrap ;
+  padding-left: 0 }
+
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
+  font-size: 100% }
+
+ul.auto-toc {
+  list-style-type: none }
+
+</style>
+</head>
+<body>
+<div class="document" id="coderguy">
+<h1 class="title">CoderGuy</h1>
+
+<ul class="simple">
+<li>Don't you ever ask google for having more information about one coder guy ?</li>
+<li>From what social networks does google found the most valuable information ?</li>
+</ul>
+<div class="section" id="the-idea">
+<h1>The Idea</h1>
+<p>Create a Web Application that give a full overview of one coder guy.
+A &quot;full overview&quot; means try to understand his programmer life.</p>
+</div>
+<div class="section" id="how-does-it-work">
+<h1>How does it work ?</h1>
+<p>This application is a mashup that takes data from several others web apps :</p>
+<ul class="simple">
+<li>LinkedIn : current job (headline).</li>
+<li>GitHub : repositories, number of followers &amp; forks.</li>
+<li>Twitter : description, number of followers, timeline.</li>
+<li>Klout : score, influencers, influencees and their Twitter/Klout account.</li>
+</ul>
+<p>CoderGuy assume that the searched coder guy must have a GitHub account. This is the entry point of the application.</p>
+<div class="section" id="process">
+<h2>Process</h2>
+<p>The process of the application is quite short &amp; simple :</p>
+<ol class="arabic simple">
+<li>Search on GitHub the coder guy by his full name (or others criteria like his pseudo).</li>
+<li>The search can return more than one GitHub user. You have to select the good one.</li>
+<li>Once selected, the searching process is launch. This can take some seconds to return a result (there is a lot of requests).</li>
+</ol>
+</div>
+<div class="section" id="limitation">
+<h2>Limitation</h2>
+<div class="line-block">
+<div class="line">Fetching the Twitter account of each influencers/influences for each search makes a lot of requests against Twitter API.</div>
+<div class="line">Twitter limits the application to 150 requests per hour.</div>
+</div>
+</div>
+</div>
+<div class="section" id="technical-solution">
+<h1>Technical solution</h1>
+<dl class="docutils">
+<dt>The idea is to use the strengths of the typesafe stack in order to :</dt>
+<dd><ul class="first last simple">
+<li>be asynchronous everywhere.</li>
+<li>have a reactive (realtime) web application.</li>
+<li>focus simplicity.</li>
+</ul>
+</dd>
+</dl>
+<div class="section" id="be-asynchronous">
+<h2>Be asynchronous</h2>
+<div class="line-block">
+<div class="line">As we saw previously, the searching process make a lot of requests and can take a long time.</div>
+<div class="line">To make asynchronous this process, I had two choices :</div>
+</div>
+<blockquote>
+<ul>
+<li><div class="first line-block">
+<div class="line">Chain all the requests at the same place and build the result directly with all the promises returns by the WS API.</div>
+<div class="line">The code would be a huge block hard to deal with it.</div>
+</div>
+</li>
+<li><p class="first">Use actors (Akka) to organize the WS calls and build the final result.</p>
+</li>
+</ul>
+</blockquote>
+<p>Of course, I select the last one. We will talking about this later.</p>
+</div>
+<div class="section" id="be-realtime">
+<h2>Be realtime</h2>
+<div class="line-block">
+<div class="line">Be realtime means give to user realtime information without reloading the web page.</div>
+<div class="line">CorderGuy provides a realtime updated progress bar displayed when a user launch a search.</div>
+</div>
+<dl class="docutils">
+<dt>There are several web technologies to do realtime:</dt>
+<dd><ul class="first last simple">
+<li>Long pooling (Comet)</li>
+<li>Server Send Event (Event Stream)</li>
+<li>Websocket</li>
+</ul>
+</dd>
+</dl>
+<div class="line-block">
+<div class="line">I don't need websocket in my case. Websocket is bidirectional (moreover, we can be annoyed by proxy).</div>
+<div class="line">Long pooling is unidirectional, works with old browsers but not efficient at all.</div>
+<div class="line">Server Sent Event is unidirectional, works with modern browsers, and efficient.</div>
+</div>
+<p>I finally decided to use Server Sent Event technology.</p>
+<p>NB : To keep the compatibilities with old browsers, the best solution would be to have a fallback to Long pooling when SSE isn't supported.</p>
+</div>
+<div class="section" id="scatter-gatherer-design">
+<h2>Scatter-Gatherer design</h2>
+<p>Here how I organize the searching process through the actors :</p>
+<img alt="CoderGuy/raw/master/readme/scatter-gather-small.png" src="CoderGuy/raw/master/readme/scatter-gather-small.png" />
+<p>For the next part, I will describe each actor.</p>
+<div class="section" id="supervisornode">
+<h3>SupervisorNode</h3>
+<div class="line-block">
+<div class="line">The SupervisorNode have the role to create (at the start) the HeadNode.</div>
+<div class="line">SupervisorNode receives requests from clients and redirects them to the HeadNode.</div>
+<div class="line">In the event of failure of the HeadNode, it's automatically restarted.</div>
+</div>
+</div>
+<div class="section" id="headnode">
+<h3>HeadNode</h3>
+<div class="line-block">
+<div class="line">The HeaderNode have the role to create (at the start) the GitHubNode, LinkedInNode TwitterNode &amp; KloutNode.</div>
+<div class="line">HeadNode handles two types of requests come from the SupervisorNode :</div>
+</div>
+<blockquote>
+<ul class="simple">
+<li>Launch the searching process.</li>
+<li>Ask for a stream to have realtime information about the progression of the search.</li>
+</ul>
+</blockquote>
+<div class="line-block">
+<div class="line">When it receives a request for launching a search, it creates an instance of GathererNode, then broadcasts it to GitHubNode, LinkedInNode and TwitterNode.</div>
+<div class="line">After that, it waits for a message to stop the GathererNode.</div>
+<div class="line">In the event of failure of one search node (GiHubNode, TwitterNode, KloutNode, LinkedInNode), it's automatically restarted.</div>
+</div>
+</div>
+<div class="section" id="githubnode">
+<h3>GitHubNode</h3>
+<div class="line-block">
+<div class="line">GitHubNode plays with GitHub API to retrieve the repositories of the searched guy.</div>
+<div class="line">Once done, it sends the result to GathererNode.</div>
+</div>
+</div>
+<div class="section" id="linkedinnode">
+<h3>LinkedInNode</h3>
+<div class="line-block">
+<div class="line">LinkedInNode plays with LinkedIn API to retrieve some extra data like the avatar &amp; the headline of the searched guy.</div>
+<div class="line">Once done, it sends the result to GathererNode.</div>
+</div>
+</div>
+<div class="section" id="twitternode">
+<h3>TwitterNode</h3>
+<div class="line-block">
+<div class="line">TwitterNode plays with Twitter API to retrieve the twitter account &amp; timeline of the searched guy.</div>
+<div class="line">Once done, it sends the result to the GathererNode and KloutNode.</div>
+</div>
+</div>
+<div class="section" id="kloutnode">
+<h3>KloutNode</h3>
+<div class="line-block">
+<div class="line">KlouNode is the only node that not receive directly the request from the HeadNode but TwitterNode (blue arrow).</div>
+<div class="line">This actor requires a twitter account to perform.</div>
+<div class="line">If it doesn't found, this actor isn't used in the searching process.</div>
+<div class="line">The KloutNode plays with the Klout API and the Twitter API to get back influencers/influencees data.</div>
+</div>
+</div>
+<div class="section" id="gatherernode">
+<h3>GathererNode</h3>
+<div class="line-block">
+<div class="line">GathererNode is the only actor that is recreated for each request (by the HeadNode).</div>
+<div class="line">It's role is to gather all the results come from GitHubNode, LinkedInNode, TwitterNode &amp; KloutNode.</div>
+<div class="line">While building the final result, it sends through the stream (grey arrow from GathererNode to Client) the current progress of the searching process.</div>
+<div class="line">Once all results have been gathered, it sends the final result to client and closes the stream.</div>
+<div class="line">In the case where the GathererNode doesn't receive all the result within a duration, he cancels the search and asks the HeadNode to stop it.</div>
+</div>
+</div>
+</div>
+<div class="section" id="optimization">
+<h2>Optimization</h2>
+<div class="line-block">
+<div class="line">In the case where several users make the same search in the same period time, the searching process is launched only once.</div>
+<div class="line">All the users subscribe to the same result and share the same stream (progress bar).</div>
+<div class="line">To do that, a state of the current requests is kept in the HeadNode actor.</div>
+<div class="line">When the GathererNode finishes to build the result, it asks the HeadNode to remove its request from the current state.</div>
+</div>
+<p>The purpose of this &quot;feature&quot; is to save the number of requests against the Twitter API.</p>
+<p>NB : To test it with a single computer, you need to use two different browsers.</p>
+</div>
+<div class="section" id="drawbacks">
+<h2>Drawbacks</h2>
+<div class="line-block">
+<div class="line">CoderGuy doesn't work like we would want in a clustered environment.</div>
+<div class="line">Why ?</div>
+</div>
+<div class="line-block">
+<div class="line">There are two main issues :</div>
+</div>
+<blockquote>
+<ul>
+<li><div class="first line-block">
+<div class="line">The first is about the optimization we talk previously.</div>
+<div class="line">Each node have his own state of the current searchs.</div>
+<div class="line">There will be no optimization is one search is made on the node N1 and the second one is made on the node N2.</div>
+</div>
+</li>
+<li><div class="first line-block">
+<div class="line">The second issue is about the stream.</div>
+<div class="line">If one client get a stream from a node N1, and then this node goes down.</div>
+<div class="line">The client will be disconnected from the node N1 and will try to have a new one from the node N2.</div>
+<div class="line">But the node N2 doesn't know what data to send to the client.</div>
+</div>
+</li>
+</ul>
+</blockquote>
+<p>To resolve those two concerns, we could centralize the data through a database.</p>
+</div>
+</div>
+<div class="section" id="setting-up">
+<h1>Setting Up</h1>
+<div class="line-block">
+<div class="line">To run CoderGuy, you only need the amazing playframework 2.1-RC1 (scala).</div>
+<div class="line">If you can't wait anymore to use CoderGuy, I deploy it on dotcloud here : <a class="reference external" href="http://coderguy-typsafe.dotcloud.com">http://coderguy-typsafe.dotcloud.com</a></div>
+<div class="line">It's just a free account, so be patient while using the application.</div>
+<div class="line">It's possible that the number of requests against API (GitHub or Twitter) exceeds the limit.</div>
+<div class="line">As a workaround, just run CoderGuy on your computer.</div>
+</div>
+</div>
+<div class="section" id="licence">
+<h1>Licence</h1>
+<p>This software is licensed under the Apache 2 license, quoted below.</p>
+<p>Licensed under the Apache License, Version 2.0 (the &quot;License&quot;); you may not use this project except in compliance with the License. You may obtain a copy of the License at <a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a>.</p>
+<p>Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.</p>
+</div>
+</div>
+</body>
+</html>

@@ -177,7 +177,11 @@ To resolve those two concerns, we could centralize the data through a database.
 Setting Up
 ==========
 
-To run CoderGuy, you only need the amazing playframework 2.1-RC1 (scala).
+| To run CoderGuy, you only need the amazing playframework 2.1-RC1 (scala).
+| If you can't wait anymore to use CoderGuy, I deploy it on dotcloud here : http://coderguy-typsafe.dotcloud.com
+| It's just a free account, so be patient while using the application.
+| It's possible that the number of requests against API (GitHub or Twitter) exceeds the limit.
+| As a workaround, just run CoderGuy on your computer.
 
 Licence
 =======
