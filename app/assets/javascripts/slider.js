@@ -93,6 +93,7 @@
                         updateButtons(optButtons);
                         bindButtons();
                         targetView.resizeContent();
+                        window.scroll(0, 0);
                         succeed && succeed();
                     }, function(err) {
                         $current.css('opacity', 0);
@@ -101,6 +102,7 @@
                         updateButtons(optButtons);
                         bindButtons();
                         targetView.resizeContent();
+                        window.scroll(0, 0);
                         succeed && succeed();
                     });
                 };
