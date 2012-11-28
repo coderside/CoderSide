@@ -9,24 +9,14 @@
 
         this.currentView = startView;
 
-        if(buttons) {
-            buttons.$back.on('click', function(e) {
-                history.back();
-            });
+        var updateButtons = function(optButtons) {
+            if(optButtons.back) {
+                buttons.$back.show();
+            } else buttons.$back.hide();
 
-            buttons.$next.on('click', function(e) {
-                history.forward();
-            });
-        }
-
-       var updateButtons = function(optButtons) {
-           if(optButtons.back) {
-               buttons.$back.show();
-           } else buttons.$back.hide();
-
-           if(optButtons.next) {
-               buttons.$next.show();
-           } else buttons.$next.hide();
+            if(optButtons.next) {
+                buttons.$next.show();
+            } else buttons.$next.hide();
         };
 
         var viewportWidth = function() {
@@ -34,6 +24,25 @@
                 return window.innerWidth > document.width ? window.innerWidth : document.width;
             } return window.innerWidth;
         };
+
+        var unbindButtons = function() {
+            buttons.$back.unbind('click');
+            buttons.$next.unbind('click');
+        };
+
+        var bindButtons = function() {
+            buttons.$back.on('click', function(e) {
+                history.back();
+                unbindButtons();
+            });
+
+            buttons.$next.on('click', function(e) {
+                history.forward();
+                unbindButtons();
+            });
+        };
+
+        if(buttons) bindButtons();
 
         (function() {
             var $pages = $('.step'),
@@ -82,12 +91,15 @@
                         $current.removeClass('current');
                         self.currentView = targetView;
                         updateButtons(optButtons);
+                        bindButtons();
+                        targetView.resizeContent();
                         succeed && succeed();
                     }, function(err) {
                         $current.css('opacity', 0);
                         $current.removeClass('current');
                         self.currentView = targetView;
                         updateButtons(optButtons);
+                        bindButtons();
                         targetView.resizeContent();
                         succeed && succeed();
                     });

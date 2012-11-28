@@ -64,11 +64,7 @@ $(document).ready(function() {
                      .fail(commons.loader.hide);
                 step2.progress(gitHubUser);
             } else {
-                if(step3.isEmpty()) {
-                    
-                } else {
-                    slider.go(step3, { back: true, next: false });
-                }
+                slider.go(step3, { back: true, next: false });
             }
         });
     });

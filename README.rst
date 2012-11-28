@@ -92,7 +92,7 @@ SupervisorNode
 
 | The SupervisorNode have the role to create (at the start) the HeadNode.
 | SupervisorNode receives requests from clients and redirects them to the HeadNode.
-| In the event of failure of the HeadNode, it's automatically restarted. It's the failure zone 1.
+| In the event of failure of the HeadNode, it's automatically restarted.
 
 HeadNode
 ^^^^^^^^
@@ -105,7 +105,7 @@ HeadNode
 
 | When it receives a request for launching a search, it creates an instance of GathererNode, then broadcasts it to GitHubNode, LinkedInNode and TwitterNode.
 | After that, it waits for a message to stop the GathererNode.
-| In the event of failure of one search node (GiHubNode, TwitterNode, KloutNode, LinkedInNode), it's automatically restarted. It's the failure zone 2.
+| In the event of failure of one search node (GiHubNode, TwitterNode, KloutNode, LinkedInNode), it's automatically restarted.
 
 GitHubNode
 ^^^^^^^^^^

@@ -32,6 +32,9 @@
                 dom.$progress().css('width', event.data + '%');
                 if(event.data == 100) {
                     onStop();
+                    setTimeout(function() {
+                        dom.$progress().css('width', '0%');
+                    }, 1000);
                 }
             };
         };

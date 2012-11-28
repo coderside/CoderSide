@@ -42,7 +42,6 @@ window.Loader = function(target, overlay, options) {
     this.hide = function() {
         $target().find('.spinner').remove();
         $overlay().hide();
-        $target().hide();
         isShown = false;
     };
 
