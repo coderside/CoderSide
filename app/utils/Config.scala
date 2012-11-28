@@ -29,7 +29,7 @@ object Config {
   }
 
   lazy val gathererTimeout: FiniteDuration = {
-    Play.configuration.getInt("gatherer.timeout").map(minutes => 1 minutes).getOrElse {
+    Play.configuration.getInt("gatherer.timeout").map(number => number seconds).getOrElse {
       Logger.warn("[Config] Please provide GathererNode timeout value")
       throw new ConfigException("Please provide GathererNode timeout value")
     }
@@ -43,7 +43,7 @@ object Config {
   }
 
   lazy val supervisorStrategyWithin: FiniteDuration = {
-    Play.configuration.getInt("supervisor.strategy.withinMinutes").map(minutes => 1 minutes).getOrElse {
+    Play.configuration.getInt("supervisor.strategy.withinMinutes").map(number => number minutes).getOrElse {
       Logger.warn("[Config] Please provide SupervisorNode strategy within value")
       throw new ConfigException("Please provide SupervisorNode supervisor strategy within value")
     }
@@ -57,7 +57,7 @@ object Config {
   }
 
   lazy val headStrategyWithin: FiniteDuration = {
-    Play.configuration.getInt("head.strategy.withinMinutes").map(minutes => 1 minutes).getOrElse {
+    Play.configuration.getInt("head.strategy.withinMinutes").map(number => number minutes).getOrElse {
       Logger.warn("[Config] Please provide HeadNode strategy within value")
       throw new ConfigException("Please provide HeadNode supervisor strategy within value")
     }
