@@ -19,4 +19,12 @@ class GitHubNode extends Actor with ActorLogging {
       }
     }
   }
+
+  override def preStart() = {
+    log.debug("[GitHubNode] Starting ...")
+  }
+
+  override def postStop() = {
+    log.debug("[GitHubNode] after stopping...")
+  }
 }

@@ -51,7 +51,6 @@ object Application extends Controller {
   }
 
   def progress(username: String, fullname: String, language: String, followers: Int) = Action {
-    Logger.debug("[Application] Asking progress")
     val name = Option(fullname) filter (!_.trim.isEmpty)
     val lang = Option(fullname) filter (!_.trim.isEmpty) orElse Some("n/a")
     val gitHubUser = GitHubUser(username, name, lang, followers)

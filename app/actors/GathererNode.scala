@@ -94,6 +94,7 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
     }
 
     case ReceiveTimeout => {
+      context.setReceiveTimeout(Duration.Undefined)
       log.error("[GathererNode] Timeout...")
       clients foreach (_ ! GathererException("Failed gathering all result : timeout"))
       headNode ! End(self)

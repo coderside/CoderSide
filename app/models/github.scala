@@ -3,6 +3,7 @@ package models.github
 import scala.concurrent.Future
 import scala.concurrent.future
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import scala.util.control.Exception._
 import play.api.libs.ws._
 import play.api.libs.json._
 import play.api.libs.json.Reads._
@@ -61,8 +62,10 @@ object GitHubAPI extends URLEncoder with Debug {
     WS.url("https://api.github.com/users/%s/repos".format(encode(username)))
    .get().map(_.json).map {
      case JsArray(reps) => reps.flatMap { rep =>
-       readRepository.reads(rep).asOpt
-     }.toList
+       catching(classOf[Exception]).opt(
+         readRepository.reads(rep).asOpt
+       )
+     }.flatten.toList
      case r => throw new GitHubApiException("Failed getting repositories for : " + username)
     }
   }

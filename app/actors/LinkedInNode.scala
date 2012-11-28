@@ -31,4 +31,12 @@ class LinkedInNode extends Actor with ActorLogging {
       }
     }
   }
+
+  override def preStart() = {
+    log.debug("[LinkedInNode] Starting ...")
+  }
+
+  override def postStop() = {
+    log.debug("[LinkedInNode] after stopping...")
+  }
 }

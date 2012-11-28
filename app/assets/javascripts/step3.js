@@ -10,7 +10,7 @@
         this.$el = $(el);
 
         this.resizeContent = function() {
-            self.$container.height(self.$el.height() + 30);
+            self.$container.height(self.$el.height() + 13);
         };
 
         this.isEmpty = function() {

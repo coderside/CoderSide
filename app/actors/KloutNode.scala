@@ -55,4 +55,12 @@ class KloutNode extends Actor with ActorLogging {
       }
     }
   }
+
+  override def preStart() = {
+    log.debug("[KloutNode] Starting ...")
+  }
+
+  override def postStop() = {
+    log.debug("[KloutNode] after stopping...")
+  }
 }

@@ -44,4 +44,12 @@ class TwitterNode extends Actor with ActorLogging {
       }
     }
   }
+
+  override def preStart() = {
+    log.debug("[TwitterNode] Starting ...")
+  }
+
+  override def postStop() = {
+    log.debug("[TwitterNode] after stopping...")
+  }
 }

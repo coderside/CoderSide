@@ -67,7 +67,7 @@
             self.$el.find('.github-users li').on('click', function(e) {
                 var $gitHubUser = $(e.currentTarget),
                     gitHubUser = {
-                        username: $gitHubUser.find('.username a').text(),
+                        username: $gitHubUser.find('.username').text().trim(),
                         fullname: $gitHubUser.find('.fullname').text(),
                         language: $gitHubUser.find('.language').text(),
                         followers: $gitHubUser.find('.followers').text()
