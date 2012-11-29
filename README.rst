@@ -118,7 +118,7 @@ LinkedInNode
 | LinkedInNode plays with LinkedIn API to retrieve some extra data like the avatar & the headline of the searched guy.
 | We can't search a user on LinkedIn with an identifier like address email.
 | The only choice is to use the fullname of the GutHub account to query LinkedIn.
-| To improve the query, I combine the fullname with the "industry" facet.
+| To improve the query, I combine the fullname with the "industry" facet offered by LinkedIn.
 | I use all facets that are related to computering.
 | Obviously, the search returns more than one LinkedIn account.
 | The challange was to select the good one. The idea is to use some information from GitHub account to optimize the result.
@@ -129,8 +129,8 @@ TwitterNode
 
 | TwitterNode plays with Twitter API to retrieve the twitter account & timeline of the searched guy.
 | We can't search a user on Twitter with an identifier like address email.
-| My only choice is to use the fullname of the GitHub account to query Twitter.
-| But the fullname isn't a required value when you create an account on GitHub.
+| The only choice is to use the fullname of the GitHub account to query Twitter.
+| But the fullname isn't a required value when you create a account GitHub.
 | It's possible that querying Twitter with fullname returns nothing.
 | In this case, the last chance is to query Twitter with the GitHub username.
 | Once we have searched with fullname or username, Twitter give us a list of Twitter accounts that could match.
@@ -142,7 +142,7 @@ TwitterNode
 KloutNode
 ^^^^^^^^^
 
-| KlouNode is the only node that not receive directly the request from the HeadNode but TwitterNode (blue arrow).
+| KlouNode is the only node that doesn't receive directly the request from the HeadNode but TwitterNode (blue arrow).
 | This actor requires that the TwitterNode found the Twitter account of the searched guy to perform.
 | If it doesn't found, this actor become useless and isn't used.
 | The KloutNode uses the Twitter account to get back influencers/influencees data from the Klout API.
@@ -156,7 +156,7 @@ GathererNode
 | It's role is to gather all the results come from GitHubNode, LinkedInNode, TwitterNode & KloutNode.
 | While building the final result, it sends through the stream (grey arrow from GathererNode to Client) the current progress of the searching process.
 | Once all results have been gathered, it sends the final result to clients and closes the stream.
-| In the case where the GathererNode doesn't receive all the result within a duration, he cancels the search and asks the HeadNode to stop it.
+| In the case where the GathererNode doesn't receive all the result within a duration, it cancels the search and asks the HeadNode to stop it.
 
 Optimization
 ------------
