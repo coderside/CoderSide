@@ -199,6 +199,11 @@ Setting Up
 | It's possible that the number of requests against API (GitHub or Twitter) exceeds the limit.
 | As a workaround, just run CoderGuy on your computer.
 
+Note
+====
+
+I was the only developper who works on this project.
+
 Licence
 =======
 
