@@ -2,6 +2,7 @@ package actors
 
 import scala.util.{ Success, Failure }
 import akka.actor.{ Actor, ActorRef, ActorLogging }
+import play.api.libs.concurrent.Promise
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import models.github._
 import Messages._
@@ -10,10 +11,27 @@ class GitHubNode extends Actor with ActorLogging {
   def receive = {
     case NodeQuery(gitHubUser, gathererRef) => {
       log.debug("[GitHubNode] receiving new head query")
-      GitHubAPI.repositories(gitHubUser.username).onComplete {
-        case Success(repositories) => gathererRef ! GitHubResult(repositories)
+      GitHubAPI.repositoriesByUser(gitHubUser.username).onComplete {
+        case Success(repositories) => self ! GitHubOrgQuery(gitHubUser, repositories, gathererRef)
         case Failure(e) => {
-          log.error("[GitHubNode] Error while fetching repositories")
+          log.error("[GitHubNode] Error while fetching user repositories")
+          gathererRef ! ErrorQuery(e)
+        }
+      }
+    }
+    case GitHubOrgQuery(gitHubUser, userRepos, gathererRef) => {
+      log.debug("[GitHubNode] receiving GitHub organization query")
+      GitHubAPI.organizations(gitHubUser.username).onComplete {
+        case Success(organizations) =>
+          Promise.sequence(organizations.map(org => GitHubAPI.repositoriesByOrg(org.login))) onComplete {
+            case Success(orgRepos) => gathererRef ! GitHubResult(orgRepos.flatten ++ userRepos)
+            case Failure(e) => {
+              log.error("[GitHubNode] Error while fetching organization repositories")
+              gathererRef ! ErrorQuery(e)
+            }
+          }
+        case Failure(e) => {
+          log.error("[GitHubNode] Error while fetching user organizations")
           gathererRef ! ErrorQuery(e)
         }
       }

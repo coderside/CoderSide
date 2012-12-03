@@ -23,6 +23,8 @@ object Messages {
   case class KloutUserQuery(kloutUser: KloutUser, gathererRef: ActorRef)
   //GitHub to Gatherer
   case class GitHubResult(repositories: List[GitHubRepository])
+  //GitHub to GitHub
+  case class GitHubOrgQuery(gitHubUser: GitHubUser, repositories: List[GitHubRepository], gathererRef: ActorRef)
   //LinkedIn to Gatherer
   case class LinkedInResult(profil: LinkedInUser)
   //Klout to Gatherer

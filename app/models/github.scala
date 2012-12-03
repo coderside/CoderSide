@@ -12,19 +12,18 @@ import models.{ URLEncoder, Debug }
 
 object GitHubAPI extends URLEncoder with Debug {
 
-  implicit val readUser: Reads[GitHubUser] = {
-    def handleJsNull(json: JsValue) = json match {
-      case JsNull => None
-      case json => json.asOpt[String]
-    }
+  private def handleJsNull(json: JsValue) = json match {
+    case JsNull => None
+    case json => json.asOpt[String]
+  }
 
+  implicit val readUser: Reads[GitHubUser] =
     (
       (__ \ 'username).read[String] and
       (__ \ 'fullname).json.pick.map(handleJsNull) and
       (__ \ 'language).json.pick.map(handleJsNull)and
       (__ \ 'followers).read[Int]
     )(GitHubUser)
-  }
 
   implicit val gitHubUserWrites = new Writes[GitHubUser] {
     def writes(gu: GitHubUser): JsValue = {
@@ -36,6 +35,14 @@ object GitHubAPI extends URLEncoder with Debug {
       )
     }
   }
+
+  implicit val readOrganization: Reads[Organization] =
+    (
+      (__ \ 'login).read[String] and
+      (__ \ 'repos_url).read[String] and
+      (__ \ 'avatar_url).json.pick.map(handleJsNull) and
+      (__ \ 'url).read[String]
+    )(Organization)
 
   implicit val readRepository: Reads[GitHubRepository] = {
     (
@@ -58,7 +65,7 @@ object GitHubAPI extends URLEncoder with Debug {
     }
   }
 
-  def repositories(username: String): Future[List[GitHubRepository]] = {
+  def repositoriesByUser(username: String): Future[List[GitHubRepository]] = {
     WS.url("https://api.github.com/users/%s/repos".format(encode(username)))
    .get().map(_.json).map {
      case JsArray(reps) => reps.flatMap { rep =>
@@ -67,6 +74,30 @@ object GitHubAPI extends URLEncoder with Debug {
        )
      }.flatten.toList
      case r => throw new GitHubApiException("Failed getting repositories for : " + username)
+    }
+  }
+
+  def repositoriesByOrg(org: String): Future[List[GitHubRepository]] = {
+    WS.url("https://api.github.com/orgs/%s/repos".format(encode(org)))
+   .get().map(_.json).map {
+     case JsArray(reps) => reps.flatMap { rep =>
+       catching(classOf[Exception]).opt(
+         readRepository.reads(rep).asOpt
+       )
+     }.flatten.toList
+     case r => throw new GitHubApiException("Failed getting repositories for : " + org)
+    }
+  }
+
+  def organizations(username: String): Future[List[Organization]] = {
+    WS.url("https://api.github.com/users/%s/orgs".format(encode(username)))
+   .get().map(_.json).map {
+     case JsArray(orgs) => orgs.flatMap { org =>
+       catching(classOf[Exception]).opt {
+         readOrganization.reads(org).asOpt
+       }
+     }.flatten.toList
+     case r => throw new GitHubApiException("Failed getting organizations for : " + username)
     }
   }
 }
@@ -98,4 +129,11 @@ case class GitHubRepository(
   url: String,
   owner: String,
   forks: Int
+)
+
+case class Organization(
+  login: String,
+  reposUrl: String,
+  avatarUrl: Option[String],
+  url: String
 )

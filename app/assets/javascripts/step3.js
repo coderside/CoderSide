@@ -29,7 +29,9 @@
             }));
 
             self.$el.append(tmpl.github({
-                repositories: coderGuy.repositories
+                repositories: _(coderGuy.repositories).sortBy(function(repo) {
+                    return -repo.forks;
+                })
             }));
 
             self.$el.append(tmpl.twitter({
