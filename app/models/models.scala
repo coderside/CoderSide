@@ -6,6 +6,7 @@ import models.linkedin._
 import models.klout._
 
 case class CoderGuy(
+  organizations: List[GitHubOrg],
   repositories: List[GitHubRepository],
   linkedInUser: Option[LinkedInUser],
   twitterUser: Option[TwitterUser],
@@ -21,7 +22,7 @@ case class CoderGuy(
 object CoderGuy {
   import play.api.libs.json._
 
-  implicit val repositoryWrites = new Writes[GitHubRepository] {
+  implicit val gitHubReposWrites = new Writes[GitHubRepository] {
     def writes(gr: GitHubRepository): JsValue = {
       Json.obj(
         "name" -> gr.name,
@@ -30,6 +31,17 @@ object CoderGuy {
         "url" -> gr.url,
         "owner" -> gr.owner,
         "forks" -> gr.forks
+      )
+    }
+  }
+
+  implicit val gitHubOrgWrites = new Writes[GitHubOrg] {
+    def writes(go: GitHubOrg): JsValue = {
+      Json.obj(
+        "login" -> go.login,
+        "reposUrl" -> go.reposUrl,
+        "avatarUrl" -> go.avatarUrl,
+        "url" -> go.url
       )
     }
   }
@@ -108,6 +120,7 @@ object CoderGuy {
       )
 
       Json.obj(
+        "organizations"   -> cg.organizations,
         "repositories"    -> cg.repositories,
         "linkedInUser"    -> cg.linkedInUser,
         "twitterUser"     -> cg.twitterUser,

@@ -42,6 +42,13 @@
     <header>
       <img src="@routes.Assets.at("images/github/logo.png")" height="30px" />
     </header>
+    <h1>Organizations</h1>
+    <dl>
+      <% _(organizations).each(function(organization) { %>
+      <dt><img src="<%= organization.avatarUrl %>" height="50px" /></dt>
+      <dd><a href="<%= organization.url %>"><%= organization.login %></a></dd>
+      <% }) %>
+    </dl>
     <h1>Repositories</h1>
     <dl>
       <% _(repositories).each(function(repository) { %>

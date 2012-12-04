@@ -36,13 +36,13 @@ object GitHubAPI extends URLEncoder with Debug {
     }
   }
 
-  implicit val readOrganization: Reads[Organization] =
+  implicit val readOrganization: Reads[GitHubOrg] =
     (
       (__ \ 'login).read[String] and
       (__ \ 'repos_url).read[String] and
       (__ \ 'avatar_url).json.pick.map(handleJsNull) and
       (__ \ 'url).read[String]
-    )(Organization)
+    )(GitHubOrg)
 
   implicit val readRepository: Reads[GitHubRepository] = {
     (
@@ -89,7 +89,7 @@ object GitHubAPI extends URLEncoder with Debug {
     }
   }
 
-  def organizations(username: String): Future[List[Organization]] = {
+  def organizations(username: String): Future[List[GitHubOrg]] = {
     WS.url("https://api.github.com/users/%s/orgs".format(encode(username)))
    .get().map(_.json).map {
      case JsArray(orgs) => orgs.flatMap { org =>
@@ -131,7 +131,7 @@ case class GitHubRepository(
   forks: Int
 )
 
-case class Organization(
+case class GitHubOrg(
   login: String,
   reposUrl: String,
   avatarUrl: Option[String],

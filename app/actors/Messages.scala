@@ -1,7 +1,7 @@
 package actors
 
 import akka.actor.ActorRef
-import models.github.{ GitHubUser, GitHubRepository }
+import models.github.{ GitHubUser, GitHubRepository, GitHubOrg }
 import models.twitter.{ TwitterUser, TwitterTimeline }
 import models.klout.KloutUser
 import models.linkedin.LinkedInUser
@@ -22,7 +22,7 @@ object Messages {
   //Klout to Klout
   case class KloutUserQuery(kloutUser: KloutUser, gathererRef: ActorRef)
   //GitHub to Gatherer
-  case class GitHubResult(repositories: List[GitHubRepository])
+  case class GitHubResult(organizations: List[GitHubOrg], repositories: List[GitHubRepository])
   //GitHub to GitHub
   case class GitHubOrgQuery(gitHubUser: GitHubUser, repositories: List[GitHubRepository], gathererRef: ActorRef)
   //LinkedIn to Gatherer

@@ -29,6 +29,7 @@
             }));
 
             self.$el.append(tmpl.github({
+                organizations: coderGuy.organizations,
                 repositories: _(coderGuy.repositories).sortBy(function(repo) {
                     return -repo.forks;
                 })

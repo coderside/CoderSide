@@ -47,6 +47,7 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
     case CheckResult => if(waited == 0) {
       log.info("[GathererNode] Gathering done !")
       val coderGuy = CoderGuy(
+        gitHubResult map (_.organizations) getOrElse Nil,
         gitHubResult map (_.repositories) getOrElse Nil,
         linkedInResult map(_.profil),
         twitterResult map (_.profil),
@@ -69,7 +70,7 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
       clients.foreach(client => client ! e)
     }
 
-    case gr @ GitHubResult(repositories) => {
+    case gr @ GitHubResult(organizations, repositories) => {
       log.debug("[GathererNode] receiving github repositories")
       gitHubResult = Some(gr)
       self ! Decrement
