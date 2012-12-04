@@ -19,12 +19,18 @@ class GitHubNode extends Actor with ActorLogging {
         }
       }
     }
-    case GitHubOrgQuery(gitHubUser, userRepos, gathererRef) => {
+    case GitHubOrgQuery(gitHubUser, repositories, gathererRef) => {
       log.debug("[GitHubNode] receiving GitHub organization query")
       GitHubAPI.organizations(gitHubUser.username).onComplete {
         case Success(organizations) =>
-          Promise.sequence(organizations.map(orgs => GitHubAPI.repositoriesByOrg(orgs.login))) onComplete {
-            case Success(orgRepos) => gathererRef ! GitHubResult(organizations, orgRepos.flatten ++ userRepos)
+          Promise.sequence(
+            organizations.map { org =>
+              GitHubAPI.repositoriesByOrg(org.login).map { repos =>
+                org.copy(repositories = repos)
+              }
+            }
+          ) onComplete {
+            case Success(organizations) => gathererRef ! GitHubResult(organizations, repositories)
             case Failure(e) => {
               log.error("[GitHubNode] Error while fetching organization repositories")
               gathererRef ! ErrorQuery(e)

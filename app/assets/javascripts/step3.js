@@ -23,7 +23,7 @@
 
         this.render = function(coderGuy) {
             self.$el.empty();
-
+            console.log(coderGuy);
             self.$el.append(tmpl.linkedin({
                 user: coderGuy.linkedInUser
             }));

@@ -30,7 +30,8 @@ object CoderGuy {
         "language" -> gr.language,
         "url" -> gr.url,
         "owner" -> gr.owner,
-        "forks" -> gr.forks
+        "forks" -> gr.forks,
+        "watchers" -> gr.watchers
       )
     }
   }
@@ -41,7 +42,8 @@ object CoderGuy {
         "login" -> go.login,
         "reposUrl" -> go.reposUrl,
         "avatarUrl" -> go.avatarUrl,
-        "url" -> go.url
+        "url" -> go.url,
+        "repositories" -> go.repositories
       )
     }
   }

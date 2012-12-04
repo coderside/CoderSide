@@ -42,7 +42,7 @@ object GitHubAPI extends URLEncoder with Debug {
       (__ \ 'repos_url).read[String] and
       (__ \ 'avatar_url).json.pick.map(handleJsNull) and
       (__ \ 'url).read[String]
-    )(GitHubOrg)
+    )((login, reposUrl, avatarUrl, url) => GitHubOrg.apply(login, reposUrl, avatarUrl, url))
 
   implicit val readRepository: Reads[GitHubRepository] = {
     (
@@ -51,7 +51,8 @@ object GitHubAPI extends URLEncoder with Debug {
       (__ \ 'language).read[String] and
       (__ \ 'html_url).read[String] and
       (__ \ 'owner \ 'login).read[String] and
-      (__ \ 'forks_count).read[Int]
+      (__ \ 'forks_count).read[Int] and
+      (__ \ 'watchers_count).read[Int]
     )(GitHubRepository)
   }
 
@@ -128,12 +129,14 @@ case class GitHubRepository(
   language: String,
   url: String,
   owner: String,
-  forks: Int
+  forks: Int,
+  watchers: Int
 )
 
 case class GitHubOrg(
   login: String,
   reposUrl: String,
   avatarUrl: Option[String],
-  url: String
+  url: String,
+  repositories: List[GitHubRepository] = Nil
 )

@@ -42,20 +42,27 @@
     <header>
       <img src="@routes.Assets.at("images/github/logo.png")" height="30px" />
     </header>
-    <h1>Organizations</h1>
+    <h1>Your Organizations</h1>
     <dl>
       <% _(organizations).each(function(organization) { %>
       <dt><img src="<%= organization.avatarUrl %>" height="50px" /></dt>
       <dd><a href="<%= organization.url %>"><%= organization.login %></a></dd>
+        <% _(organization.repositories).each(function(repository) { %>
+        <ul>
+          <li><a href="<%= repository.url %>"><%= repository.name %></a></li>
+          <li><span class="description"><%= repository.description %></span></li>
+          <li><span class="forks-watchers"><%= repository.forks %> forks & <%= repository.watchers %> watchers</span></li>
+        </ul>
+        <% }) %>
       <% }) %>
     </dl>
-    <h1>Repositories</h1>
+    <h1>Your Repositories</h1>
     <dl>
       <% _(repositories).each(function(repository) { %>
       <dt><h3><a href="<%= repository.url %>"><%= repository.name %></a></h3></dt>
       <dd>
         <span class="description"><%= repository.description %></span>
-        <span class="forks"><%= repository.forks %> forks</span>
+        <span class="forks-watchers"><%= repository.forks %> forks & <%= repository.watchers %> watchers</span>
       </dd>
       <% }) %>
     </dl>
