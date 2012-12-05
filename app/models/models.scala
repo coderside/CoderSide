@@ -6,18 +6,11 @@ import models.linkedin._
 import models.klout._
 
 case class CoderGuy(
-  organizations: List[GitHubOrg],
-  repositories: List[GitHubRepository],
+  gitHubUser: Option[GitHubUser],
   linkedInUser: Option[LinkedInUser],
   twitterUser: Option[TwitterUser],
-  twitterTimeline: Option[TwitterTimeline],
-  kloutUser: Option[KloutUser],
-  influencers: List[(KloutUser, TwitterUser)],
-  influencees: List[(KloutUser, TwitterUser)]
-) {
-  val hasTwitterAccount = twitterUser.isDefined
-  val hasLinkedInAccont = linkedInUser.isDefined
-}
+  kloutUser: Option[KloutUser]
+)
 
 object CoderGuy {
   import play.api.libs.json._
@@ -48,6 +41,19 @@ object CoderGuy {
     }
   }
 
+  implicit val gitHubUserWrites = new Writes[GitHubUser] {
+    def writes(gu: GitHubUser): JsValue = {
+      Json.obj(
+        "username" -> gu.username,
+        "fullname" -> gu.fullname,
+        "language" -> gu.language,
+        "followers" -> gu.followers,
+        "repositories" -> gu.repositories,
+        "organizations" -> gu.organizations
+      )
+    }
+  }
+
   implicit val linkedInUserWrites = new Writes[LinkedInUser] {
     def writes(lu: LinkedInUser): JsValue = {
       Json.obj(
@@ -56,17 +62,6 @@ object CoderGuy {
         "lastname" -> lu.lastName,
         "headline" -> lu.headline,
         "pictureUrl" -> lu.pictureUrl
-      )
-    }
-  }
-
-  implicit val twitterUserWrites = new Writes[TwitterUser] {
-    def writes(tu: TwitterUser): JsValue = {
-      Json.obj(
-        "screenName" -> tu.screenName,
-        "name" -> tu.name,
-        "description" -> tu.description,
-        "followers" -> tu.followers
       )
     }
   }
@@ -91,45 +86,51 @@ object CoderGuy {
     }
   }
 
+  implicit val twitterUserWrites = new Writes[TwitterUser] {
+    def writes(tu: TwitterUser): JsValue = {
+      Json.obj(
+        "screenName" -> tu.screenName,
+        "name" -> tu.name,
+        "description" -> tu.description,
+        "followers" -> tu.followers,
+        "timeline" -> tu.timeline
+      )
+    }
+  }
+
   implicit val kloutUserWrites = new Writes[KloutUser] {
+
+    def influenceJson(influence: List[(KloutUser, TwitterUser)]) = JsArray(
+      influence map { case (kloutUser, twitterUser) =>
+          Json.obj(
+            "klout" -> Json.obj(
+              "id" -> kloutUser.id,
+              "nick" -> kloutUser.nick,
+              "score" -> kloutUser.score
+            ),
+            "twitter" -> twitterUser
+          )
+      }
+    )
+
     def writes(ku: KloutUser): JsValue = {
       Json.obj(
         "id" -> ku.id,
         "nick" -> ku.nick,
-        "score" -> ku.score
+        "score" -> ku.score,
+        "influencers" -> influenceJson(ku.influencers),
+        "influencees" -> influenceJson(ku.influencees)
       )
     }
   }
 
   implicit val coderGuyWrites = new Writes[CoderGuy] {
     def writes(cg: CoderGuy): JsValue = {
-      val influencers = JsArray(
-        cg.influencers map { case (kloutUser, twitterUser) =>
-          Json.obj(
-            "klout" -> kloutUser,
-            "twitter" -> twitterUser
-          )
-        }
-      )
-
-      val influencees = JsArray(
-        cg.influencees map { case (kloutUser, twitterUser) =>
-          Json.obj(
-            "klout" -> kloutUser,
-            "twitter" -> twitterUser
-          )
-        }
-      )
-
       Json.obj(
-        "organizations"   -> cg.organizations,
-        "repositories"    -> cg.repositories,
+        "gitHubUser"      -> cg.gitHubUser,
         "linkedInUser"    -> cg.linkedInUser,
         "twitterUser"     -> cg.twitterUser,
-        "twitterTimeline" -> cg.twitterTimeline,
-        "kloutUser"       -> cg.kloutUser,
-        "influencers"     -> influencers,
-        "influencees"     -> influencees
+        "kloutUser"       -> cg.kloutUser
       )
     }
   }

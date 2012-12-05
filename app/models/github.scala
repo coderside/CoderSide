@@ -21,9 +21,9 @@ object GitHubAPI extends URLEncoder with Debug {
     (
       (__ \ 'username).read[String] and
       (__ \ 'fullname).json.pick.map(handleJsNull) and
-      (__ \ 'language).json.pick.map(handleJsNull)and
+      (__ \ 'language).json.pick.map(handleJsNull) and
       (__ \ 'followers).read[Int]
-    )(GitHubUser)
+    )((username, fullname, language, followers) => GitHubUser(username, fullname, language, followers))
 
   implicit val gitHubUserWrites = new Writes[GitHubUser] {
     def writes(gu: GitHubUser): JsValue = {
@@ -42,7 +42,7 @@ object GitHubAPI extends URLEncoder with Debug {
       (__ \ 'repos_url).read[String] and
       (__ \ 'avatar_url).json.pick.map(handleJsNull) and
       (__ \ 'url).read[String]
-    )((login, reposUrl, avatarUrl, url) => GitHubOrg.apply(login, reposUrl, avatarUrl, url))
+    )((login, reposUrl, avatarUrl, url) => GitHubOrg(login, reposUrl, avatarUrl, url))
 
   implicit val readRepository: Reads[GitHubRepository] = {
     (
@@ -101,11 +101,32 @@ object GitHubAPI extends URLEncoder with Debug {
      case r => throw new GitHubApiException("Failed getting organizations for : " + username)
     }
   }
+
+  def contributions(username: String, repository: GitHubRepository): Future[Option[Long]] = {
+    WS.url("https://api.github.com/%s/%s/contributors".format(encode(repository.owner), encode(repository.name)))
+   .get().map(_.json).map {
+     case JsArray(contributors) => {
+       contributors.map { contributor =>
+         (contributor \ "login").asOpt[String] -> (contributor \ "contributions").asOpt[Long]
+       }.toList.collect {
+         case (Some(login), Some(commits)) if (username == login) => commits
+       }.headOption
+     }
+     case r => throw new GitHubApiException("Failed getting contributions for : " + username)
+    }
+  }
 }
 
 case class GitHubApiException(message: String) extends Exception
 
-case class GitHubUser(username: String, fullname: Option[String], language: Option[String], followers: Int) {
+case class GitHubUser(
+  username: String,
+  fullname: Option[String],
+  language: Option[String],
+  followers: Int,
+  repositories: List[GitHubRepository] = Nil,
+  organizations: List[GitHubOrg] = Nil
+) {
 
   private def escapeSpecialCaracters(fullname: String): String = {
     val specialCaracters = """[^\w \tÀÂÇÈÉÊËÎÔÙÛàâçèéêëîôùû-]""".r

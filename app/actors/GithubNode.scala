@@ -12,14 +12,14 @@ class GitHubNode extends Actor with ActorLogging {
     case NodeQuery(gitHubUser, gathererRef) => {
       log.debug("[GitHubNode] receiving new head query")
       GitHubAPI.repositoriesByUser(gitHubUser.username).onComplete {
-        case Success(repositories) => self ! GitHubOrgQuery(gitHubUser, repositories, gathererRef)
+        case Success(repos) => self ! GitHubOrgQuery(gitHubUser.copy(repositories = repos), gathererRef)
         case Failure(e) => {
           log.error("[GitHubNode] Error while fetching user repositories")
           gathererRef ! ErrorQuery(e)
         }
       }
     }
-    case GitHubOrgQuery(gitHubUser, repositories, gathererRef) => {
+    case GitHubOrgQuery(gitHubUser, gathererRef) => {
       log.debug("[GitHubNode] receiving GitHub organization query")
       GitHubAPI.organizations(gitHubUser.username).onComplete {
         case Success(organizations) =>
@@ -30,7 +30,7 @@ class GitHubNode extends Actor with ActorLogging {
               }
             }
           ) onComplete {
-            case Success(organizations) => gathererRef ! GitHubResult(organizations, repositories)
+            case Success(orgs) => gathererRef ! GitHubResult(gitHubUser.copy(organizations = orgs))
             case Failure(e) => {
               log.error("[GitHubNode] Error while fetching organization repositories")
               gathererRef ! ErrorQuery(e)

@@ -36,8 +36,7 @@ class TwitterNode extends Actor with ActorLogging {
         TwitterAPI.searchBy(fname).onComplete { byFullname =>
           handleResponse(byFullname,
             TwitterAPI.searchBy(gitHubUser.username).onComplete { byUsername =>
-              handleResponse(byUsername,
-                {
+              handleResponse(byUsername, {
                   gathererRef ! NotFound("twitter")
                   gathererRef ! NotFound("klout")
                 }
@@ -51,7 +50,7 @@ class TwitterNode extends Actor with ActorLogging {
     case TwitterTimelineQuery(twitterUser, gathererRef) => {
       log.debug("[TwitterNode] Getting twitter timeline")
       TwitterAPI.timeline(twitterUser.screenName).onComplete {
-        case Success(timeline) => gathererRef ! TwitterResult(twitterUser, timeline)
+        case Success(timeline) => gathererRef ! TwitterResult(twitterUser.copy(timeline = timeline))
         case Failure(e) => {
           log.error("[TwitterNode] Error while fetching twitter user timeline")
           gathererRef ! ErrorQuery(e)

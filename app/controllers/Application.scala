@@ -38,7 +38,7 @@ object Application extends Controller {
   def overview(username: String, fullname: String, language: String, followers: Int) = Action {
     Logger.debug("[Application] Searching coder guy")
     val name = Option(fullname) filter (!_.trim.isEmpty)
-    val lang = Option(fullname) filter (!_.trim.isEmpty) orElse Some("n/a")
+    val lang = Option(language) filter (!_.trim.isEmpty) orElse Some("n/a")
     val gitHubUser = GitHubUser(username, name, lang, followers)
     implicit val timeout = Timeout(20.seconds)
     Async {

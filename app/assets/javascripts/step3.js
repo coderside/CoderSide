@@ -23,27 +23,25 @@
 
         this.render = function(coderGuy) {
             self.$el.empty();
-            console.log(coderGuy);
+
             self.$el.append(tmpl.linkedin({
                 user: coderGuy.linkedInUser
             }));
 
             self.$el.append(tmpl.github({
-                organizations: coderGuy.organizations,
-                repositories: _(coderGuy.repositories).sortBy(function(repo) {
-                    return -repo.forks;
-                })
+                organizations: coderGuy.gitHubUser.organizations,
+                repositories: coderGuy.gitHubUser.repositories
             }));
 
             self.$el.append(tmpl.twitter({
                 user: coderGuy.twitterUser,
-                timeline: coderGuy.twitterTimeline
+                timeline: coderGuy.twitterUser.timeline
             }));
 
             self.$el.append(tmpl.klout({
                 user: coderGuy.kloutUser,
-                influencers: coderGuy.influencers,
-                influencees: coderGuy.influencees
+                influencers: coderGuy.kloutUser.influencers,
+                influencees: coderGuy.kloutUser.influencees
             }));
             self.resizeContent();
         };

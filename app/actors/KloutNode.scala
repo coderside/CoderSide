@@ -40,7 +40,8 @@ class KloutNode extends Actor with ActorLogging {
           ) onComplete {
             case Success(twitterUsers) =>
               Klout.splitInfluence(influencers, influencees, Klout.flattenTwitterUsers(twitterUsers)) match {
-                case (influencers, influencees) => gathererRef ! KloutResult(kloutUser,influencers, influencees)
+                case (influencers, influencees) =>
+                  gathererRef ! KloutResult(kloutUser.copy(influencers = influencers, influencees = influencees))
               }
             case Failure(e) => {
               log.error("[KloutNode] Error while getting influence (second part): " + e.getMessage)

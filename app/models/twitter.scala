@@ -27,7 +27,7 @@ object TwitterAPI extends URLEncoder with Debug {
       (__ \ 'name).read[String] and
       (__ \ 'description).read[String] and
       (__ \ 'followers_count).read[Int]
-    )(TwitterUser)
+    )((screenName, name, desc, followers) => TwitterUser(screenName, name, desc, followers))
   }
 
   implicit val readTweet = {
@@ -124,5 +124,11 @@ object Twitter {
 }
 
 case class Tweet(text: String, createdAt: Date, retweeted: Boolean, inReplyToUser: Boolean, inReplyToStatus: Boolean)
-case class TwitterUser(screenName: String, name: String, description: String, followers: Int)
+case class TwitterUser(
+  screenName: String,
+  name: String,
+  description: String,
+  followers: Int,
+  timeline: Option[TwitterTimeline] = None
+)
 case class TwitterApiException(message: String) extends Exception

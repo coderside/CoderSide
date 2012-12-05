@@ -19,7 +19,7 @@ object KloutAPI extends URLEncoder {
       (__ \ 'payload \ 'kloutId).read[String] and
       (__ \ 'payload \ 'nick).read[String] and
       (__ \ 'payload \ 'score \ 'score).read[Double]
-    )(KloutUser)
+    )((id, nick, score) => KloutUser(id, nick, score))
   }
 
   implicit val readUser: Reads[KloutUser] = {
@@ -27,7 +27,7 @@ object KloutAPI extends URLEncoder {
       (__ \ 'kloutId).read[String] and
       (__ \ 'nick).read[String] and
       (__ \ 'score \ 'score).read[Double]
-    )(KloutUser)
+    )((id, nick, score) => KloutUser(id, nick, score))
   }
 
   def kloutID(twitterID: String): Future[Option[String]] = {
@@ -105,6 +105,12 @@ object Klout {
   }
 }
 
-case class KloutUser(id: String, nick: String, score: Double)
+case class KloutUser(
+  id: String,
+  nick: String,
+  score: Double,
+  influencers: List[(KloutUser, TwitterUser)] = Nil,
+  influencees: List[(KloutUser, TwitterUser)] = Nil
+)
 case class Influence(influencers: List[KloutUser], influencees: List[KloutUser])
 case class KloutApiException(message: String) extends Exception

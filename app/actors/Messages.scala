@@ -21,16 +21,18 @@ object Messages {
   case class KloutNodeQuery(twitterUser: TwitterUser, gatherer: ActorRef)
   //Klout to Klout
   case class KloutUserQuery(kloutUser: KloutUser, gathererRef: ActorRef)
-  //GitHub to Gatherer
-  case class GitHubResult(organizations: List[GitHubOrg], repositories: List[GitHubRepository])
   //GitHub to GitHub
-  case class GitHubOrgQuery(gitHubUser: GitHubUser, repositories: List[GitHubRepository], gathererRef: ActorRef)
+  case class GitHubOrgQuery(gitHubUser: GitHubUser, gathererRef: ActorRef)
+  //GitHub to GitHub
+  case class GitHubContribQuery(gitHubUser: GitHubUser, organizations: List[GitHubOrg], gathererRef: ActorRef)
+  //GitHub to Gatherer
+  case class GitHubResult(profil: GitHubUser)
   //LinkedIn to Gatherer
   case class LinkedInResult(profil: LinkedInUser)
   //Klout to Gatherer
-  case class KloutResult(profil: KloutUser, influencers: List[(KloutUser, TwitterUser)], influencees: List[(KloutUser, TwitterUser)])
+  case class KloutResult(profil: KloutUser)
   //Twitter to Gatherer
-  case class TwitterResult(profil: TwitterUser, timeline: Option[TwitterTimeline])
+  case class TwitterResult(profil: TwitterUser)
   //Twitter to Twitter
   case class TwitterUserQuery(gitHubUser: GitHubUser, klout: ActorRef, gatherer: ActorRef)
   //Twitter to Twitter
