@@ -62,7 +62,7 @@ $(document).ready(function() {
                      .then(commons.loader.hide)
                      .fail(step2.toggleLoader)
                      .fail(commons.loader.hide);
-                //step2.progress(gitHubUser);
+                step2.progress(gitHubUser);
             } else {
                 slider.go(step3, { back: true, next: false });
             }

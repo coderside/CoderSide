@@ -53,7 +53,7 @@ object Application extends Controller {
 
   def progress(username: String, fullname: String, language: String, followers: Int) = Action {
     val name = Option(fullname) filter (!_.trim.isEmpty)
-    val lang = Option(fullname) filter (!_.trim.isEmpty) orElse Some("n/a")
+    val lang = Option(language) filter (!_.trim.isEmpty) orElse Some("n/a")
     val gitHubUser = GitHubUser(username, name, lang, followers)
     Async {
       implicit val timeout = Timeout(20.seconds)

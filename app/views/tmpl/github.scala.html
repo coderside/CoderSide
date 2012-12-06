@@ -48,21 +48,21 @@
       <% _(organizations).each(function(organization) { %>
       <dt><img src="<%= organization.avatarUrl %>" height="50px" /></dt>
       <dd><a href="<%= organization.url %>"><%= organization.login %></a></dd>
-        <% _(sortByContributions(organization.repositories)).each(function(repository) { %>
-        <ul>
-          <li><a href="<%= repository.url %>"><%= repository.name %></a></li>
-          <li><span class="description"><%= repository.description %></span></li>
-          <li>
-            <span class="forks-watchers">
-              <%= repository.forks %> forks | 
-              <%= repository.watchers %> watchers
-              <% if(repository.contributions) { %>
-                   | <%= repository.contributions %> contributions
-              <% } %>
-            </span>
-          </li>
-        </ul>
-        <% }) %>
+      <% _(sortByContributions(organization.repositories)).each(function(repository) { %>
+      <ul>
+        <li><a href="<%= repository.url %>"><%= repository.name %></a></li>
+        <li><span class="description"><%= repository.description %></span></li>
+        <li>
+          <span class="forks-watchers">
+            <%= repository.forks %> forks | 
+            <%= repository.watchers %> watchers
+            <% if(repository.contributions) { %>
+            | <%= repository.contributions %> contributions
+            <% } %>
+          </span>
+        </li>
+      </ul>
+      <% }) %>
       <% }) %>
     </dl>
     <% } %>
@@ -76,7 +76,7 @@
           <%= repository.forks %> forks | 
           <%= repository.watchers %> watchers
           <% if(repository.contributions) { %>
-             | <%= repository.contributions %> contributions
+          | <%= repository.contributions %> contributions
           <% } %>
         </span>
       </dd>
