@@ -28,6 +28,13 @@ object Config {
     }
   }
 
+  lazy val overviewTimeout: FiniteDuration = {
+    Play.configuration.getInt("overview.timeout").map(number => number seconds).getOrElse {
+      Logger.warn("[Config] Please provide overview timeout value")
+      throw new ConfigException("Please provide overview timeout value")
+    }
+  }
+
   lazy val gathererTimeout: FiniteDuration = {
     Play.configuration.getInt("gatherer.timeout").map(number => number seconds).getOrElse {
       Logger.warn("[Config] Please provide GathererNode timeout value")
@@ -63,7 +70,23 @@ object Config {
     }
   }
 
-  object linkedIn {
+  object GitHub {
+    lazy val clientID: String = {
+      Play.configuration.getString("oauth.github.clientid").getOrElse {
+        Logger.warn("[Config] Please provide github clientid")
+        throw new ConfigException("Please provide GitHub client id")
+      }
+    }
+
+    lazy val clientSecret: String = {
+      Play.configuration.getString("oauth.github.clientsecret").getOrElse {
+        Logger.warn("[Config] Please provide GitHub client secret")
+        throw new ConfigException("Please provide GitHub client secret")
+      }
+    }
+  }
+
+  object LinkedIn {
     lazy val key: String = {
       Play.configuration.getString("oauth.linkedin.key").getOrElse {
         Logger.warn("[Config] Please provide LinkedIn key")
@@ -93,7 +116,7 @@ object Config {
     }
   }
 
-  object klout {
+  object Klout {
     lazy val key: String = {
       Play.configuration.getString("oauth.klout.key").getOrElse {
         Logger.warn("[Config] Please provide klout key")
@@ -102,7 +125,7 @@ object Config {
     }
   }
 
-  object twitter {
+  object Twitter {
     lazy val consumerKey: String = {
       Play.configuration.getString("oauth.twitter.consumerkey").getOrElse {
         Logger.warn("[Config] Please provide twitter consummer key")

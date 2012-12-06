@@ -34,7 +34,7 @@ object KloutAPI extends URLEncoder {
     WS.url("http://api.klout.com/v2/identity.json/twitter")
       .withQueryString(
         "screenName" -> twitterID,
-        "key" -> Config.klout.key
+        "key" -> Config.Klout.key
       )
       .get().map { response =>
         catching(classOf[Exception]).opt(response.json).flatMap { json =>
@@ -45,7 +45,7 @@ object KloutAPI extends URLEncoder {
 
   def kloutUser(kloutID: String): Future[Option[KloutUser]] = {
     WS.url("http://api.klout.com/v2/user.json/" + encode(kloutID))
-      .withQueryString("key" -> Config.klout.key)
+      .withQueryString("key" -> Config.Klout.key)
       .get().map { response =>
         catching(classOf[Exception]).opt(response.json).flatMap { json =>
           readUser.reads(json).asOpt
@@ -56,7 +56,7 @@ object KloutAPI extends URLEncoder {
   def topics(kloutID: String): Future[List[String]] = {
     val uri = "http://api.klout.com/v2/user.json/%s/topics".format(encode(kloutID))
     WS.url(uri)
-      .withQueryString("key" -> Config.klout.key)
+      .withQueryString("key" -> Config.Klout.key)
       .get().map { response =>
         (response.json \\ "displayName").flatMap(topic => topic.asOpt[String]).toList
     }
@@ -65,7 +65,7 @@ object KloutAPI extends URLEncoder {
   def influence(kloutID: String): Future[Influence] = {
     val uri = "http://api.klout.com/v2/user.json/%s/influence".format(encode(kloutID))
     WS.url(uri)
-      .withQueryString("key" -> Config.klout.key)
+      .withQueryString("key" -> Config.Klout.key)
       .get().map(_.json).map { influence =>
         val influencers = (influence \ "myInfluencers" \\ "entity").flatMap { influencer =>
           readInfluence.reads(influencer).asOpt

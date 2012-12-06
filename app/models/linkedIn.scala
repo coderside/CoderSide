@@ -15,8 +15,8 @@ import models.github.GitHubUser
 object LinkedInAPI extends URLEncoder with Debug {
 
   val signatureCalc = OAuthCalculator(
-    ConsumerKey(Config.linkedIn.key, Config.linkedIn.secretKey),
-    RequestToken(Config.linkedIn.userToken, Config.linkedIn.userSecret)
+    ConsumerKey(Config.LinkedIn.key, Config.LinkedIn.secretKey),
+    RequestToken(Config.LinkedIn.userToken, Config.LinkedIn.userSecret)
   )
 
   implicit val readUser: Reads[LinkedInUser] = {

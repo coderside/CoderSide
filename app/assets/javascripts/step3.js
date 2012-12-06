@@ -23,6 +23,7 @@
 
         this.render = function(coderGuy) {
             self.$el.empty();
+            console.log(coderGuy);
 
             self.$el.append(tmpl.linkedin({
                 user: coderGuy.linkedInUser
@@ -30,7 +31,12 @@
 
             self.$el.append(tmpl.github({
                 organizations: coderGuy.gitHubUser.organizations,
-                repositories: coderGuy.gitHubUser.repositories
+                repositories: coderGuy.gitHubUser.repositories,
+                sortByContributions: function(repositories) {
+                    return _(repositories).sortBy(function(repository) {
+                        return -repository.contributions;
+                    });
+                }
             }));
 
             self.$el.append(tmpl.twitter({

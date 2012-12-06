@@ -24,7 +24,7 @@ object Messages {
   //GitHub to GitHub
   case class GitHubOrgQuery(gitHubUser: GitHubUser, gathererRef: ActorRef)
   //GitHub to GitHub
-  case class GitHubContribQuery(gitHubUser: GitHubUser, organizations: List[GitHubOrg], gathererRef: ActorRef)
+  case class GitHubContribQuery(gitHubUser: GitHubUser, gathererRef: ActorRef)
   //GitHub to Gatherer
   case class GitHubResult(profil: GitHubUser)
   //LinkedIn to Gatherer

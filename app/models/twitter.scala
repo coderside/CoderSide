@@ -17,8 +17,8 @@ import models.github.GitHubUser
 object TwitterAPI extends URLEncoder with Debug {
 
   val signatureCalc = OAuthCalculator(
-    ConsumerKey(Config.twitter.consumerKey, Config.twitter.consumerSecret),
-    RequestToken(Config.twitter.accessToken, Config.twitter.accessTokenSecret)
+    ConsumerKey(Config.Twitter.consumerKey, Config.Twitter.consumerSecret),
+    RequestToken(Config.Twitter.accessToken, Config.Twitter.accessTokenSecret)
   )
 
   implicit val readUser: Reads[TwitterUser] = {

@@ -9,6 +9,7 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import models.{ URLEncoder, Debug }
+import utils.Config
 
 object GitHubAPI extends URLEncoder with Debug {
 
@@ -53,11 +54,15 @@ object GitHubAPI extends URLEncoder with Debug {
       (__ \ 'owner \ 'login).read[String] and
       (__ \ 'forks_count).read[Int] and
       (__ \ 'watchers_count).read[Int]
-    )(GitHubRepository)
+    ) ((name, desc, lang, htmlUrl, owner, forks, watchers) =>
+      GitHubRepository(name, desc, lang, htmlUrl, owner, forks, watchers)
+    )
   }
 
+  def oauthURL = "client_id=" + Config.GitHub.clientID + "&client_secret=" + Config.GitHub.clientSecret
+
   def searchByFullname(fullname: String): Future[Set[GitHubUser]] = {
-    WS.url("https://api.github.com/legacy/user/search/" + encode(fullname))
+    WS.url("https://api.github.com/legacy/user/search/" + encode(fullname) + "?" + oauthURL)
    .get().map(_.json \ "users").map {
        case JsArray(users) => users.flatMap { user =>
          readUser.reads(user).asOpt
@@ -67,7 +72,7 @@ object GitHubAPI extends URLEncoder with Debug {
   }
 
   def repositoriesByUser(username: String): Future[List[GitHubRepository]] = {
-    WS.url("https://api.github.com/users/%s/repos".format(encode(username)))
+    WS.url("https://api.github.com/users/%s/repos".format(encode(username)) + "?" + oauthURL)
    .get().map(_.json).map {
      case JsArray(reps) => reps.flatMap { rep =>
        catching(classOf[Exception]).opt(
@@ -79,7 +84,7 @@ object GitHubAPI extends URLEncoder with Debug {
   }
 
   def repositoriesByOrg(org: String): Future[List[GitHubRepository]] = {
-    WS.url("https://api.github.com/orgs/%s/repos".format(encode(org)))
+    WS.url("https://api.github.com/orgs/%s/repos".format(encode(org)) + "?" + oauthURL)
    .get().map(_.json).map {
      case JsArray(reps) => reps.flatMap { rep =>
        catching(classOf[Exception]).opt(
@@ -91,7 +96,7 @@ object GitHubAPI extends URLEncoder with Debug {
   }
 
   def organizations(username: String): Future[List[GitHubOrg]] = {
-    WS.url("https://api.github.com/users/%s/orgs".format(encode(username)))
+    WS.url("https://api.github.com/users/%s/orgs".format(encode(username)) + "?" + oauthURL)
    .get().map(_.json).map {
      case JsArray(orgs) => orgs.flatMap { org =>
        catching(classOf[Exception]).opt {
@@ -102,15 +107,15 @@ object GitHubAPI extends URLEncoder with Debug {
     }
   }
 
-  def contributions(username: String, repository: GitHubRepository): Future[Option[Long]] = {
-    WS.url("https://api.github.com/%s/%s/contributors".format(encode(repository.owner), encode(repository.name)))
+  def contributions(username: String, repository: GitHubRepository): Future[Long] = {
+    WS.url("https://api.github.com/repos/%s/%s/contributors".format(encode(repository.owner), encode(repository.name)) + "?" + oauthURL)
    .get().map(_.json).map {
      case JsArray(contributors) => {
        contributors.map { contributor =>
-         (contributor \ "login").asOpt[String] -> (contributor \ "contributions").asOpt[Long]
+         (contributor \ "login").asOpt[String] -> ((contributor \ "contributions").asOpt[Long] getOrElse 0L)
        }.toList.collect {
-         case (Some(login), Some(commits)) if (username == login) => commits
-       }.headOption
+         case (Some(login), commits) if (username == login) => commits
+       }.headOption getOrElse 0
      }
      case r => throw new GitHubApiException("Failed getting contributions for : " + username)
     }
@@ -151,7 +156,8 @@ case class GitHubRepository(
   url: String,
   owner: String,
   forks: Int,
-  watchers: Int
+  watchers: Int,
+  contributions: Long = 0
 )
 
 case class GitHubOrg(

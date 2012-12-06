@@ -15,6 +15,7 @@ import actors.{ SupervisorNode, GathererNode }
 import actors.Messages.{ InitQuery, AskProgress }
 import models.github.{ GitHubAPI, GitHubUser }
 import models.CoderGuy
+import utils.Config
 
 object Application extends Controller {
 
@@ -40,7 +41,7 @@ object Application extends Controller {
     val name = Option(fullname) filter (!_.trim.isEmpty)
     val lang = Option(language) filter (!_.trim.isEmpty) orElse Some("n/a")
     val gitHubUser = GitHubUser(username, name, lang, followers)
-    implicit val timeout = Timeout(20.seconds)
+    implicit val timeout = Timeout(Config.overviewTimeout)
     Async {
       (SupervisorNode.ref ? InitQuery(gitHubUser)).mapTo[CoderGuy].map { coderGuy =>
         Ok(toJson(coderGuy))
