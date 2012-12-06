@@ -48,7 +48,7 @@
       <% _(organizations).each(function(organization) { %>
       <dt><img src="<%= organization.avatarUrl %>" height="50px" /></dt>
       <dd><a href="<%= organization.url %>"><%= organization.login %></a></dd>
-      <% _(sortByContributions(organization.repositories)).each(function(repository) { %>
+      <% _(sortByUpdatedAt(organization.repositories)).each(function(repository) { %>
       <ul>
         <li><a href="<%= repository.url %>"><%= repository.name %></a></li>
         <li><span class="description"><%= repository.description %></span></li>
@@ -59,6 +59,9 @@
             <% if(repository.contributions) { %>
             | <%= repository.contributions %> contributions
             <% } %>
+            <% if(repository.fork) { %>
+            | forked
+            <% } %>
           </span>
         </li>
       </ul>
@@ -68,7 +71,7 @@
     <% } %>
     <h1>User Repositories</h1>
     <dl>
-      <% _(sortByContributions(repositories)).each(function(repository) { %>
+      <% _(sortByUpdatedAt(repositories)).each(function(repository) { %>
       <dt><h3><a href="<%= repository.url %>"><%= repository.name %></a></h3></dt>
       <dd>
         <span class="description"><%= repository.description %></span>
@@ -77,6 +80,9 @@
           <%= repository.watchers %> watchers
           <% if(repository.contributions) { %>
           | <%= repository.contributions %> contributions
+          <% } %>
+          <% if(repository.fork) { %>
+          | forked
           <% } %>
         </span>
       </dd>

@@ -25,6 +25,8 @@ object CoderGuy {
         "owner" -> gr.owner,
         "forks" -> gr.forks,
         "watchers" -> gr.watchers,
+        "fork" -> gr.fork,
+        "updatedAt" -> gr.updatedAt,
         "contributions" -> gr.contributions
       )
     }

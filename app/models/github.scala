@@ -2,6 +2,7 @@ package models.github
 
 import scala.concurrent.Future
 import scala.concurrent.future
+import java.util.Date
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.util.control.Exception._
 import play.api.libs.ws._
@@ -53,9 +54,11 @@ object GitHubAPI extends URLEncoder with Debug {
       (__ \ 'html_url).read[String] and
       (__ \ 'owner \ 'login).read[String] and
       (__ \ 'forks_count).read[Int] and
-      (__ \ 'watchers_count).read[Int]
-    ) ((name, desc, lang, htmlUrl, owner, forks, watchers) =>
-      GitHubRepository(name, desc, lang, htmlUrl, owner, forks, watchers)
+      (__ \ 'watchers_count).read[Int] and
+      (__ \ 'fork).read[Boolean] and
+      (__ \ 'updated_at).read[Date]
+    ) ((name, desc, lang, htmlUrl, owner, forks, watchers, fork, updatedAt) =>
+      GitHubRepository(name, desc, lang, htmlUrl, owner, forks, watchers, fork, updatedAt)
     )
   }
 
@@ -157,6 +160,8 @@ case class GitHubRepository(
   owner: String,
   forks: Int,
   watchers: Int,
+  fork: Boolean,
+  updatedAt: Date,
   contributions: Long = 0
 )
 

@@ -30,9 +30,9 @@
             self.$el.append(tmpl.github({
                 organizations: coderGuy.gitHubUser.organizations || [],
                 repositories: coderGuy.gitHubUser.repositories || [],
-                sortByContributions: function(repositories) {
+                sortByUpdatedAt: function(repositories) {
                     return _(repositories).sortBy(function(repository) {
-                        return -repository.contributions;
+                        return -repository.updatedAt;
                     });
                 }
             }));
