@@ -35,7 +35,7 @@ object LinkedInAPI extends URLEncoder with Debug {
 
     WS.url(uri + params)
    .sign(signatureCalc)
-   .get().map(response => (response.json, response.json \ "people" \ "values")) map {
+   .get().map(debug).map(response => (response.json, response.json \ "people" \ "values")) map {
        case (_, JsArray(users)) => users.flatMap { user =>
          readUser.reads(user).asOpt
        }.toList
