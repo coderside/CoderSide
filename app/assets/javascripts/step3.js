@@ -23,13 +23,15 @@
 
         this.render = function(coderGuy) {
             self.$el.empty();
-            console.log(coderGuy);
+
             self.$el.append(tmpl.linkedin({
                 user: coderGuy.linkedInUser
             }));
+
+            var gitHubUser = coderGuy.gitHubUser;
             self.$el.append(tmpl.github({
-                organizations: coderGuy.gitHubUser.organizations || [],
-                repositories: coderGuy.gitHubUser.repositories || [],
+                organizations: gitHubUser ? gitHubUser.organizations : [],
+                repositories: gitHubUser ? gitHubUser.repositories : [],
                 sortByUpdatedAt: function(repositories) {
                     return _(repositories).sortBy(function(repository) {
                         return -repository.updatedAt;
@@ -37,16 +39,23 @@
                 }
             }));
 
+            var twitterUser = coderGuy.twitterUser;
             self.$el.append(tmpl.twitter({
-                user: coderGuy.twitterUser,
-                timeline: coderGuy.twitterUser.timeline
+                user: twitterUser,
+                timeline: twitterUser ? twitterUser.timeline : null
             }));
 
+            var kloutUser = coderGuy.kloutUser;
             self.$el.append(tmpl.klout({
-                user: coderGuy.kloutUser,
-                influencers: coderGuy.kloutUser.influencers,
-                influencees: coderGuy.kloutUser.influencees
+                user: kloutUser,
+                influencers: kloutUser ? kloutUser.influencers : [],
+                influencees: kloutUser ? kloutUser.influencees : []
             }));
+
+            self.$el.append(tmpl.errors({
+                errors: coderGuy.errors
+            }));
+
             self.resizeContent();
         };
     };

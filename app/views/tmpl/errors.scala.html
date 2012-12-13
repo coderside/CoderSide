@@ -1,0 +1,12 @@
+@()
+
+<script id="errors-result-tmpl" type="text/html">
+  <% if(errors && errors.length) { %>
+  <h1>Errors</h1>
+    <dl class="errors">
+    <% _(errors).each(function(error) { %>
+      <dt><%= error.from %></dt><dd><%= error.what %></dd>
+    <% }); %>
+    </dl>
+  <% } %>
+</script>

@@ -20,6 +20,7 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
   private var linkedInResult: Option[LinkedInResult] = None
   private var kloutResult: Option[KloutResult] = None
   private var twitterResult: Option[TwitterResult] = None
+  private var errors: Seq[(String, String)] = Nil
 
   def computeProgress(): Float = 100 - ((waited / 4F) * 100)
 
@@ -50,7 +51,8 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
         gitHubResult map (_.profil),
         linkedInResult map(_.profil),
         twitterResult map (_.profil),
-        kloutResult map (_.profil)
+        kloutResult map (_.profil),
+        errors
       )
       clients foreach (_ ! coderGuy)
       headNode ! End(self)
@@ -61,9 +63,10 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
       self ! Decrement
     }
 
-    case ErrorQuery(e) => {
-      log.info("[GathererNode] Error well received.")
-      clients.foreach(client => client ! e)
+    case ErrorQuery(from, e) => {
+      log.info("[GathererNode] Error well received: " + e.getMessage)
+      errors = (from, e.getMessage) +: errors
+      self ! Decrement
     }
 
     case gr @ GitHubResult(profil) => {

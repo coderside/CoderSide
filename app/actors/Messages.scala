@@ -8,7 +8,7 @@ import models.linkedin.LinkedInUser
 
 object Messages {
   //Node to Gatherer
-  case class ErrorQuery(e: Throwable)
+  case class ErrorQuery(from: String, e: Throwable)
   //Application to Supervisor.
   case class InitQuery(profil: GitHubUser)
   //Supervisor to Head

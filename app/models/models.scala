@@ -9,7 +9,8 @@ case class CoderGuy(
   gitHubUser: Option[GitHubUser],
   linkedInUser: Option[LinkedInUser],
   twitterUser: Option[TwitterUser],
-  kloutUser: Option[KloutUser]
+  kloutUser: Option[KloutUser],
+  errors: Seq[(String, String)] = Nil
 )
 
 object CoderGuy {
@@ -128,12 +129,23 @@ object CoderGuy {
   }
 
   implicit val coderGuyWrites = new Writes[CoderGuy] {
+
+    def errorsAsJson(errors: Seq[(String, String)]): JsValue = {
+      JsArray(errors.map { case (who, what) =>
+          Json.obj(
+            "from" -> who,
+            "what" -> what
+          )
+      })
+    }
+
     def writes(cg: CoderGuy): JsValue = {
       Json.obj(
         "gitHubUser"      -> cg.gitHubUser,
         "linkedInUser"    -> cg.linkedInUser,
         "twitterUser"     -> cg.twitterUser,
-        "kloutUser"       -> cg.kloutUser
+        "kloutUser"       -> cg.kloutUser,
+        "errors"          -> errorsAsJson(cg.errors)
       )
     }
   }

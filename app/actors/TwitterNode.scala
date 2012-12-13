@@ -27,8 +27,8 @@ class TwitterNode extends Actor with ActorLogging {
             }
             case Failure(e) => {
               log.error("[TwitterNode] Error while searching twitter user")
-              gathererRef ! ErrorQuery(e) //twitter
-              gathererRef ! ErrorQuery(e) //klout
+              gathererRef ! ErrorQuery("Twitter", e) //twitter
+              gathererRef ! ErrorQuery("Klout", e) //klout
             }
           }
         }
@@ -37,8 +37,8 @@ class TwitterNode extends Actor with ActorLogging {
           handleResponse(byFullname,
             TwitterAPI.searchBy(gitHubUser.username).onComplete { byUsername =>
               handleResponse(byUsername, {
-                  gathererRef ! NotFound("twitter")
-                  gathererRef ! NotFound("klout")
+                  gathererRef ! NotFound("Twitter")
+                  gathererRef ! NotFound("Klout")
                 }
               )
             }
@@ -53,7 +53,7 @@ class TwitterNode extends Actor with ActorLogging {
         case Success(timeline) => gathererRef ! TwitterResult(twitterUser.copy(timeline = timeline))
         case Failure(e) => {
           log.error("[TwitterNode] Error while fetching twitter user timeline")
-          gathererRef ! ErrorQuery(e)
+          gathererRef ! ErrorQuery("Twitter", e)
         }
       }
     }

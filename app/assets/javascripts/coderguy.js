@@ -108,7 +108,8 @@ $(document).ready(function() {
             twitter: _.template($("#twitter-result-tmpl").html()),
             github: _.template($("#github-result-tmpl").html()),
             klout: _.template($("#klout-result-tmpl").html()),
-            linkedin: _.template($("#linkedin-result-tmpl").html())
+            linkedin: _.template($("#linkedin-result-tmpl").html()),
+            errors: _.template($("#errors-result-tmpl").html())
         }
     );
 

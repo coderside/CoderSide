@@ -1,7 +1,10 @@
+@import "helpers";
+
 html {
     height: 100%;
     body {
         height: 100%;
+        background: #ECECEC;
 
         .coderguy-loader {
             display: none;
@@ -26,7 +29,7 @@ html {
                 border-bottom: 1px solid white;
                 padding: 10px;
                 color: white;
-                background: #252525;
+                .gradient(#252525, #414141);
             }
 
             #content {
@@ -37,8 +40,9 @@ html {
         footer {
             padding: 10px;
             height: 4em;
-            background: #252525;
             color: white;
+            .gradient(#252525, #414141);
+
             .twitter-account {
                 text-decoration: none;
                 color: white;

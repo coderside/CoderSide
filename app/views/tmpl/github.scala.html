@@ -44,7 +44,7 @@
     </header>
     <% if(organizations && organizations.length) { %>
     <h1>User Organizations</h1>
-    <dl>
+    <dl class="organizations">
       <% _(organizations).each(function(organization) { %>
       <dt><img src="<%= organization.avatarUrl %>" height="50px" /></dt>
       <dd><a href="<%= organization.url %>"><%= organization.login %></a></dd>

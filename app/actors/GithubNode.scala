@@ -18,7 +18,7 @@ class GitHubNode extends Actor with ActorLogging {
         case Success(repos) => self ! GitHubOrgQuery(gitHubUser.copy(repositories = repos), gathererRef)
         case Failure(e) => {
           log.error("[GitHubNode] Error while fetching user repositories")
-          gathererRef ! ErrorQuery(e)
+          gathererRef ! ErrorQuery("GitHub", e)
         }
       }
     }
@@ -37,12 +37,12 @@ class GitHubNode extends Actor with ActorLogging {
             case Success(orgs) => self ! GitHubContribQuery(gitHubUser.copy(organizations = orgs), gathererRef)
             case Failure(e) => {
               log.error("[GitHubNode] Error while fetching organization repositories")
-              gathererRef ! ErrorQuery(e)
+              gathererRef ! ErrorQuery("GitHub", e)
             }
           }
         case Failure(e) => {
           log.error("[GitHubNode] Error while fetching user organizations")
-          gathererRef ! ErrorQuery(e)
+          gathererRef ! ErrorQuery("GitHub", e)
         }
       }
     }
@@ -70,13 +70,13 @@ class GitHubNode extends Actor with ActorLogging {
             case Success(repos) => gathererRef ! GitHubResult(gitHubUser.copy(organizations = orgs, repositories = repos))
             case Failure(e) => {
               log.error("[GitHubNode] Error while fetching contribution for organizations repositories")
-              gathererRef ! ErrorQuery(e)
+              gathererRef ! ErrorQuery("GitHub", e)
             }
           }
         }
         case Failure(e) => {
           log.error("[GitHubNode] Error while fetching contribution for his repositories")
-          gathererRef ! ErrorQuery(e)
+          gathererRef ! ErrorQuery("GitHub", e)
         }
       }
     }

@@ -22,12 +22,12 @@ class LinkedInNode extends Actor with ActorLogging {
           }
           case Failure(e) => {
             log.error("[LinkedInNode] Error while fetching linkedIn profil")
-            gathererRef ! ErrorQuery(e)
+            gathererRef ! ErrorQuery("LinkedIn", e)
           }
         }
       }) getOrElse {
         log.info("[LinkedInNode] NotFound ! The firstname & lastname aren't valid: " + gitHubUser)
-        gathererRef ! NotFound("linkedin")
+        gathererRef ! NotFound("LinkedIn")
       }
     }
   }
