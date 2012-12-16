@@ -150,6 +150,8 @@ case class GitHubUser(
     val str = escapeSpecialCaracters(name).split(" ")
     if(str.size > 1) Some(str.tail.mkString) else None
   }
+
+  def isFullnameOk: Boolean = firstname.isDefined && lastname.isDefined
 }
 
 case class GitHubRepository(

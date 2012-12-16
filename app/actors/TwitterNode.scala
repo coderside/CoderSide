@@ -17,22 +17,22 @@ class TwitterNode extends Actor with ActorLogging {
     case TwitterUserQuery(gitHubUser, kloutRef, gathererRef) => {
       log.debug("[TwitterNode] Getting twitter profil")
 
-      gitHubUser.fullname foreach { fname =>
-        def handleResponse(response: Try[List[TwitterUser]], notFound: => Unit)  = {
-          response match {
-            case Success(Nil) => notFound
-            case Success(profils) => Twitter.matchUser(gitHubUser, profils) foreach { found =>
-              self ! TwitterTimelineQuery(found, gathererRef)
-              kloutRef ! KloutNodeQuery(found, gathererRef)
-            }
-            case Failure(e) => {
-              log.error("[TwitterNode] Error while searching twitter user")
-              gathererRef ! ErrorQuery("Twitter", e) //twitter
-              gathererRef ! ErrorQuery("Klout", e) //klout
-            }
+      def handleResponse(response: Try[List[TwitterUser]], notFound: => Unit)  = {
+        response match {
+          case Success(Nil) => notFound
+          case Success(profils) => Twitter.matchUser(gitHubUser, profils) foreach { found =>
+            self ! TwitterTimelineQuery(found, gathererRef)
+            kloutRef ! KloutNodeQuery(found, gathererRef)
+          }
+          case Failure(e) => {
+            log.error("[TwitterNode] Error while searching twitter user")
+            gathererRef ! ErrorQuery("Twitter", e) //twitter
+            gathererRef ! ErrorQuery("Klout", e) //klout
           }
         }
+      }
 
+      gitHubUser.fullname.filter(_ => gitHubUser.isFullnameOk) map { fname =>
         TwitterAPI.searchBy(fname).onComplete { byFullname =>
           handleResponse(byFullname,
             TwitterAPI.searchBy(gitHubUser.username).onComplete { byUsername =>
@@ -43,6 +43,13 @@ class TwitterNode extends Actor with ActorLogging {
               )
             }
           )
+        }
+      } getOrElse {
+        TwitterAPI.searchBy(gitHubUser.username).onComplete { byUsername =>
+          handleResponse(byUsername, {
+            gathererRef ! NotFound("Twitter")
+            gathererRef ! NotFound("Klout")
+          })
         }
       }
     }
