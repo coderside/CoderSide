@@ -1,8 +1,13 @@
-@import "helpers.less";
+ @import "helpers.less";
 
 @font-text: HelveticaNeue;
-@font-text-bold: HelveticaNeue-Bold;
-@font-display: CallunaSans-Regular;
+@font-text-light: HelveticaNeue-Light;
+@font-text-bold: CallunaSans;
+@font-display: MuseoSLab;/* CallunaSans-Regular; */
+
+* {
+    .font-text();
+}
 
 .font-text() {
     font-family: @font-text;
@@ -10,6 +15,11 @@
 
 .font-text-bold() {
     font-family: @font-text-bold;
+    font-weight: bold;
+}
+
+.font-text-light() {
+    font-family: @font-text-light;
 }
 
 .font-display() {
@@ -34,14 +44,14 @@ html {
             .layout-header {
                 border-bottom: 1px solid white;
                 padding-left: 10px;
-                padding-bottom: 14px;
+                padding-bottom: 10px;
                 color: white;
-                height: 35px;
+                height: 30px;
                 .gradient(#252525, #414141);
 
                 h1 {
                     font-family: Pacifico;
-                    font-size: 24px;
+                    font-size: 20px;
                     color: #D8D8D8;
                 }
             }
@@ -62,8 +72,9 @@ html {
                 .search {
                     background: #F4F4F4;
                     text-align: center;
-                    padding-top: 50px;
-                    padding-bottom: 50px;
+                    padding-top: 35px;
+                    padding-bottom: 30px;
+                    border-bottom: 1px solid grey;
 
                     form {
                         input[name=keywords] {
@@ -72,6 +83,8 @@ html {
                             border-radius: 15px;
                             border: 1px solid #9F9C9C;
                             font-size: 14pt;
+                            padding-left: 10px;
+                            .font-text-light();
                         }
 
                         .container-search {
@@ -89,18 +102,22 @@ html {
                         }
 
                         .submit-search {
+                            border: 1px solid grey;
                             border-radius: 10px;
-                            background: #6AA4E9;
+                            background: white;
                             width: 100px;
                             height: 38px;
                             text-transform: uppercase;
-                            border: 0;
-                            color: white;
+                            color: #393939;
                             margin-left: 10px;
                             font-size: 16pt;
                             text-align: center;
                             line-height: 1px;
-                            .font-text();
+                            .font-text-light();
+
+                            &:hover {
+                                border-color: black;
+                            }
                         }
                     }
                 }
@@ -108,12 +125,60 @@ html {
                 .nb-results {
                     text-align: center;
                     padding: 5px;
-                    color: white;
-                    background: #C5C5C5;
-                    background-image: -webkit-linear-gradient(-90deg, rgba(255, 255, 255, 0.0) 0%, rgba(102, 102, 102, 0.5) 100%);
+                    color: #751018;
+                    background: #E4E4E4;
                     border: 1px solid #979797;
                     text-transform: uppercase;
+                    display: none;
                     .font-text();
+                }
+
+                .results {
+                    height: 600px;
+                    text-align: center;
+
+                    li {
+                        position: relative;
+                        cursor: pointer;
+                        background: white;
+                        border-bottom: 1px solid grey;
+                        overflow: hidden;
+                        height: 72px;
+
+                        .profil {
+                            float: left;
+                            margin-top: 15px;
+                            margin-bottom: 15px;
+                            width: 98%;
+
+                            header {
+                                .font-text-bold();
+                                color: #393939;
+                            }
+
+                            .separator:before {
+                                content: " | ";
+                                color: black;
+                                margin-left: 5px;
+                                margin-right: 5px;
+                            }
+
+                            .details {
+                                color: #012947;
+                                margin-top: 10px;
+                            }
+                        }
+
+                        .hover {
+                            height: 100%;
+                            background: #3693DB;
+                            float: right;
+                            width: 5px;
+                        }
+
+                        &:hover {
+                        }
+                    }
                 }
 
                 .popular {
