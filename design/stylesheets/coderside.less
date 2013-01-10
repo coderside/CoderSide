@@ -1,0 +1,145 @@
+@import "helpers.less";
+
+@font-text: HelveticaNeue;
+@font-text-bold: HelveticaNeue-Bold;
+@font-display: CallunaSans-Regular;
+
+.font-text() {
+    font-family: @font-text;
+}
+
+.font-text-bold() {
+    font-family: @font-text-bold;
+}
+
+.font-display() {
+    font-family: @font-display;
+}
+
+button {
+    cursor: pointer;
+}
+
+html {
+    height: 100%;
+    body {
+        height: 100%;
+        background: #ECECEC;
+
+        .wrapper {
+            min-height: 100%;
+            height: 100%;
+            margin: 0 auto -4em;
+
+            .layout-header {
+                border-bottom: 1px solid white;
+                padding-left: 10px;
+                padding-bottom: 14px;
+                color: white;
+                height: 35px;
+                .gradient(#252525, #414141);
+
+                h1 {
+                    font-family: Pacifico;
+                    font-size: 24px;
+                    color: #D8D8D8;
+                }
+            }
+
+            .layout-content {
+                .introduction {
+                    background: #BE2B2B;
+                    padding: 10px;
+                    border-bottom: 1px solid white;
+                    p {
+                        .font-display();
+                        font-size: 18pt;
+                        color: #FFFFFF;
+                        text-align: center;
+                    }
+                }
+
+                .search {
+                    background: #F4F4F4;
+                    text-align: center;
+                    padding-top: 50px;
+                    padding-bottom: 50px;
+
+                    form {
+                        input[name=keywords] {
+                            height: 40px;
+                            width: 100%;
+                            border-radius: 15px;
+                            border: 1px solid #9F9C9C;
+                            font-size: 14pt;
+                        }
+
+                        .container-search {
+                            position: relative;
+                            display: inline-block;
+                            width: 30%;
+
+                            .icon-github {
+                                color: #797575;
+                                position: absolute;
+                                top: 5px;
+                                right: 6px;
+                                font-size: 30px;
+                            }
+                        }
+
+                        .submit-search {
+                            border-radius: 10px;
+                            background: #6AA4E9;
+                            width: 100px;
+                            height: 38px;
+                            text-transform: uppercase;
+                            border: 0;
+                            color: white;
+                            margin-left: 10px;
+                            font-size: 16pt;
+                            text-align: center;
+                            line-height: 1px;
+                            .font-text();
+                        }
+                    }
+                }
+
+                .nb-results {
+                    text-align: center;
+                    padding: 5px;
+                    color: white;
+                    background: #C5C5C5;
+                    background-image: -webkit-linear-gradient(-90deg, rgba(255, 255, 255, 0.0) 0%, rgba(102, 102, 102, 0.5) 100%);
+                    border: 1px solid #979797;
+                    text-transform: uppercase;
+                    .font-text();
+                }
+
+                .popular {
+                    height: 100%;
+                    background: #EDD49C;
+                }
+            }
+        }
+
+        footer {
+            padding: 10px;
+            height: 44px;
+            color: white;
+            .gradient(#252525, #414141);
+
+            .twitter-account {
+                text-decoration: none;
+                color: white;
+            }
+            .twitter-button {
+                vertical-align: -9px;
+                display: inline-block;
+                a {
+                    color: #252525;
+                }
+            }
+        }
+    }
+}
