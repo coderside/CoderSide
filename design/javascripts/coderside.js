@@ -22,4 +22,19 @@ $(document).ready(function() {
     }, function() {
         $(this).find('.hint').removeClass('hover');
     });
+
+    $('.results li').css('left', '-110%');
+
+    var fadeIn = function($elt) {
+        return function() {
+            $elt.addClass('transition');
+        };
+    };
+
+    $('.results li').on('webkitTransitionEnd', function() {
+        var $next = $(this).next('li');
+        if($next.length) $next.addClass('transition');
+    });
+
+    window.setTimeout(fadeIn($('.results li:first')));
 });

@@ -13,6 +13,22 @@ h1 {
     -ms-filter: formatstring("\"progid:DXImageTransform.Microsoft.gradient(startColorStr='{0}', EndColorStr='{1}')\"", @from, @to); /* IE8 */
 }
 
+.box_shadow(@arguments) {
+    box-shadow: @arguments;
+    -webkit-box-shadow: @arguments;
+    -moz-box-shadow: @arguments;
+}
+
+.box-shadow(@style1, @color1, @style2, @color2){
+  box-shadow:         @style1 @color1, @style2 @color2;
+  -webkit-box-shadow: @style1 @color1, @style2 @color2;
+  -moz-box-shadow:    @style1 @color1, @style2 @color2;
+}
+
+.text_shadow(@arg) {
+    text-shadow: @arguments;
+}
+
 .button-common-properties{
      text-shadow: 0px 1px 2px rgba(0,0,0,0.6);
      color: white;
