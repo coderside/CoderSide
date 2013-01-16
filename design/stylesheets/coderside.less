@@ -3,10 +3,10 @@
 /* @font-text: Helvetica; */
 /* @font-text-light: Helvetica-Light; */
 /* @font-text-bold: Helvetica-Bold; */
-@font-text: 'Open Sans';
-@font-text-light: 'Open Sans';
-@font-text-bold: 'Open Sans';
-@font-display: MuseoSLab;
+@font-text: 'Open Sans', Helvetica;
+@font-text-light: 'Open Sans', Helvetica;
+@font-text-bold: 'Open Sans' Helvetica;
+@font-display: Helvetica;
 
 .font-text() {
     font-family: @font-text;
@@ -65,7 +65,7 @@ html {
                 .introduction {
                     background: #325770;
                     padding: 18px;
-                    -webkit-box-shadow: inset 0px -2px 4px rgba(61, 59, 59, 0.7);
+                    .box-shadow(inset 0px -2px 4px rgba(61, 59, 59, 0.7));
 
                     p {
                         .font-display();
@@ -86,7 +86,7 @@ html {
                         input[name=keywords] {
                             height: 40px;
                             width: 100%;
-                            border-radius: 15px;
+                            border-radius: 3px;
                             border: 1px solid #9F9C9C;
                             font-size: 14pt;
                             padding-left: 10px;
@@ -109,8 +109,8 @@ html {
 
                         .submit-search {
                             border: 1px solid grey;
-                            border-radius: 10px;
-                            background: white;
+                            border-radius: 3px;
+                            background: #FCFCFC;
                             width: 100px;
                             height: 38px;
                             text-transform: uppercase;
@@ -123,6 +123,7 @@ html {
 
                             &:hover {
                                 border-color: black;
+                                background: white;
                             }
                         }
                     }
@@ -143,45 +144,53 @@ html {
                     text-align: center;
 
                     li {
+                        position: relative;
+                        cursor: pointer;
+                        background: #FCFCFC;
+                        overflow: hidden;
+                        height: 72px;
+
                         &.transition {
                             -webkit-transition-duration: 0.17s;
                             -webkit-transform: translate3d(110%, 0, 0);
                         }
 
-                        &:not(.last) {
-                            position: relative;
-                            cursor: pointer;
-                            background: #FCFCFC;
-                            border-bottom: 1px solid #F2F2F2;
-                            overflow: hidden;
-                            height: 72px;
+                        .progress {
+                            position: absolute;
+                            height: 100%;
+                            width: 30%;
+                            background: rgba(133, 170, 144, 0.17);
+                        }
 
-                            .profil {
-                                float: right;
-                                margin-top: 15px;
-                                margin-bottom: 15px;
-                                width: 98%;
+                        .profil {
+                            float: right;
+                            margin-top: 15px;
+                            margin-bottom: 15px;
+                            width: 98%;
 
-                                header {
-                                    .font-text-medium();
-                                    font-size: 14px;
-                                    color: #393939;
-                                }
-
-                                .separator:before {
-                                    content: " | ";
-                                    color: #393939;
-                                    margin-left: 5px;
-                                    margin-right: 5px;
-                                }
-
-                                .details {
-                                    font-size: 12px;
-                                    color: #1D435F;
-                                    margin-top: 10px;
-                                    .font-text();
-                                }
+                            header {
+                                .font-text-medium();
+                                font-size: 14px;
+                                color: #393939;
                             }
+
+                            .separator:before {
+                                content: " | ";
+                                color: #393939;
+                                margin-left: 5px;
+                                margin-right: 5px;
+                            }
+
+                            .details {
+                                font-size: 12px;
+                                color: #1D435F;
+                                margin-top: 10px;
+                                .font-text();
+                            }
+                        }
+
+                        &:not(.last) {
+                            border-bottom: 1px solid #F2F2F2;
                         }
 
                         &:hover {
@@ -201,6 +210,7 @@ html {
                     padding-bottom: 40px;
                     background: #E4EBF3;
                     border-top: 1px solid #D6D6D6;
+                    .box-shadow(inset 0px 1px 4px rgba(189, 189, 189, 0.7));
 
                     .top {
                         background: white;

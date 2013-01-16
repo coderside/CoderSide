@@ -1,0 +1,173 @@
+@import 'coderside.less';
+
+.sidebar {
+    height: 100%;
+    width: 100px;
+    border: 1px solid grey;
+    float: left;
+    background: blue;
+}
+
+h1 {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+h2 {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+h3 {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.avatar {
+    border: 1px solid black;
+}
+
+.linkedIn, .github, .twitter, .klout {
+    padding: 15px 0px 15px 10%;
+    .font-text();
+}
+
+.linkedIn {
+    overflow: hidden;
+    background: #325770;
+    color: white;
+    .box-shadow(inset 0px -2px 4px rgba(61, 59, 59, 0.7));
+
+    .avatar {
+        float: left;
+    }
+
+    .info {
+        float: left;
+        margin-left: 20px;
+        span {
+            font-size: 20px;
+            .font-text();
+            display: block;
+            padding: 8px;
+        }
+    }
+}
+
+.github {
+    background: #F4F4F4;
+    .orgs-container, .personal-container {
+        background: #ECEBEB;
+        padding: 10px 0px 10px 10px;
+
+        .repository {
+            font-size: 14px;
+            padding: 10px 15px;
+            /* border-left: 1px solid black; */
+            margin-top: 10px;
+
+            .social {
+                display: block;
+                color: grey;
+            }
+        }
+    }
+
+    .organizations, .personal {
+        margin-top: 10px;
+    }
+
+    .personal-container {
+        margin-top: 10px;
+    }
+
+    .personal-container, .orgs-container {
+        border: 1px solid #F2F2F2;
+    }
+
+    .organization {
+        overflow: hidden;
+
+        header {
+            overflow: hidden;
+            .avatar {
+                height: 45px;
+                float: left;
+            }
+            h2 {
+                float: left;
+                margin: 13px 20px;;
+            }
+        }
+
+        .info {
+            margin-top: 10px;
+        }
+     }
+}
+
+.twitter {
+    background: #D4DAE0;
+
+    .info {
+        border: 1px solid #F2F2F2;
+        background: #F3F3F3;
+ 
+        span {
+            padding: 5px;
+            display: block;
+        }
+
+        .pseudo {
+            font-weight: bold;
+        }
+
+        .social {
+            font-size: 12px;
+            color: grey;
+        }
+    }
+
+    .tweets {
+        margin-top: 20px;
+        border: 1px solid #F2F2F2;
+        background: #F1F1F1;
+        font-size: 14px;
+
+        li {
+            padding: 15px;
+            margin-top: 10px;
+
+            &:not(.last) {
+                border-bottom: 1px solid white;
+            }
+        }
+    }
+}
+
+.klout {
+    background: #F2F2F2;
+    dl {
+        margin-top: 2px;
+        padding: 10px;
+        background: white;
+        border: 1px solid #F2F2F2;
+    }
+
+    .influencees {
+        margin-top: 10px;
+    }
+
+    dt, dd {
+        display: inline-block;
+    }
+
+    dt {
+        margin-top: 10px;
+        width: 20%;
+    }
+
+    dd {
+        width: 78%;
+    }
+}
