@@ -14,16 +14,11 @@ import utils.Config
 
 object GitHubAPI extends URLEncoder with Debug {
 
-  private def handleJsNull(json: JsValue) = json match {
-    case JsNull => None
-    case json => json.asOpt[String]
-  }
-
   implicit val readUser: Reads[GitHubUser] =
     (
       (__ \ 'username).read[String] and
-      (__ \ 'fullname).json.pick.map(handleJsNull) and
-      (__ \ 'language).json.pick.map(handleJsNull) and
+      (__ \ 'fullname).readNullable[String] and
+      (__ \ 'language).readNullable[String] and
       (__ \ 'followers).read[Int]
     )((username, fullname, language, followers) => GitHubUser(username, fullname, language, followers))
 
@@ -42,7 +37,7 @@ object GitHubAPI extends URLEncoder with Debug {
     (
       (__ \ 'login).read[String] and
       (__ \ 'repos_url).read[String] and
-      (__ \ 'avatar_url).json.pick.map(handleJsNull) and
+      (__ \ 'avatar_url).readNullable[String] and
       (__ \ 'url).read[String]
     )((login, reposUrl, avatarUrl, url) => GitHubOrg(login, reposUrl, avatarUrl, url))
 

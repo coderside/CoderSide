@@ -1,45 +1,39 @@
-@import "helpers.less";
+@import 'colors.less';
 
 html {
     height: 100%;
     body {
         height: 100%;
-        background: #ECECEC;
-
-        .coderguy-loader {
-            display: none;
-            position: absolute;
-            width: 200px;
-            top: 50%;
-            left: 50%;
-
-            span {
-                display: inline-block;
-                margin-top: 10px;
-            }
-        }
+        background: @grey7;
 
         .wrapper {
             min-height: 100%;
-            height: auto !important;
             height: 100%;
             margin: 0 auto -4em;
 
-            header.coderguy-header {
-                border-bottom: 1px solid white;
-                padding: 10px;
+            .layout-header {
+                border-bottom: 1px solid @black1;
+                padding-left: 10px;
+                padding-bottom: 10px;
                 color: white;
+                height: 30px;
                 .gradient(#252525, #414141);
+
+                h1 {
+                    font-family: Pacifico;
+                    font-size: 20px;
+                    color: @grey12;
+                }
             }
 
-            #content {
-                min-height: 75%;
+            .layout-content {
             }
         }
 
         footer {
+            display: none;
             padding: 10px;
-            height: 4em;
+            height: 44px;
             color: white;
             .gradient(#252525, #414141);
 
@@ -51,7 +45,7 @@ html {
                 vertical-align: -9px;
                 display: inline-block;
                 a {
-                    color: #252525;
+                    color: @black5;
                 }
             }
         }

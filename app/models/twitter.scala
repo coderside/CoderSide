@@ -36,7 +36,7 @@ object TwitterAPI extends URLEncoder with Debug {
       (__ \ 'created_at).read[String] and
       (__ \ 'retweeted).read[Boolean] and
       (__ \ 'in_reply_to_user_id).read[Option[String]] and
-      (__ \ 'in_reply_to_status_id_str).readOpt[Option[String]]
+      (__ \ 'in_reply_to_status_id_str).readNullable[Option[String]]
     ) tupled
   }
 

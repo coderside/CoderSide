@@ -25,7 +25,7 @@ object LinkedInAPI extends URLEncoder with Debug {
       (__ \ 'firstName).read[String] and
       (__ \ 'lastName).read[String] and
       (__ \ 'headline).read[String] and
-      (__ \ 'pictureUrl).readOpt[String]
+      (__ \ 'pictureUrl).readNullable[String]
     )(LinkedInUser)
   }
 

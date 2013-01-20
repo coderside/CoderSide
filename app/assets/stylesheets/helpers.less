@@ -1,9 +1,3 @@
-/*** Titles ***/
-h1 {
-    font-size: 1.5em;
-    font-weight: bold;
-}
-
 /*** Helpers ***/
 .gradient(@from:#000, @to:#EEE) {
     background: @from;
@@ -13,7 +7,7 @@ h1 {
     -ms-filter: formatstring("\"progid:DXImageTransform.Microsoft.gradient(startColorStr='{0}', EndColorStr='{1}')\"", @from, @to); /* IE8 */
 }
 
-.box_shadow(@arguments) {
+.box-shadow(@arguments) {
     box-shadow: @arguments;
     -webkit-box-shadow: @arguments;
     -moz-box-shadow: @arguments;
@@ -23,10 +17,6 @@ h1 {
   box-shadow:         @style1 @color1, @style2 @color2;
   -webkit-box-shadow: @style1 @color1, @style2 @color2;
   -moz-box-shadow:    @style1 @color1, @style2 @color2;
-}
-
-.text_shadow(@arg) {
-    text-shadow: @arguments;
 }
 
 .button-common-properties{
