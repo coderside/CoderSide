@@ -1,4 +1,5 @@
-@import 'coderside.less';
+@import 'commons.less';
+@import 'colors.less';
 
 .sidebar {
     height: 100%;
@@ -13,184 +14,199 @@
     .font-text();
 }
 
-.linkedIn {
-    overflow: hidden;
-    background: @blue2;
-    color: white;
-    .box-shadow(inset 0px -2px 4px rgba(61, 59, 59, 0.7));
+.profil {
+    opacity: 0;
+    margin-left: 25px;
 
-    .avatar {
-        float: left;
+    &.fade-in {
+        -webkit-transition-property: opacity, margin-left;
+        -webkit-transition-duration: 0.2s;
+        -webkit-transition-timing-function: ease;
     }
 
-    .info {
-        float: left;
-        margin-left: 20px;
-        span {
-            font-size: 20px;
-            .font-text();
-            display: block;
-            padding: 8px;
-        }
-    }
-}
+    .linkedIn {
+        overflow: hidden;
+        background: @blue2;
+        color: white;
+        .box-shadow(inset 0px -2px 4px rgba(61, 59, 59, 0.7));
 
-.github {
-    background: @grey5;
-    color: @black4;
-
-    .logo {
-        background: url(../images/github/logo.png) no-repeat;
-        background-size: 100%;
-        height: 45px;
-        width: 100px;
-    }
-
-    .social {
-        display: block;
-        color: grey;
-        font-size: 12px;
-        padding-top: 2px;
-        padding-bottom: 2px;
-    }
-
-    .desc {
-        padding-top: 10px;
-        display: inline-block;
-    }
-
-    .orgs-container, .personal-container {
-        background: @grey6;
-        padding: 10px 0px 10px 10px;
-        margin-top: 10px;
-
-        .repository {
-            font-size: 14px;
-            padding: 10px 15px;
-
-            .info {
-                margin-top: 5px;
-            }
-        }
-    }
-
-    .organizations {
-        margin-top: 15px;
-    }
-
-    .personal-container, .orgs-container {
-        border: 1px solid @grey3;
-    }
-
-    .organization {
-        header {
-            overflow: hidden;
-            .avatar {
-                height: 45px;
-                float: left;
-            }
-            h2 {
-                float: left;
-                margin: 13px 20px;
-            }
+        .avatar {
+            float: left;
         }
 
         .info {
-            margin-top: 5px;
-        }
-     }
-}
-
-.twitter {
-    background: @grey17;
-    background: @grey10;
-    color: @black4;
-    padding-top: 0px;
-
-    .logo {
-        background: url(../images/twitter/logo.png) no-repeat;
-        background-size: 100%;
-        height: 50px;
-        width: 60px;
-    }
-
-    .info {
-        margin-top: 10px;
-        border: 1px solid @grey3;
-        background: @grey4;
-
-        span {
-            padding: 5px;
-            display: block;
-        }
-
-        .social {
-            font-size: 12px;
-            color: @red2;
-        }
-
-        .pseudo {
-            font-weight: bold;
-        }
-    }
-
-    .tweets {
-        margin-top: 20px;
-        border: 1px solid @grey3;
-        background: @grey2;
-        font-size: 14px;
-
-        li {
-            padding: 15px;
-            margin-top: 10px;
-
-            &:not(.last) {
-                border-bottom: 1px solid white;
+            float: left;
+            margin-left: 20px;
+            span {
+                font-size: 20px;
+                .font-text();
+                display: block;
+                padding: 8px;
             }
         }
     }
-}
 
-.klout {
-    background: @grey3;
-    color: @marron1;
+    .github {
+        background: @grey5;
+        color: @black4;
 
-    .logo {
-        background: url(../images/klout/logo.png) no-repeat;
-        background-size: 100%;
-        height: 40px;
-        width: 150px;
+        .logo {
+            background: url(../images/github/logo.png) no-repeat;
+            background-size: 100%;
+            height: 45px;
+            width: 100px;
+        }
+
+        .social {
+            display: block;
+            color: grey;
+            font-size: 12px;
+            padding-top: 2px;
+            padding-bottom: 2px;
+        }
+
+        .desc {
+            padding-top: 10px;
+            display: inline-block;
+        }
+
+        .orgs-container, .personal-container {
+            background: @grey6;
+            padding: 10px 0px 10px 10px;
+            margin-top: 10px;
+
+            .repository {
+                font-size: 14px;
+                padding: 10px 15px;
+
+                &:not(.last) {
+                    border-bottom: 1px solid @grey19;
+                }
+            }
+        }
+
+        .organizations {
+            margin-top: 15px;
+        }
+
+        .personal-container, .orgs-container {
+            border: 1px solid @grey3;
+        }
+
+        .organization {
+            margin-top: 10px;
+            header {
+                overflow: hidden;
+                .avatar {
+                    height: 45px;
+                    float: left;
+                }
+                h2 {
+                    float: left;
+                    margin: 13px 20px;
+                }
+            }
+        }
     }
 
-    .influencers {
-        margin-top: 10px;
+    .twitter {
+        background: @grey17;
+        background: @grey10;
+        color: @black4;
+        padding-top: 0px;
+
+        .logo {
+            background: url(../images/twitter/logo.png) no-repeat;
+            background-size: 100%;
+            height: 50px;
+            width: 60px;
+        }
+
+        .info {
+            padding: 4px;
+            margin-top: 10px;
+            border: 1px solid @grey3;
+            background: @grey4;
+
+            span {
+                padding: 5px;
+                display: block;
+            }
+
+            .social {
+                font-size: 12px;
+                color: @red2;
+            }
+
+            .pseudo {
+                font-weight: bold;
+            }
+        }
+
+        .tweets {
+            margin-top: 20px;
+            border: 1px solid @grey3;
+            background: @grey2;
+            font-size: 14px;
+
+            li {
+                padding: 15px;
+                margin-top: 10px;
+
+                &:not(.last) {
+                    border-bottom: 1px solid white;
+                }
+            }
+        }
     }
 
-    dl {
-        margin-top: 2px;
-        padding: 10px;
-        background: white;
-        border: 1px solid @grey3;
+    .klout {
+        background: @grey3;
+        color: @marron1;
+
+        .logo {
+            background: url(../images/klout/logo.png) no-repeat;
+            background-size: 100%;
+            height: 40px;
+            width: 150px;
+        }
+
+        .influencers {
+            margin-top: 10px;
+        }
+
+        .influencers, .influencees dt {
+            margin-top: 10px;
+        }
+
+        .influencers, .influencees dd {
+            margin-top: 10px;
+        }
 
         .score {
             color: @orange1;
         }
-    }
 
-    .influencees {
-        margin-top: 10px;
-    }
+        dl {
+            padding: 10px;
+            background: white;
+            border: 1px solid @grey3;
+        }
 
-    dt, dd {
-        display: inline-block;
-    }
+        .influencees {
+            margin-top: 10px;
+        }
 
-    dt {
-        margin-top: 10px;
-        width: 20%;
-    }
+        dt, dd {
+            display: inline-block;
+        }
 
-    dd {
-        width: 78%;
+        dt {
+            width: 20%;
+        }
+
+        dd {
+            width: 78%;
+        }
     }
 }

@@ -1,0 +1,69 @@
+@import 'commons.less';
+@import 'colors.less';
+
+.results {
+    text-align: center;
+
+    li {
+        position: relative;
+        cursor: pointer;
+        background: @grey1;
+        overflow: hidden;
+        height: 72px;
+        left: -110%;
+
+        &.fade-in {
+            -webkit-transition-duration: 0.17s;
+            -webkit-transform: translate3d(110%, 0, 0);
+        }
+
+        .progress {
+            position: absolute;
+            height: 100%;
+            width: 0%;
+            background: @green1;
+        }
+
+        .user {
+            float: right;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            width: 98%;
+
+            header {
+                .font-text-medium();
+                font-size: 14px;
+                color: @black2;
+            }
+
+            .separator:before {
+                content: " | ";
+                color: @black2;
+                margin-left: 5px;
+                margin-right: 5px;
+            }
+
+            .details {
+                font-size: 12px;
+                color: @blue3;
+                margin-top: 10px;
+                .font-text();
+            }
+        }
+
+        &:not(.last) {
+            border-bottom: 1px solid @grey3;
+        }
+
+        &:hover {
+            background: white;
+        }
+
+        .hover {
+            height: 100%;
+            background: @blue1;
+            float: left;
+            width: 4px;
+        }
+    }
+}

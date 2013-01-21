@@ -20,8 +20,11 @@ object GitHubAPI extends URLEncoder with Debug {
       (__ \ 'fullname).readNullable[String] and
       (__ \ 'language).readNullable[String] and
       (__ \ 'followers).read[Int] and
-      (__ \ 'location).readNullable[String]
-    )((username, fullname, language, followers, location) => GitHubUser(username, fullname, language, Some(followers), location))
+      (__ \ 'location).readNullable[String] and
+      (__ \ 'repos).read[Int]
+    )((username, fullname, language, followers, location, reposCount) =>
+      GitHubUser(username, fullname, language, Some(followers), location, Some(reposCount))
+    )
 
   implicit val gitHubUserWrites = new Writes[GitHubUser] {
     def writes(gu: GitHubUser): JsValue = {
@@ -129,6 +132,7 @@ case class GitHubUser(
   language: Option[String],
   followers: Option[Int] = None,
   location: Option[String] = None,
+  reposCount: Option[Int] = None,
   repositories: List[GitHubRepository] = Nil,
   organizations: List[GitHubOrg] = Nil
 ) {

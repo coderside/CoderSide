@@ -9,14 +9,14 @@ $(document).ready(function() {
                 console.log('Welcome to CoderSide !');
             }
         },
-        '/search?*queryString': {
+        '/search/:keywords': {
             get: function(any, params) {
-                var data = parseQueryString(params.queryString);
-                if(data.keywords) {
+                if(params.keywords) {
+                    CoderSide.home.setInputSearch(params.keywords);
                     jsRoutes.controllers.Application.search(
-                        data.keywords
+                        params.keywords
                     ).ajax().done(function(response) {
-                        console.log(response);
+                        CoderSide.search.render(response);
                     });
                 }
             }
@@ -30,13 +30,16 @@ $(document).ready(function() {
                         data.fullname,
                         data.language
                     ).ajax().done(function(response) {
-                        console.log(response);
+                        CoderSide.profil.render(response);
                     });
                 }
             }
         }
     });
 
+    CoderSide.home = new Home();
+    CoderSide.search = new Search();
+    CoderSide.profil = new Profil();
     CoderSide.start('/');
 });
 

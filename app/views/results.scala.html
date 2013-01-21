@@ -1,18 +1,23 @@
 @(gitHubUsers: List[models.github.GitHubUser])(implicit lang: Lang)
 <ul class="results">
-  @gitHubUsers.map { gitHubUser =>
+  @gitHubUsers.sortBy(u => -u.followers.getOrElse(0)).map { gitHubUser =>
   <li>
     <div class="progress"></div>
-    <div class="profil">
-      <header>@gitHubUser.username - @gitHubUser.fullname</header>
+    <div class="user">
+      <header>
+        <span class="username">@gitHubUser.username</span>
+        @gitHubUser.fullname.filter(!_.trim.isEmpty).map { fullname =>
+        - <span class="fullname">@fullname</span>
+        }
+      </header>
       <div class="details">
         @gitHubUser.location.map { location =>
         <span>@location</span><span class="separator"></span>
         }
         @gitHubUser.language.map { language =>
-        <span>@language</span ><span class="separator"></span>
+        <span class="language">@language</span > Guy<span class="separator"></span>
         }
-        <span>@gitHubUser.repositories.length repositories</span><span class="separator"></span>
+        <span>@gitHubUser.reposCount repositories</span><span class="separator"></span>
         <span>@gitHubUser.followers followers</span>
       </div>
     </div>

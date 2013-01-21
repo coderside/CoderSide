@@ -2,198 +2,143 @@
 @import "commons.less";
 @import "colors.less";
 @import "layout.less";
+@import "search.less";
+@import "profil.less";
 
 .layout-content {
-    .introduction {
-        background: @blue2;
-        padding: 18px;
-        .box-shadow(inset 0px -2px 4px @black1);
+    .home {
 
-        p {
-            .font-display();
-            font-size: 18pt;
-            color: white;
-            text-align: center;
+        &.fade-out {
+            -webkit-transition-property: opacity;
+            -webkit-transition-duration: 0.2s;
+            -webkit-transition-timing-function: ease;
         }
-    }
 
-    .search {
-        background: @grey5;
-        text-align: center;
-        padding-top: 35px;
-        padding-bottom: 30px;
-        border-bottom: 1px solid @grey11;
+        .introduction {
+            background: @blue2;
+            padding: 18px;
+            .box-shadow(inset 0px -2px 4px @black1);
 
-        form {
-            input[name=keywords] {
-                height: 40px;
-                width: 100%;
-                border-radius: 3px;
-                border: 1px solid @grey14;
-                font-size: 14pt;
-                padding-left: 10px;
-                .font-text-light();
-                box-sizing: border-box;
-            }
-
-            .container-search {
-                position: relative;
-                display: inline-block;
-                width: 30%;
-
-                .icon-github {
-                    color: @grey16;
-                    position: absolute;
-                    top: 5px;
-                    right: 6px;
-                    font-size: 30px;
-                }
-            }
-
-            .submit-search {
-                border: 1px solid grey;
-                border-radius: 3px;
-                background: @grey1;
-                width: 100px;
-                height: 38px;
-                text-transform: uppercase;
-                color: @black2;
-                margin-left: 10px;
-                font-size: 16pt;
-                text-align: center;
-                line-height: 1px;
-                .font-text-light();
-
-                &:hover {
-                    border-color: black;
-                    background: white;
-                }
-            }
-        }
-    }
-
-    .results {
-        text-align: center;
-
-        li {
-            position: relative;
-            cursor: pointer;
-            background: @grey1;
-            overflow: hidden;
-            height: 72px;
-
-            &.transition {
-                -webkit-transition-duration: 0.17s;
-                -webkit-transform: translate3d(110%, 0, 0);
-            }
-
-            .progress {
-                position: absolute;
-                height: 100%;
-                width: 0%;
-                background: @green1;
-            }
-
-            .profil {
-                float: right;
-                margin-top: 15px;
-                margin-bottom: 15px;
-                width: 98%;
-
-                header {
-                    .font-text-medium();
-                    font-size: 14px;
-                    color: @black2;
-                }
-
-                .separator:before {
-                    content: " | ";
-                    color: @black2;
-                    margin-left: 5px;
-                    margin-right: 5px;
-                }
-
-                .details {
-                    font-size: 12px;
-                    color: @blue3;
-                    margin-top: 10px;
-                    .font-text();
-                }
-            }
-
-            &:not(.last) {
-                border-bottom: 1px solid @grey3;
-            }
-
-            &:hover {
-                background: white;
-            }
-
-            .hover {
-                height: 100%;
-                background: @blue1;
-                float: left;
-                width: 4px;
-            }
-        }
-    }
-
-    .popular {
-        padding-top: 20px;
-        padding-bottom: 40px;
-        background: @grey9;
-        border-top: 1px solid @grey11;
-        .box-shadow(inset 0px 1px 4px @grey13);
-
-        .top {
-            background: white;
-            width: 40%;
-            margin: auto;
-            border-radius: 4px;
-            padding-top: 5px;
-
-            h2 {
-                margin-left: 10px;
-                text-transform: uppercase;
-                color: @black2;
-                font-size: 20px;
+            p {
                 .font-display();
+                font-size: 18pt;
+                color: white;
+                text-align: center;
             }
+        }
 
-            .coders {
-                li {
-                    border-top: 1px solid white;
-                    header {
-                        font-size: 14px;
-                        .font-text-medium();
+        .search {
+            background: @grey5;
+            text-align: center;
+            padding-top: 35px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid @grey11;
+
+            form {
+                input[name=keywords] {
+                    height: 40px;
+                    width: 100%;
+                    border-radius: 3px;
+                    border: 1px solid @grey14;
+                    font-size: 14pt;
+                    padding-left: 10px;
+                    .font-text-light();
+                    box-sizing: border-box;
+                }
+
+                .container-search {
+                    position: relative;
+                    display: inline-block;
+                    width: 30%;
+
+                    .icon-github {
+                        color: @grey16;
+                        position: absolute;
+                        top: 5px;
+                        right: 6px;
+                        font-size: 30px;
                     }
-                    .desc {
-                        font-size: 12px;
-                        margin-top: 5px;
+                }
+
+                .submit-search {
+                    border: 1px solid grey;
+                    border-radius: 3px;
+                    background: @grey1;
+                    width: 100px;
+                    height: 38px;
+                    text-transform: uppercase;
+                    color: @black2;
+                    margin-left: 10px;
+                    font-size: 16pt;
+                    text-align: center;
+                    line-height: 1px;
+                    .font-text-light();
+
+                    &:hover {
+                        border-color: black;
+                        background: white;
                     }
-                    background: @grey2;
-                    padding: 8px;
-                    color: @marron2;
                 }
             }
         }
 
-        footer {
-            display: none;
-            padding: 10px;
-            height: 44px;
-            color: white;
-            .gradient(@black5, @black3);
+        .popular {
+            padding-top: 20px;
+            padding-bottom: 40px;
+            background: @grey9;
+            border-top: 1px solid @grey11;
+            .box-shadow(inset 0px 1px 4px @grey13);
 
-            .twitter-account {
-                text-decoration: none;
-                color: white;
+            .top {
+                background: white;
+                width: 40%;
+                margin: auto;
+                border-radius: 4px;
+                padding-top: 5px;
+
+                h2 {
+                    margin-left: 10px;
+                    text-transform: uppercase;
+                    color: @black2;
+                    font-size: 20px;
+                    .font-display();
+                }
+
+                .coders {
+                    li {
+                        border-top: 1px solid white;
+                        header {
+                            font-size: 14px;
+                            .font-text-medium();
+                        }
+                        .desc {
+                            font-size: 12px;
+                            margin-top: 5px;
+                        }
+                        background: @grey2;
+                        padding: 8px;
+                        color: @marron2;
+                    }
+                }
             }
-            .twitter-button {
-                vertical-align: -9px;
-                display: inline-block;
-                a {
-                    color: @black5;
+
+            footer {
+                display: none;
+                padding: 10px;
+                height: 44px;
+                color: white;
+                .gradient(@black5, @black3);
+
+                .twitter-account {
+                    text-decoration: none;
+                    color: white;
+                }
+                .twitter-button {
+                    vertical-align: -9px;
+                    display: inline-block;
+                    a {
+                        color: @black5;
+                    }
                 }
             }
         }
