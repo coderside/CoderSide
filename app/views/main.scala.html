@@ -1,0 +1,49 @@
+@()(content: Html)(scripts: Html)(implicit lang: Lang, request: Request[AnyContent])
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>CoderSide</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+
+    <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/reset.css")">
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/coderside.css")">
+    <link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/font/coderfont.css")">
+    <link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/fonts/fontawesome/font-awesome.css")">
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700,600,300">
+
+    <!-- Javascripts libraries -->
+    <script src="@routes.Assets.at("javascripts/libs/jquery-1.8.3.min.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("javascripts/libs/simrou.js")" type="text/javascript"></script>
+
+    <!--[if IE]>
+        <script src="@routes.Assets.at("javascripts/libs/html5shiv.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/libs/es5-shim.min.js")" type="text/javascript"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="layout-header">
+        <h1>CoderSide</h1>
+      </header>
+      <div class="layout-content">
+        @content
+      </div>
+    </div>
+    <footer></footer>
+
+    <!-- Javascript Router -->
+    @import helper.javascriptRouter
+    @javascriptRouter("jsRoutes")(
+      routes.javascript.Application.search,
+      routes.javascript.Application.profil,
+      routes.javascript.Application.progress
+    )
+
+    <!-- Javascripts app -->
+    <script src="@routes.Assets.at("javascripts/helpers.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("javascripts/coderside.js")" type="text/javascript"></script>
+  </body>
+</html>

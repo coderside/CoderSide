@@ -19,7 +19,7 @@ import utils.Config
 
 object Application extends Controller {
 
-  def index = Action {
+  def index = Action { implicit request =>
     Logger.debug("[Application] Welcome !")
     Ok(views.html.index())
   }
@@ -29,32 +29,32 @@ object Application extends Controller {
     Logger.debug("[Application] Pre-searching coder guy")
     Async {
       GitHubAPI.searchByFullname(keywords).map { gitHubUsers =>
-        Ok(toJson(gitHubUsers))
+        Ok(views.html.results(gitHubUsers))
       } recover {
         case e: Exception => InternalServerError(e.getMessage)
       }
     }
   }
 
-  def overview(username: String, fullname: String, language: String, followers: Int) = Action {
+  def profil(username: String, fullname: String, language: String) = Action {
     Logger.debug("[Application] Searching coder guy")
     val name = Option(fullname) filter (!_.trim.isEmpty)
     val lang = Option(language) filter (!_.trim.isEmpty) orElse Some("n/a")
-    val gitHubUser = GitHubUser(username, name, lang, followers)
+    val gitHubUser = GitHubUser(username, name, lang)
     implicit val timeout = Timeout(Config.overviewTimeout)
     Async {
       (SupervisorNode.ref ? InitQuery(gitHubUser)).mapTo[CoderGuy].map { coderGuy =>
-        Ok(toJson(coderGuy))
+        Ok(views.html.profil(coderGuy))
       } recover {
         case e: Exception => InternalServerError(e.getMessage)
       }
     }
   }
 
-  def progress(username: String, fullname: String, language: String, followers: Int) = Action {
+  def progress(username: String, fullname: String, language: String) = Action {
     val name = Option(fullname) filter (!_.trim.isEmpty)
     val lang = Option(language) filter (!_.trim.isEmpty) orElse Some("n/a")
-    val gitHubUser = GitHubUser(username, name, lang, followers)
+    val gitHubUser = GitHubUser(username, name, lang)
     Async {
       implicit val timeout = Timeout(20.seconds)
       (SupervisorNode.ref ? AskProgress(gitHubUser)).mapTo[Enumerator[Float]].map { progress =>

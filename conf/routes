@@ -5,8 +5,8 @@
 # Home page
 GET     /                           controllers.Application.index
 GET     /search                     controllers.Application.search(keywords: String)
-GET     /overview                   controllers.Application.overview(username: String, fullname: String, language: String, followers: Int)
-GET     /progress                   controllers.Application.progress(username: String, fullname: String, language: String, followers: Int)
+GET     /profil                     controllers.Application.profil(username: String, fullname: String, language: String)
+GET     /progress                   controllers.Application.progress(username: String, fullname: String, language: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

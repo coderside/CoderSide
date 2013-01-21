@@ -76,7 +76,13 @@ object LinkedIn {
   }
 }
 
-case class LinkedInUser(id: String, firstName: String, lastName: String, headline: String, pictureUrl: Option[String]) {
+case class LinkedInUser(
+  id: String,
+  firstName: String,
+  lastName: String,
+  headline: String,
+  pictureUrl: Option[String]
+) {
   lazy val fullName = firstName + " " + lastName
 }
 case class LinkedInApiException(message: String) extends Exception

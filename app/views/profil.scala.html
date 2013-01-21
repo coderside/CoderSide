@@ -1,0 +1,129 @@
+@(coderGuy: models.CoderGuy)(implicit lang: Lang)
+
+@coderGuy.linkedInUser.map { linkedIn =>
+<div class="linkedIn">
+  @linkedIn.pictureUrl.map { avatar =>
+  <img class="avatar" src="@avatar" />
+  }
+  <div class="info">
+    <span>@linkedIn.fullName</span>
+    <span>@linkedIn.headline</span>
+  </div>
+</div>
+}
+
+@coderGuy.gitHubUser.map { github =>
+<div class="github">
+  <div class="logo"></div>
+  @if(github.organizations.length > 0) {
+  <div class="orgs-container">
+    <h1>Organizations</h1>
+    <ul class="organizations">
+      @github.organizations.map { org =>
+      <li class="organization">
+        <header>
+          <img class="avatar" src="images/github/org.png" />
+          <h2>@org.login</h2>
+        </header>
+        <div class="info">
+          <ul>
+            @org.repositories.map { repository =>
+            <li class="repository">
+              <h3>@repository.name</h3>
+              <span class="desc">@repository.description</span>
+              <span class="social">
+                @repository.forks forks |
+                @repository.watchers watchers
+              </span>
+            </li>
+            }
+          </ul>
+        </div>
+      </li>
+      }
+    </ul>
+  </div>
+  }
+  <div class="personal-container">
+    <h1>Personal</h1>
+    <ul class="personal">
+      @github.repositories.map { repository =>
+      <li class="repository">
+        <h3>@repository.name</h3>
+        <div class="info">
+          <span class="desc">@repository.description</span>
+          <span class="social">
+            @repository.forks forks |
+            @repository.watchers watchers
+          </span>
+        </div>
+      </li>
+      }
+    </ul>
+  </div>
+</div>
+}
+
+@coderGuy.twitterUser.map { twitter =>
+<div class="twitter">
+  <div class="logo"></div>
+  <div class="info">
+    <span class="pseudo">@twitter.screenName - @twitter.name</span>
+    <span class="desc">@twitter.description</span>
+    <span class="social">@twitter.followers followers</span>
+  </div>
+  @twitter.timeline.map { timeline =>
+  <ul class="tweets">
+    @timeline.tweets.map { tweet =>
+    <li>@tweet.text</li>
+    }
+  </ul>
+  }
+</div>
+}
+
+@coderGuy.kloutUser.map { klout =>
+<div class="klout">
+  <div class="logo"></div>
+  <div class="info">
+    <span>@klout.nick</span>
+    <span>@klout.score</span>
+  </div>
+
+  @klout.influencers.map { case (klout, twitter) =>
+  <div class="influencers">
+    <h1>Influencers</h1>
+    <dl>
+      <dt>Fullname</dt>
+      <dd>@twitter.name</dd>
+      <dt>Twitter pseudo</dt>
+      <dd>@twitter.screenName</dd>
+      <dt>Description</dt>
+      <dd>@twitter.description</dd>
+      <dt>Followers</dt>
+      <dd>@twitter.followers</dd>
+      <dt>Score</dt>
+      <dd class="score">@klout.score</dd>
+    </dl>
+  </div>
+  }
+
+  @klout.influencees.map { case (klout, twitter) =>
+  <div class="influencees">
+    <h1>Influencees</h1>
+    <dl class="infuencees">
+      <dt>Fullname</dt>
+      <dd>@twitter.name</dd>
+      <dt>Twitter pseudo</dt>
+      <dd>@twitter.screenName</dd>
+      <dt>Description</dt>
+      <dd>@twitter.description</dd>
+      <dt>Followers</dt>
+      <dd>@twitter.followers</dd>
+      <dt>Score</dt>
+      <dd class="score">@klout.score</dd>
+    </dl>
+  </div>
+  }
+</div>
+}

@@ -1,115 +1,32 @@
-@()
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>CoderSide</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width"/>
-    <meta name="apple-mobile-web-app-capable" content="yes"/>
+@()(implicit lang: Lang, request: Request[AnyContent])
 
-    <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
-    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/reset.css")">
-    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/coderside.css")">
-    <link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/font/coderfont.css")">
-    <link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/fonts/fontawesome/font-awesome.css")">
-    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700,600,300">
-
-    <!-- Javascripts libraries -->
-    <script src="@routes.Assets.at("javascripts/libs/jquery-1.8.3.min.js")" type="text/javascript"></script>
-    <script src="@routes.Assets.at("javascripts/libs/simrou.js")" type="text/javascript"></script>
-
-    <!--[if IE]>
-      <script src="@routes.Assets.at("javascripts/libs/html5shiv.js")" type="text/javascript"></script>
-      <script src="@routes.Assets.at("javascripts/libs/es5-shim.min.js")" type="text/javascript"></script>
-   <![endif]-->
-  </head>
-  <body>
-    <div class="wrapper">
-      <header class="layout-header">
-        <h1>CoderSide</h1>
-      </header>
-      <div class="layout-content">
-        <div class="introduction">
-          <p>Having a full overview of one coder guy</p>
-        </div>
-        <div class="search">
-          <form name="github-search">
-            <div class="container-search">
-              <input type="text" name="keywords" placeholder="Search over github..."/>
-              <span class="icon-github"></span>
-            </div>
-            <button class="submit-search">search</button>
-          </form>
-        </div>
-        <ul class="results">
-          <li>
-            <div class="progress"></div>
-            <div class="profil">
-              <header>srenault - Sebastien RENAULT</header>
-              <div class="details">
-                <span>Paris</span><span class="separator"></span>
-                <span>Scala guy</span ><span class="separator"></span>
-                <span>21 repositories</span><span class="separator"></span>
-                <span>91 followers</span>
-              </div>
-            </div>
-            <div class="hint"></div>
-          </li>
-          <li>
-            <div class="profil">
-              <header>srenault - Sebastien RENAULT</header>
-              <div class="details">
-                <span>Paris</span><span class="separator"></span>
-                <span>Scala guy</span ><span class="separator"></span>
-                <span>21 repositories</span><span class="separator"></span>
-                <span>91 followers</span>
-              </div>
-            </div>
-            <div class="hint"></div>
-          </li>
-          <li>
-            <div class="profil">
-              <header>srenault - Sebastien RENAULT</header>
-              <div class="details">
-                <span>Paris</span><span class="separator"></span>
-                <span>Scala guy</span ><span class="separator"></span>
-                <span>21 repositories</span><span class="separator"></span>
-                <span>91 followers</span>
-              </div>
-            </div>
-            <div class="hint"></div>
-          </li>
-          <li class="last">
-            <div class="profil">
-              <header>srenault - Sebastien RENAULT</header>
-              <div class="details">
-                <span>Paris</span><span class="separator"></span>
-                <span>Scala guy</span ><span class="separator"></span>
-                <span>21 repositories</span><span class="separator"></span>
-                <span>91 followers</span>
-              </div>
-            </div>
-            <div class="hint"></div>
-          </li>
-        </ul>
-        <div class="popular">
-          <div class="top">
-            <h2>Popular</h2>
-            <ul class="coders">
-              <li>
-                <header>srenault - Sebastien RENAULT</header>
-                <p class="desc">Web programmer working at @@Zenexity. @@HTML, @@CSS, @@Javascript and @@Scala are become my day-to-day.</p>
-              </li>
-              <li>
-                <header>srenault - Sebastien RENAULT</header>
-                <p class="desc">Web programmer working at @@Zenexity. @@HTML, @@CSS, @@Javascript and @@Scala are become my day-to-day.</p>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
+@main() {
+<div class="introduction">
+  <p>Having a full overview of one coder guy</p>
+</div>
+<div class="search">
+  <form name="github-search">
+    <div class="container-search">
+      <input type="text" name="keywords" placeholder="Search over github..."/>
+      <span class="icon-github"></span>
     </div>
-    <footer>
-    </footer>
-  </body>
-</html>
+    <button class="submit-search">search</button>
+  </form>
+</div>
+<div class="popular">
+  <div class="top">
+    <h2>Popular</h2>
+    <ul class="coders">
+      <li>
+        <header>srenault - Sebastien RENAULT</header>
+        <p class="desc">Web programmer working at @@Zenexity. @@HTML, @@CSS, @@Javascript and @@Scala are become my day-to-day.</p>
+      </li>
+      <li>
+        <header>srenault - Sebastien RENAULT</header>
+        <p class="desc">Web programmer working at @@Zenexity. @@HTML, @@CSS, @@Javascript and @@Scala are become my day-to-day.</p>
+      </li>
+    </ul>
+  </div>
+</div>
+} {
+}

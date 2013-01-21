@@ -123,7 +123,14 @@ object Twitter {
   }
 }
 
-case class Tweet(text: String, createdAt: Date, retweeted: Boolean, inReplyToUser: Boolean, inReplyToStatus: Boolean)
+case class Tweet(
+  text: String,
+  createdAt: Date,
+  retweeted: Boolean,
+  inReplyToUser: Boolean,
+  inReplyToStatus: Boolean
+)
+
 case class TwitterUser(
   screenName: String,
   name: String,
@@ -131,4 +138,5 @@ case class TwitterUser(
   followers: Int,
   timeline: Option[TwitterTimeline] = None
 )
+
 case class TwitterApiException(message: String) extends Exception

@@ -19,8 +19,9 @@ object GitHubAPI extends URLEncoder with Debug {
       (__ \ 'username).read[String] and
       (__ \ 'fullname).readNullable[String] and
       (__ \ 'language).readNullable[String] and
-      (__ \ 'followers).read[Int]
-    )((username, fullname, language, followers) => GitHubUser(username, fullname, language, followers))
+      (__ \ 'followers).read[Int] and
+      (__ \ 'location).readNullable[String]
+    )((username, fullname, language, followers, location) => GitHubUser(username, fullname, language, Some(followers), location))
 
   implicit val gitHubUserWrites = new Writes[GitHubUser] {
     def writes(gu: GitHubUser): JsValue = {
@@ -59,12 +60,12 @@ object GitHubAPI extends URLEncoder with Debug {
 
   def oauthURL = "client_id=" + Config.GitHub.clientID + "&client_secret=" + Config.GitHub.clientSecret
 
-  def searchByFullname(fullname: String): Future[Set[GitHubUser]] = {
+  def searchByFullname(fullname: String): Future[List[GitHubUser]] = {
     WS.url("https://api.github.com/legacy/user/search/" + encode(fullname) + "?" + oauthURL)
    .get().map(_.json \ "users").map {
        case JsArray(users) => users.flatMap { user =>
          readUser.reads(user).asOpt
-       }.toSet
+       }.toList
        case o => throw new GitHubApiException("Failed seaching gitHub user by fullname : " + fullname)
     }
   }
@@ -126,7 +127,8 @@ case class GitHubUser(
   username: String,
   fullname: Option[String],
   language: Option[String],
-  followers: Int,
+  followers: Option[Int] = None,
+  location: Option[String] = None,
   repositories: List[GitHubRepository] = Nil,
   organizations: List[GitHubOrg] = Nil
 ) {
