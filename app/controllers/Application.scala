@@ -1,6 +1,7 @@
 package controllers
 
 import scala.concurrent.duration._
+import scala.concurrent.future
 import play.api._
 import play.api.mvc._
 import play.api.libs.concurrent._
@@ -24,12 +25,16 @@ object Application extends Controller {
     Ok(views.html.index())
   }
 
+  def home = Action {
+    Ok(views.html.search())
+  }
+
   def search(keywords: String) = Action {
     import GitHubAPI._
     Logger.debug("[Application] Pre-searching coder guy")
     Async {
       GitHubAPI.searchByFullname(keywords).map { gitHubUsers =>
-        Ok(views.html.results(gitHubUsers))
+        Ok(views.html.results(List(GitHubUser("srenault", Some("RENAULT"), Some("scala"), None))))
       } recover {
         case e: Exception => InternalServerError(e.getMessage)
       }
@@ -43,11 +48,12 @@ object Application extends Controller {
     val gitHubUser = GitHubUser(username, name, lang)
     implicit val timeout = Timeout(Config.overviewTimeout)
     Async {
-      (SupervisorNode.ref ? InitQuery(gitHubUser)).mapTo[CoderGuy].map { coderGuy =>
-        Ok(views.html.profil(coderGuy))
-      } recover {
-        case e: Exception => InternalServerError(e.getMessage)
-      }
+      future(Ok(views.html.profil(CoderGuy(Some(GitHubUser("srenault", Some("RENAULT"), None, None)), None, None, None))))
+      // (SupervisorNode.ref ? InitQuery(gitHubUser)).mapTo[CoderGuy].map { coderGuy =>
+      //   Ok(views.html.profil(coderGuy))
+      // } recover {
+      //   case e: Exception => InternalServerError(e.getMessage)
+      // }
     }
   }
 

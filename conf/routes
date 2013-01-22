@@ -4,6 +4,7 @@
 
 # Home page
 GET     /                           controllers.Application.index
+GET     /home                       controllers.Application.home
 GET     /search                     controllers.Application.search(keywords: String)
 GET     /profil                     controllers.Application.profil(username: String, fullname: String, language: String)
 GET     /progress                   controllers.Application.progress(username: String, fullname: String, language: String)

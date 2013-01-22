@@ -1,6 +1,73 @@
 @import 'commons.less';
 @import 'colors.less';
 
+.search {
+    background: @grey5;
+    text-align: center;
+    padding-top: 35px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid @grey11;
+
+    form {
+        input[name=keywords] {
+            height: 40px;
+            width: 100%;
+            border-radius: 3px;
+            border: 1px solid @grey14;
+            font-size: 14pt;
+            padding-left: 10px;
+            .font-text-light();
+            box-sizing: border-box;
+        }
+
+        .container-search {
+            position: relative;
+            display: inline-block;
+            width: 30%;
+
+            .icon-github, .loading-github {
+                position: absolute;
+                top: 5px;
+                right: 6px;
+            }
+
+            .icon-github {
+                color: @grey16;
+                font-size: 30px;
+            }
+
+            .loading-github {
+                background: url('../images/github/octocat-spinner-128.gif') no-repeat 7px 2px;
+                height: 31px;
+                width: 42px;
+                display: inline-block;
+                background-size: 63%;
+                display: none;
+            }
+        }
+
+        .submit-search {
+            border: 1px solid grey;
+            border-radius: 3px;
+            background: @grey1;
+            width: 100px;
+            height: 38px;
+            text-transform: uppercase;
+            color: @black2;
+            margin-left: 10px;
+            font-size: 16pt;
+            text-align: center;
+            line-height: 1px;
+            .font-text-light();
+
+            &:hover {
+                border-color: black;
+                background: white;
+            }
+        }
+    }
+}
+
 .results {
     text-align: center;
 

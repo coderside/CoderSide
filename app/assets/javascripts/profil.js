@@ -6,15 +6,33 @@
     window.Profil = function() {
         var self = this;
 
-        this.render = function(res) {
-            $('.layout-content .tweets li:last').addClass('last');
-            $('.layout-content .organization:last li:last').addClass('last');
-            $('.layout-content .home').css('opacity', 0);
+        this.empty = function() {
+            $('.profil').empty();
+        };
 
-            $('.home').on('webkitTransitionEnd', function() {
-                $('.layout-content').html(res);
-                $('.layout-content .profil').css('margin-left', 0);
-                $('.layout-content .profil').css('opacity', 1);
+        this.isEmpty = function() {
+            return $('.profil').text().trim() == '';
+        };
+
+        this.toggleFadeIn = function() {
+            var $profil = $('.profil');
+            if($profil.css('opacity') == 1) {
+                $profil.css('opacity', 0);
+            } else {
+                $profil.css('opacity', 1);
+            }
+        };
+
+        this.render = function(res) {
+            CoderSide.home.toggleFadeOut();
+            $('.home').on('webkitTransitionEnd', function(e) {
+                e.stopPropagation();
+                if($(e.target).hasClass('home') && CoderSide.home.isEmpty()) {
+                    $('.layout-content .profil').html(res);
+                    $('.layout-content .tweets li:last').addClass('last');
+                    $('.layout-content .organization:last li:last').addClass('last');
+                    self.toggleFadeIn();
+                }
             });
         };
     };

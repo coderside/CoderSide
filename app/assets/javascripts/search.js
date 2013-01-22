@@ -20,19 +20,19 @@
 
         $(document).on('click', '.search .submit-search', function(e) {
             e.preventDefault();
-            self.clear();
             self.submit();
         });
 
         $(document).on('keydown', '.search input[name=keywords]', function(e) {
             if(e.keyCode == 13) { //ENTER key.
                 e.preventDefault();
-                self.clear();
+                self.clearResults();
                 self.submit();
             }
         });
 
-        $(document).on('webkitTransitionEnd', '.results li', function() {
+        $(document).on('webkitTransitionEnd', '.results li', function(e) {
+            e.stopPropagation();
             var $next = $(this).next('li');
             if($next.length) $next.addClass('fade-in');
         });
@@ -52,11 +52,20 @@
                     fullname: $gitHubUser.find('.fullname').text(),
                     language: $gitHubUser.find('.language').text()
                 };
+
+            $gitHubUser.addClass('selected');
+
             CoderSide.navigate('/profil?' + $.param(gitHubUser));
+            //CoderSide.resolve('/progress?' + $.param(gitHubUser), 'get');
         });
 
-        this.clear = function() {
+        this.clearResults = function() {
             $('.results').empty();
+        };
+
+        this.clear = function() {
+            $('.search input[name=keywords]').val('');
+            self.clearResults();
         };
 
         this.submit = function() {
@@ -64,9 +73,19 @@
             CoderSide.navigate('/search/' + encodeURIComponent($keywords.val()));
         };
 
+        this.progress = function(value) {
+            $('.results .selected .progress').css('width', value + '%');
+        };
+
         this.render = function(res) {
             $('.results').html(res);
             $('.results li:first').addClass('fade-in');
+
+            if(!CoderSide.profil.isEmpty()) {
+                CoderSide.profil.toggleFadeIn();
+                CoderSide.profil.empty();
+                CoderSide.home.toggleFadeOut();
+            }
         };
     };
 })();

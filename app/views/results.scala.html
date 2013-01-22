@@ -1,7 +1,7 @@
 @(gitHubUsers: List[models.github.GitHubUser])(implicit lang: Lang)
 <ul class="results">
   @gitHubUsers.sortBy(u => -u.followers.getOrElse(0)).map { gitHubUser =>
-  <li>
+  <li class="result">
     <div class="progress"></div>
     <div class="user">
       <header>
