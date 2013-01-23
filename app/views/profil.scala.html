@@ -1,15 +1,17 @@
 @(coderGuy: models.CoderGuy)(implicit lang: Lang)
 
-@coderGuy.linkedInUser.map { linkedIn =>
-<div class="linkedIn">
-  @linkedIn.pictureUrl.map { avatar =>
-  <img class="avatar" src="@avatar" />
+@(coderGuy.linkedInUser, coderGuy.gitHubUser, coderGuy.twitterUser) match {
+  case (Some(linkedIn), _, _) => {
+    @profil_header(linkedIn.fullName, linkedIn.headline, linkedIn.pictureUrl)
   }
-  <div class="info">
-    <span>@linkedIn.fullName</span>
-    <span>@linkedIn.headline</span>
-  </div>
-</div>
+  case (None, _, Some(twitter)) => {
+    @profil_header(twitter.name, twitter.description, None)
+  }
+  case (None, Some(gitHub), None) if(gitHub.fullname.isDefined) => {
+    @profil_header(gitHub.fullname.getOrElse(""), "", None)
+  }
+  case _ => {
+  }
 }
 
 @coderGuy.gitHubUser.map { github =>

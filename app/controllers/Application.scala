@@ -18,6 +18,10 @@ import models.github.{ GitHubAPI, GitHubUser }
 import models.CoderGuy
 import utils.Config
 
+import models.linkedin._
+import models.twitter._
+import models.klout._
+
 object Application extends Controller {
 
   def index = Action { implicit request =>
@@ -33,8 +37,14 @@ object Application extends Controller {
     import GitHubAPI._
     Logger.debug("[Application] Pre-searching coder guy")
     Async {
+      val users = List(
+        GitHubUser("srenault", Some("RENAULT"), Some("scala"), None)
+      )
+      future(
+        Ok(views.html.results(users))
+      )
 //      GitHubAPI.searchByFullname(keywords).map { gitHubUsers =>
-        future(Ok(views.html.results(List(GitHubUser("srenault", Some("RENAULT"), Some("scala"), None)))))
+        //Ok(views.html.results(gitHubUsers)
       // } recover {
       //   case e: Exception => InternalServerError(e.getMessage)
       // }
@@ -48,7 +58,43 @@ object Application extends Controller {
     val gitHubUser = GitHubUser(username, name, lang)
     implicit val timeout = Timeout(Config.overviewTimeout)
     Async {
-      future(Ok(views.html.profil(CoderGuy(Some(GitHubUser("srenault", Some("RENAULT"), None, None)), None, None, None))))
+      val coderGuy = CoderGuy(
+        Some(
+          GitHubUser(
+            "srenault",
+            Some("RENAULT"),
+            Some("Scala"),
+            Some(12),
+            Some("location")
+          )),
+        Some(
+          LinkedInUser(
+            "id",
+            "Sébastien",
+            "RENAULT",
+            "Web developper at @Zenexity",
+            None
+          )),
+        Some(
+          TwitterUser(
+            "srenaultcontact",
+            "Sébastien RENAULT",
+            "Web developper at Zenexity",
+            10,
+            None
+          )),
+        Some(
+          KloutUser(
+            "id",
+            "srenault",
+            10.00000111,
+            Nil,
+            Nil
+          ))
+      )
+      future(
+        Ok(views.html.profil(coderGuy))
+      )
       // (SupervisorNode.ref ? InitQuery(gitHubUser)).mapTo[CoderGuy].map { coderGuy =>
       //   Ok(views.html.profil(coderGuy))
       // } recover {
