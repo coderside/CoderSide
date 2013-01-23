@@ -33,11 +33,11 @@ object Application extends Controller {
     import GitHubAPI._
     Logger.debug("[Application] Pre-searching coder guy")
     Async {
-      GitHubAPI.searchByFullname(keywords).map { gitHubUsers =>
-        Ok(views.html.results(List(GitHubUser("srenault", Some("RENAULT"), Some("scala"), None))))
-      } recover {
-        case e: Exception => InternalServerError(e.getMessage)
-      }
+//      GitHubAPI.searchByFullname(keywords).map { gitHubUsers =>
+        future(Ok(views.html.results(List(GitHubUser("srenault", Some("RENAULT"), Some("scala"), None)))))
+      // } recover {
+      //   case e: Exception => InternalServerError(e.getMessage)
+      // }
     }
   }
 

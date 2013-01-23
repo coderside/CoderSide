@@ -35,7 +35,7 @@
             return $('.home').text().trim() == '';
         };
 
-        this.toggleFadeOut = function() {
+        this.toggleFade = function() {
             var $home = $('.home');
             if($home.css('opacity') == 0) {
                 $home.css('opacity', 1);

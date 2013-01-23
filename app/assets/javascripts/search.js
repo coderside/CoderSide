@@ -82,9 +82,9 @@
             $('.results li:first').addClass('fade-in');
 
             if(!CoderSide.profil.isEmpty()) {
-                CoderSide.profil.toggleFadeIn();
+                CoderSide.profil.toggleFade();
                 CoderSide.profil.empty();
-                CoderSide.home.toggleFadeOut();
+                CoderSide.home.toggleFade();
             }
         };
     };
