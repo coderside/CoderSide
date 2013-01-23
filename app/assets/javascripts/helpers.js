@@ -22,4 +22,6 @@
         }
         return params;
     };
+
+    window.transitionend = 'transitionend webkitTransitionEnd oTransitionEnd otransitionend';
 })();

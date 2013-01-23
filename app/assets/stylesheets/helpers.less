@@ -30,3 +30,24 @@
          cursor: pointer;
      }
 }
+
+.transition(@range: all, @time: 500ms, @ease: ease-in-out) {
+    -moz-transition: @range @time @ease;
+    -webkit-transition: @range @time @ease;
+    -o-transition: @range @time @ease;
+    transition: @range @time @ease;
+}
+
+.transition-duration(@time: 500ms) {
+    -moz-transition-duration: @time;
+    -webkit-transition-duration: @time;
+    -o-transition-duration: @time;
+    transition-duration: @time;
+}
+
+.transform(@all){
+    -moz-transform: @all;
+    -webkit-transform: @all;
+    -o-transform: @all;
+    transform: @all;
+}

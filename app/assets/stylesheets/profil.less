@@ -19,9 +19,8 @@
     margin-left: 35px;
 
     &.fade {
-        -webkit-transition-property: opacity, margin-left;
-        -webkit-transition-duration: 0.2s;
-        -webkit-transition-timing-function: ease;
+        .transition(opacity, 0.2s, ease);
+        .transition(margin-left, 0.2s, ease);
     }
 
     .linkedIn {

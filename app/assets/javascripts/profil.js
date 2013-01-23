@@ -25,17 +25,21 @@
             }
         };
 
-        this.render = function(res) {
-            CoderSide.home.toggleFade();
-            $('.home').on('webkitTransitionEnd', function(e) {
+        this.fade = function(content) {
+            $('.home').on(transitionend, function(e) {
                 e.stopPropagation();
                 if($(e.target).hasClass('home') && CoderSide.home.isEmpty()) {
-                    $('.layout-content .profil').html(res);
+                    $('.layout-content .profil').html(content);
                     $('.layout-content .tweets li:last').addClass('last');
                     $('.layout-content .organization:last li:last').addClass('last');
                     self.toggleFade();
                 }
             });
+        };
+
+        this.render = function(content) {
+            this.fade(content);
+            CoderSide.home.toggleFade();
         };
     };
 })();

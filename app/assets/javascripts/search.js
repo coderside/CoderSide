@@ -31,8 +31,7 @@
             }
         });
 
-        $(document).on('webkitTransitionEnd', '.results li', function(e) {
-            console.log('here');
+        $(document).on(transitionend, '.results li', function(e) {
             e.stopPropagation();
             if($(e.target).has('result')) {
                 var $next = $(this).next('li');
