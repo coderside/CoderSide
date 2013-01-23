@@ -11,7 +11,21 @@ case class CoderGuy(
   twitterUser: Option[TwitterUser],
   kloutUser: Option[KloutUser],
   errors: Seq[(String, String)] = Nil
-)
+) {
+  lazy val oneAvatar: Option[String] = {
+    val linkedInAvatar = for {
+      linkedIn <- linkedInUser
+      avatar <- linkedIn.pictureUrl
+    } yield avatar
+
+    val twitterAvatar = for {
+      twitter <- twitterUser
+      avatar <- twitter.avatar
+    } yield avatar
+
+    linkedInAvatar orElse twitterAvatar
+  }
+}
 
 object CoderGuy {
   import play.api.libs.json._

@@ -32,9 +32,12 @@
         });
 
         $(document).on('webkitTransitionEnd', '.results li', function(e) {
+            console.log('here');
             e.stopPropagation();
-            var $next = $(this).next('li');
-            if($next.length) $next.addClass('fade-in');
+            if($(e.target).has('result')) {
+                var $next = $(this).next('li');
+                if($next.length) $next.addClass('fade-in');
+            }
         });
 
         $(document).on('mouseenter', '.results li', function() {
@@ -56,7 +59,7 @@
             $gitHubUser.addClass('selected');
 
             CoderSide.navigate('/profil?' + $.param(gitHubUser));
-            //CoderSide.resolve('/progress?' + $.param(gitHubUser), 'get');
+            CoderSide.resolve('/progress?' + $.param(gitHubUser), 'get');
         });
 
         this.clearResults = function() {
@@ -77,8 +80,19 @@
             $('.results .selected .progress').css('width', value + '%');
         };
 
+        this.fadeIn = function() {
+            $('.results li').on('webkitTransitionEnd', function(e) {
+                e.stopPropagation();
+                if($(e.target).has('result')) {
+                    var $next = $(this).next('li');
+                    if($next.length) $next.addClass('fade-in');
+                }
+            });
+        };
+
         this.render = function(res) {
             $('.results').html(res);
+            this.fadeIn();
             $('.results li:first').addClass('fade-in');
 
             if(!CoderSide.profil.isEmpty()) {

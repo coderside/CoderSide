@@ -38,16 +38,17 @@ object Application extends Controller {
     Logger.debug("[Application] Pre-searching coder guy")
     Async {
       val users = List(
-        GitHubUser("srenault", Some("RENAULT"), Some("scala"), None)
+        GitHubUser("srenault", Some("RENAULT"), Some("scala"), None),
+        GitHubUser("srenault", Some("RENAUD"), Some("scala"), None)
       )
       future(
         Ok(views.html.results(users))
       )
-//      GitHubAPI.searchByFullname(keywords).map { gitHubUsers =>
-        //Ok(views.html.results(gitHubUsers)
-      // } recover {
-      //   case e: Exception => InternalServerError(e.getMessage)
-      // }
+     GitHubAPI.searchByFullname(keywords).map { gitHubUsers =>
+        Ok(views.html.results(gitHubUsers))
+      } recover {
+        case e: Exception => InternalServerError(e.getMessage)
+      }
     }
   }
 
@@ -95,11 +96,11 @@ object Application extends Controller {
       future(
         Ok(views.html.profil(coderGuy))
       )
-      // (SupervisorNode.ref ? InitQuery(gitHubUser)).mapTo[CoderGuy].map { coderGuy =>
-      //   Ok(views.html.profil(coderGuy))
-      // } recover {
-      //   case e: Exception => InternalServerError(e.getMessage)
-      // }
+      (SupervisorNode.ref ? InitQuery(gitHubUser)).mapTo[CoderGuy].map { coderGuy =>
+        Ok(views.html.profil(coderGuy))
+      } recover {
+        case e: Exception => InternalServerError(e.getMessage)
+      }
     }
   }
 

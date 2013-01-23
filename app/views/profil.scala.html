@@ -2,7 +2,7 @@
 
 @(coderGuy.linkedInUser, coderGuy.gitHubUser, coderGuy.twitterUser) match {
   case (Some(linkedIn), _, _) => {
-    @profil_header(linkedIn.fullName, linkedIn.headline, linkedIn.pictureUrl)
+    @profil_header(linkedIn.fullName, linkedIn.headline, coderGuy.oneAvatar)
   }
   case (None, _, Some(twitter)) => {
     @profil_header(twitter.name, twitter.description, None)

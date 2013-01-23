@@ -26,8 +26,9 @@ object TwitterAPI extends URLEncoder with Debug {
       (__ \ 'screen_name).read[String] and
       (__ \ 'name).read[String] and
       (__ \ 'description).read[String] and
-      (__ \ 'followers_count).read[Int]
-    )((screenName, name, desc, followers) => TwitterUser(screenName, name, desc, followers))
+      (__ \ 'followers_count).read[Int] and
+      (__ \ 'profile_image_url).readNullable[String]
+    )((screenName, name, desc, followers, avatar) => TwitterUser(screenName, name, desc, followers, avatar))
   }
 
   implicit val readTweet = {
@@ -136,6 +137,7 @@ case class TwitterUser(
   name: String,
   description: String,
   followers: Int,
+  avatar: Option[String],
   timeline: Option[TwitterTimeline] = None
 )
 

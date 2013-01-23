@@ -20,7 +20,6 @@ $(document).ready(function() {
             get: function(any, params) {
                 if(params.keywords) {
                     CoderSide.home.toggleLoading();
-
                     if(CoderSide.home.exist()) {
                         jsRoutes.controllers.Application.search(
                             params.keywords
@@ -75,6 +74,11 @@ $(document).ready(function() {
                         console.log('Error while getting progress update');
                     };
                 }
+            }
+        },
+        '/*any': {
+            get: function() {
+                CoderSide.navigate('/');
             }
         }
     });
