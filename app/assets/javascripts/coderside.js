@@ -19,23 +19,24 @@ $(document).ready(function() {
         '/search/:keywords': {
             get: function(any, params) {
                 if(params.keywords) {
-                    CoderSide.home.toggleLoading();
                     if(CoderSide.home.exist()) {
-                        jsRoutes.controllers.Application.search(
-                            params.keywords
-                        ).ajax().done(function(response) {
+                        CoderSide.search.disable();
+                        CoderSide.search.toggleLoading();
+
+                        jsRoutes.controllers.Application.search(params.keywords).ajax().done(function(response) {
                             CoderSide.search.render(response);
-                            CoderSide.home.toggleLoading();
-                            CoderSide.home.setInputSearch(params.keywords);
+                            CoderSide.search.enable();
+                            CoderSide.search.toggleLoading();
+                            CoderSide.search.setInputSearch(params.keywords);
                         });
                     } else {
                         var promiseHome = jsRoutes.controllers.Application.home().ajax(),
                             promiseResults = jsRoutes.controllers.Application.search(params.keywords).ajax();
                         $.when(promiseHome, promiseResults).done(function(home, results) {
                             CoderSide.home.render(home[0]);
-                            CoderSide.home.toggleLoading();
                             CoderSide.search.render(results[0]);
-                            CoderSide.home.setInputSearch(params.keywords);
+                            CoderSide.search.enable();
+                            CoderSide.search.setInputSearch(params.keywords);
                         });
                     }
                 }

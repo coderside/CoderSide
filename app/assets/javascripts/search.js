@@ -90,6 +90,33 @@
             });
         };
 
+        this.toggleLoading = function() {
+            var $iconGitHub = $('.search .icon-github'),
+                $loadingGitHub = $('.search .loading-github');
+
+            if($iconGitHub.css('display') === 'none' || $iconGitHub.css('display') != 'block') {
+                $iconGitHub.show();
+                $loadingGitHub.hide();
+            } else {
+                $iconGitHub.hide();
+                $loadingGitHub.show();
+            }
+        };
+
+        this.setInputSearch = function(keywords) {
+            $('.search input[name=keywords]').val(keywords);
+        };
+
+        this.disable = function() {
+            $('.search input[name=keywords]').attr('disabled', '');
+            $('.search .submit-search').attr('disabled', '');
+        };
+
+        this.enable = function() {
+            $('.search input[name=keywords]').removeAttr('disabled');
+            $('.search .submit-search').removeAttr('disabled');
+        };
+
         this.render = function(res) {
             $('.results').html(res);
             this.fadeIn();
