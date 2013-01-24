@@ -1,0 +1,11 @@
+@(fullname: String, headline: String, avatar: Option[String])
+
+<div class="linkedIn">
+  @avatar.map { avatar =>
+  <img class="avatar" src="@avatar" />
+  }
+  <div class="info">
+    <span>@fullname</span>
+    <span>@headline</span>
+  </div>
+</div>
