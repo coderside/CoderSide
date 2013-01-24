@@ -26,9 +26,9 @@
         };
 
         this.fade = function(content) {
-            $('.home').on(transitionend, function(e) {
+            $('.home').one(transitionend, function(e) {
                 e.stopPropagation();
-                if($(e.target).hasClass('home') && CoderSide.home.isEmpty()) {
+                if($(e.target).hasClass('home')) {
                     $('.layout-content .profil').html(content);
                     $('.layout-content .tweets li:last').addClass('last');
                     $('.layout-content .organization:last li:last').addClass('last');

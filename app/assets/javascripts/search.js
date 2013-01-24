@@ -50,7 +50,7 @@
             $gitHubUser.addClass('selected');
 
             CoderSide.navigate('/profil?' + $.param(gitHubUser));
-            CoderSide.resolve('/progress?' + $.param(gitHubUser), 'get');
+            //CoderSide.resolve('/progress?' + $.param(gitHubUser), 'get');
         });
 
         this.clearResults = function() {
@@ -85,7 +85,7 @@
         };
 
         this.fadeIn = function() {
-            $('.results .result').on(transitionend, function(e) {
+            $('.results .result').one(transitionend, function(e) {
                 e.stopPropagation();
                 if($(e.target).hasClass('result')) {
                     var $next = $(this).next('li');
