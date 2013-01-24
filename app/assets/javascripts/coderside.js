@@ -32,6 +32,7 @@ $(document).ready(function() {
                     } else {
                         var promiseHome = jsRoutes.controllers.Application.home().ajax(),
                             promiseResults = jsRoutes.controllers.Application.search(params.keywords).ajax();
+
                         $.when(promiseHome, promiseResults).done(function(home, results) {
                             CoderSide.home.render(home[0]);
                             CoderSide.search.render(results[0]);

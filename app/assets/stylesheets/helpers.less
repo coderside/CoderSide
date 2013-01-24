@@ -51,3 +51,11 @@
     -o-transform: @all;
     transform: @all;
 }
+
+.box-sizing(@arg) {
+    -moz-box-sizing:@arguments;
+    -webkit-box-sizing:@arguments;
+    -o-box-sizing:@arguments;
+    -ms-box-sizing:@arguments;
+    box-sizing:@arguments;
+}
