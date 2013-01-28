@@ -1,9 +1,10 @@
-@()(implicit lang: Lang, request: Request[AnyContent])
+@(popularCoders: List[models.PopularCoder])(implicit lang: Lang, request: Request[AnyContent])
 
 @main() {
 @loading()
 <div class="home first-loading fade">
   @search()
+  @popular(popularCoders)
 </div>
 <div class="profil fade"></div>
 } {

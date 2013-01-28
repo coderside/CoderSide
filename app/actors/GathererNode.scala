@@ -3,7 +3,8 @@ package actors
 import scala.concurrent.duration._
 import akka.actor.{ Actor, ActorRef, ActorLogging, ReceiveTimeout }
 import play.api.libs.iteratee.Concurrent
-import models.CoderGuy
+import reactivemongo.bson.BSONObjectID
+import models.{ CoderGuy, PopularCoder }
 import utils.Config
 import Messages._
 
@@ -54,6 +55,18 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
         kloutResult map (_.profil),
         errors
       )
+
+      gitHubResult.foreach { github =>
+        val fullname = linkedInResult.map(_.profil.fullName) orElse twitterResult.map(_.profil.name) orElse github.profil.fullname
+        val popularCoder = PopularCoder(
+          BSONObjectID.generate,
+          github.profil.username,
+          fullname,
+          twitterResult map(_.profil.description)
+        )
+        PopularCoder.uncheckedCreate(popularCoder)
+      }
+
       clients foreach (_ ! coderGuy)
       headNode ! End(self)
     }

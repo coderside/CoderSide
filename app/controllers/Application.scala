@@ -15,7 +15,7 @@ import akka.util.Timeout
 import actors.{ SupervisorNode, GathererNode }
 import actors.Messages.{ InitQuery, AskProgress }
 import models.github.{ GitHubAPI, GitHubUser }
-import models.CoderGuy
+import models.{ CoderGuy, PopularCoder }
 import utils.Config
 
 import models.linkedin._
@@ -26,7 +26,12 @@ object Application extends Controller {
 
   def index = Action { implicit request =>
     Logger.debug("[Application] Welcome !")
-    Ok(views.html.index())
+    import models.PopularCoder.json._
+    Async {
+      PopularCoder.top(10).map { coders =>
+        Ok(views.html.index(coders.flatMap(_.asOpt[PopularCoder])))
+      }
+    }
   }
 
   def home = Action {
