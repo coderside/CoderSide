@@ -18,6 +18,7 @@ $(document).ready(function() {
         },
         '/search/:keywords': {
             get: function(any, params) {
+                CoderSide.loading.hide();
                 if(params.keywords) {
                     if(CoderSide.home.exist()) {
                         CoderSide.search.disable();
@@ -45,16 +46,26 @@ $(document).ready(function() {
         },
         '/profil?*queryString': {
             get: function(any, params) {
-                var data = parseQueryString(params.queryString);
-                if(data.username && data.fullname && data.language) {
-                    jsRoutes.controllers.Application.profil(
-                        data.username,
-                        data.fullname,
-                        data.language
-                    ).ajax().done(function(response) {
-                        CoderSide.profil.render(response);
-                    });
+                if(CoderSide.home.isFirstLoading()) {
+                    CoderSide.home.notFirstLoading();
+                    CoderSide.home.empty();
+                    CoderSide.loading.show();
+                    CoderSide.loading.progress(30);
                 }
+                var data = parseQueryString(params.queryString);
+
+                // if(data.username && data.fullname && data.language) {
+                //     console.log(params);
+                //     CoderSide.resolve('/progress?' + params.queryString, 'get');
+                //     jsRoutes.controllers.Application.profil(
+                //         data.username,
+                //         data.fullname,
+                //         data.language
+                //     ).ajax().done(function(response) {
+                //         CoderSide.loading.hide();
+                //         CoderSide.profil.render(response);
+                //     });
+                // }
             }
         },
         '/progress?*queryString': {
@@ -70,7 +81,12 @@ $(document).ready(function() {
                     var eventSource = new EventSource(uri);
                     eventSource.onmessage = function(msg) {
                         var progress = JSON.parse(msg.data);
-                        CoderSide.search.progress(progress);
+                        console.log(data);
+                        if(data.classic) {
+                            CoderSide.search.progress(progress);
+                        } else {
+                            CoderSide.loading.progress(progress);
+                        }
                     };
                     eventSource.onerror = function() {
                         console.log('Error while getting progress update');
@@ -88,6 +104,6 @@ $(document).ready(function() {
     CoderSide.home = new Home();
     CoderSide.search = new Search();
     CoderSide.profil = new Profil();
+    CoderSide.loading = new Loading();
     CoderSide.start('/');
 });
-

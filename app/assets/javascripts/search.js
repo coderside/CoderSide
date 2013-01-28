@@ -44,13 +44,13 @@
                 gitHubUser = {
                     username: $gitHubUser.find('.username').text(),
                     fullname: $gitHubUser.find('.fullname').text(),
-                    language: $gitHubUser.find('.language').text()
+                    language: $gitHubUser.find('.language').text(),
+                    classic: true
                 };
 
             $gitHubUser.addClass('selected');
 
             CoderSide.navigate('/profil?' + $.param(gitHubUser));
-            //CoderSide.resolve('/progress?' + $.param(gitHubUser), 'get');
         });
 
         this.clearResults = function() {

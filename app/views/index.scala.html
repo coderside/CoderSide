@@ -1,7 +1,10 @@
 @()(implicit lang: Lang, request: Request[AnyContent])
 
 @main() {
-<div class="home fade"></div>
+@loading()
+<div class="home first-loading fade">
+  @search()
+</div>
 <div class="profil fade"></div>
 } {
 }

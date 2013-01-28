@@ -1,0 +1,49 @@
+@import "colors.less";
+
+.loading {
+    background: @grey5;
+    display: none;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    border-top: 1px solid @grey2;
+    border-bottom: 1px solid @grey2;
+
+    .progress {
+        width: 100%;
+        height: 75px;
+        position: relative;
+        background: @grey2;
+
+        .bar {
+            background: @blue2;
+            height: 100%;
+        }
+
+        .spin-container {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+        }
+    }
+
+    .advice {
+        padding: 10px;
+    }
+
+    .loading-text {
+        text-align: center;
+        font-size: 20px;
+        font-family: "Pacifico";
+        margin-top: 180px;
+        color: @grey11;
+    }
+
+    .twitter-waiting {
+        margin-top: 40px;
+        .twitter-timeline {
+            margin: auto;
+            display: block;
+        }
+    }
+}

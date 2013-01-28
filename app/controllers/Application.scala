@@ -37,18 +37,18 @@ object Application extends Controller {
     import GitHubAPI._
     Logger.debug("[Application] Pre-searching coder guy")
     Async {
-      // val users = List(
-      //   GitHubUser("srenault", Some("RENAULT"), Some("scala"), None),
-      //   GitHubUser("srenault", Some("RENAUD"), Some("scala"), None)
-      // )
-      // future(
-      //   Ok(views.html.results(users))
-      // )
-     GitHubAPI.searchByFullname(keywords).map { gitHubUsers =>
-        Ok(views.html.results(gitHubUsers))
-      } recover {
-        case e: Exception => InternalServerError(e.getMessage)
-      }
+      val users = List(
+        GitHubUser("srenault", Some("RENAULT"), Some("scala"), None),
+        GitHubUser("srenault", Some("RENAUD"), Some("scala"), None)
+      )
+      future(
+        Ok(views.html.results(users))
+      )
+     // GitHubAPI.searchByFullname(keywords).map { gitHubUsers =>
+     //    Ok(views.html.results(gitHubUsers))
+     //  } recover {
+     //    case e: Exception => InternalServerError(e.getMessage)
+     //  }
     }
   }
 

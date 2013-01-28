@@ -28,6 +28,14 @@
             }
         };
 
+        this.isFirstLoading = function() {
+            return $('.home').hasClass('first-loading');
+        };
+
+        this.notFirstLoading = function() {
+            $('.home').removeClass('first-loading');
+        };
+
         this.render = function(searchDOM) {
             $('.layout-content .home').html(searchDOM);
         };
