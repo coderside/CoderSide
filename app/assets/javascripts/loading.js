@@ -36,7 +36,7 @@
 
         this.show = function() {
             spinner.spin($target()[0]);
-            this.displayTimeline();
+            //this.displayTimeline();
             $container().show();
             isShown = true;
         };

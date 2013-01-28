@@ -44,8 +44,7 @@
                 gitHubUser = {
                     username: $gitHubUser.find('.username').text(),
                     fullname: $gitHubUser.find('.fullname').text(),
-                    language: $gitHubUser.find('.language').text(),
-                    classic: true
+                    language: $gitHubUser.find('.language').text()
                 };
 
             $gitHubUser.addClass('selected');

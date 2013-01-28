@@ -7,6 +7,7 @@ $(document).ready(function() {
         '/' : {
             get: function() {
                 console.log('Welcome to CoderSide !');
+                CoderSide.home.notFirstLoading();
                 if(!CoderSide.home.exist()) {
                     jsRoutes.controllers.Application.home().ajax().done(function(response) {
                         CoderSide.home.render(response);
@@ -18,6 +19,7 @@ $(document).ready(function() {
         },
         '/search/:keywords': {
             get: function(any, params) {
+                CoderSide.home.notFirstLoading();
                 CoderSide.loading.hide();
                 if(params.keywords) {
                     if(CoderSide.home.exist()) {
@@ -47,25 +49,22 @@ $(document).ready(function() {
         '/profil?*queryString': {
             get: function(any, params) {
                 if(CoderSide.home.isFirstLoading()) {
-                    CoderSide.home.notFirstLoading();
                     CoderSide.home.empty();
                     CoderSide.loading.show();
-                    CoderSide.loading.progress(30);
                 }
                 var data = parseQueryString(params.queryString);
 
-                // if(data.username && data.fullname && data.language) {
-                //     console.log(params);
-                //     CoderSide.resolve('/progress?' + params.queryString, 'get');
-                //     jsRoutes.controllers.Application.profil(
-                //         data.username,
-                //         data.fullname,
-                //         data.language
-                //     ).ajax().done(function(response) {
-                //         CoderSide.loading.hide();
-                //         CoderSide.profil.render(response);
-                //     });
-                // }
+                if(data.username && data.fullname && data.language) {
+                    CoderSide.resolve('/progress?' + params.queryString, 'get');
+                    jsRoutes.controllers.Application.profil(
+                        data.username,
+                        data.fullname,
+                        data.language
+                    ).ajax().done(function(response) {
+                        CoderSide.loading.hide();
+                        CoderSide.profil.render(response);
+                    });
+                }
             }
         },
         '/progress?*queryString': {
@@ -81,11 +80,10 @@ $(document).ready(function() {
                     var eventSource = new EventSource(uri);
                     eventSource.onmessage = function(msg) {
                         var progress = JSON.parse(msg.data);
-                        console.log(data);
-                        if(data.classic) {
-                            CoderSide.search.progress(progress);
-                        } else {
+                        if(CoderSide.home.isFirstLoading()) {
                             CoderSide.loading.progress(progress);
+                        } else {
+                            CoderSide.search.progress(progress);
                         }
                     };
                     eventSource.onerror = function() {
