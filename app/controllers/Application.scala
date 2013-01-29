@@ -35,7 +35,12 @@ object Application extends Controller {
   }
 
   def home = Action {
-    Ok(views.html.search())
+    import models.PopularCoder.json._
+    Async {
+      PopularCoder.top(10).map { coders =>
+        Ok(views.html.search() + views.html.popular(coders.flatMap(_.asOpt[PopularCoder])))
+      }
+    }
   }
 
   def search(keywords: String) = Action {
