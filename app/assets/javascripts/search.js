@@ -31,15 +31,15 @@
             }
         });
 
-        $(document).on('mouseenter', '.results li', function() {
+        $(document).on('mouseenter', '.results .result', function() {
             $(this).find('.hint').addClass('hover');
         });
 
-        $(document).on('mouseleave', '.results li', function() {
+        $(document).on('mouseleave', '.results .result', function() {
             $(this).find('.hint').removeClass('hover');
         });
 
-        $(document).on('click', '.results li', function(e) {
+        $(document).on('click', '.results .result', function(e) {
             var $gitHubUser = $(this),
                 gitHubUser = {
                     username: $gitHubUser.find('.username').text(),
@@ -48,7 +48,7 @@
                 };
 
             $gitHubUser.addClass('selected');
-
+            $gitHubUser.addClass('hover');
             CoderSide.navigate('/profil?' + $.param(gitHubUser));
         });
 

@@ -6,21 +6,6 @@ import play.api.Play.current
 import scala.concurrent.duration._
 
 object Config {
-
-  lazy val twitterBtnUrl: String = {
-    Play.configuration.getString("twitter.btn.url") getOrElse {
-      Logger.warn("[Config] Please provide twitter button URL")
-      throw new ConfigException("Please provide twitter button URL")
-    }
-  }
-
-  lazy val twitterBtnTweet: String = {
-    Play.configuration.getString("twitter.btn.tweet") getOrElse {
-      Logger.warn("[Config] Please provide twitter button tweet text")
-      throw new ConfigException("Please provide twitter button tweet text")
-    }
-  }
-
   lazy val gathererWaited: Int = {
     Play.configuration.getInt("gatherer.waited") getOrElse {
       Logger.warn("[Config] Please provide GathererNode waited value")
@@ -151,6 +136,15 @@ object Config {
       Play.configuration.getString("oauth.twitter.accesstokensecret").getOrElse {
         Logger.warn("[Config] Please provide twitter access token secret")
         throw new ConfigException("Please provide twitter access token secret")
+      }
+    }
+  }
+
+  object Cache {
+    lazy val expiration: Int = {
+      Play.configuration.getInt("cache.expiration").getOrElse {
+        Logger.warn("[Config] Please provide a cache expiration time")
+        throw new ConfigException("Please provide a cache expiration cache")
       }
     }
   }

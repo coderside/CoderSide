@@ -10,9 +10,9 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import models.{ URLEncoder, Debug }
-import utils.Config
+import utils.{ Config, CacheHelpers }
 
-object GitHubAPI extends URLEncoder with Debug {
+object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
 
   implicit val readUser: Reads[GitHubUser] =
     (
@@ -64,62 +64,66 @@ object GitHubAPI extends URLEncoder with Debug {
   def oauthURL = "client_id=" + Config.GitHub.clientID + "&client_secret=" + Config.GitHub.clientSecret
 
   def searchByFullname(fullname: String): Future[List[GitHubUser]] = {
-    WS.url("https://api.github.com/legacy/user/search/" + encode(fullname) + "?" + oauthURL)
-   .get().map(_.json \ "users").map {
-       case JsArray(users) => users.flatMap { user =>
-         readUser.reads(user).asOpt
-       }.toList
-       case o => throw new GitHubApiException("Failed seaching gitHub user by fullname : " + fullname)
+    val url = "https://api.github.com/legacy/user/search/" + encode(fullname)
+    WS.url(url + "?" + oauthURL)
+      .withHeaders(etagHeaderFor(url):_*)
+      .get().map { implicit response =>
+      (cachedResponseOrElse(url) \ "users") match {
+        case JsArray(users) => {
+          users.flatMap(_.asOpt[GitHubUser]).toList
+        }
+        case o => throw new GitHubApiException("Failed seaching gitHub user by fullname : " + fullname)
+      }
     }
   }
 
   def repositoriesByUser(username: String): Future[List[GitHubRepository]] = {
     WS.url("https://api.github.com/users/%s/repos".format(encode(username)) + "?" + oauthURL)
-   .get().map(_.json).map {
-     case JsArray(reps) => reps.flatMap { rep =>
-       catching(classOf[Exception]).opt(
-         readRepository.reads(rep).asOpt
-       )
-     }.flatten.toList
-     case r => throw new GitHubApiException("Failed getting repositories for : " + username)
+      .get().map(_.json).map {
+      case JsArray(reps) => reps.flatMap { rep =>
+        catching(classOf[Exception]).opt(
+          readRepository.reads(rep).asOpt
+        )
+      }.flatten.toList
+      case r => throw new GitHubApiException("Failed getting repositories for : " + username)
     }
   }
 
   def repositoriesByOrg(org: String): Future[List[GitHubRepository]] = {
     WS.url("https://api.github.com/orgs/%s/repos".format(encode(org)) + "?" + oauthURL)
-   .get().map(_.json).map {
-     case JsArray(reps) => reps.flatMap { rep =>
-       catching(classOf[Exception]).opt(
-         readRepository.reads(rep).asOpt
-       )
-     }.flatten.toList
-     case r => throw new GitHubApiException("Failed getting repositories for : " + org)
+      .get().map(_.json).map {
+      case JsArray(reps) => reps.flatMap { rep =>
+        catching(classOf[Exception]).opt(
+          readRepository.reads(rep).asOpt
+        )
+      }.flatten.toList
+      case r => throw new GitHubApiException("Failed getting repositories for : " + org)
     }
   }
 
   def organizations(username: String): Future[List[GitHubOrg]] = {
     WS.url("https://api.github.com/users/%s/orgs".format(encode(username)) + "?" + oauthURL)
-   .get().map(_.json).map {
-     case JsArray(orgs) => orgs.flatMap { org =>
-       catching(classOf[Exception]).opt {
-         readOrganization.reads(org).asOpt
-       }
-     }.flatten.toList
-     case r => throw new GitHubApiException("Failed getting organizations for : " + username)
+      .get().map(_.json).map {
+      case JsArray(orgs) => orgs.flatMap { org =>
+        catching(classOf[Exception]).opt {
+          readOrganization.reads(org).asOpt
+        }
+      }.flatten.toList
+      case r => throw new GitHubApiException("Failed getting organizations for : " + username)
     }
   }
 
   def contributions(username: String, repository: GitHubRepository): Future[Long] = {
     WS.url("https://api.github.com/repos/%s/%s/contributors".format(encode(repository.owner), encode(repository.name)) + "?" + oauthURL)
-   .get().map(_.json).map {
-     case JsArray(contributors) => {
-       contributors.map { contributor =>
-         (contributor \ "login").asOpt[String] -> ((contributor \ "contributions").asOpt[Long] getOrElse 0L)
-       }.toList.collect {
-         case (Some(login), commits) if (username == login) => commits
-       }.headOption getOrElse 0
-     }
-     case r => throw new GitHubApiException("Failed getting contributions for : " + username)
+      .get().map(_.json).map {
+      case JsArray(contributors) => {
+        contributors.map { contributor =>
+          (contributor \ "login").asOpt[String] -> ((contributor \ "contributions").asOpt[Long] getOrElse 0L)
+        }.toList.collect {
+          case (Some(login), commits) if (username == login) => commits
+        }.headOption getOrElse 0
+      }
+      case r => throw new GitHubApiException("Failed getting contributions for : " + username)
     }
   }
 }

@@ -54,7 +54,7 @@ object Application extends Controller {
       future(
         Ok(views.html.results(users))
       )
-     GitHubAPI.searchByFullname(keywords).map { gitHubUsers =>
+      GitHubAPI.searchByFullname(keywords).map { gitHubUsers =>
         Ok(views.html.results(gitHubUsers))
       } recover {
         case e: Exception => InternalServerError(e.getMessage)
@@ -69,48 +69,48 @@ object Application extends Controller {
     val gitHubUser = GitHubUser(username, name, lang)
     implicit val timeout = Timeout(Config.overviewTimeout)
     Async {
-      // val coderGuy = CoderGuy(
-      //   Some(
-      //     GitHubUser(
-      //       "srenault",
-      //       Some("RENAULT"),
-      //       Some("Scala"),
-      //       Some(12),
-      //       Some("location")
-      //     )),
-      //   Some(
-      //     LinkedInUser(
-      //       "id",
-      //       "Sébastien",
-      //       "RENAULT",
-      //       "Web developper at @Zenexity",
-      //       None
-      //     )),
-      //   Some(
-      //     TwitterUser(
-      //       "srenaultcontact",
-      //       "Sébastien RENAULT",
-      //       "Web developper at Zenexity",
-      //       10,
-      //       None
-      //     )),
-      //   Some(
-      //     KloutUser(
-      //       "id",
-      //       "srenault",
-      //       10.00000111,
-      //       Nil,
-      //       Nil
-      //     ))
-      // )
-      // future(
-      //   Ok(views.html.profil(coderGuy))
-      // )
-      (SupervisorNode.ref ? InitQuery(gitHubUser)).mapTo[CoderGuy].map { coderGuy =>
+      val coderGuy = CoderGuy(
+        Some(
+          GitHubUser(
+            "srenault",
+            Some("RENAULT"),
+            Some("Scala"),
+            Some(12),
+            Some("location")
+          )),
+        Some(
+          LinkedInUser(
+            "id",
+            "Sébastien",
+            "RENAULT",
+            "Web developper at @Zenexity",
+            None
+          )),
+        Some(
+          TwitterUser(
+            "srenaultcontact",
+            "Sébastien RENAULT",
+            "Web developper at Zenexity",
+            10,
+            None
+          )),
+        Some(
+          KloutUser(
+            "id",
+            "srenault",
+            10.00000111,
+            Nil,
+            Nil
+          ))
+      )
+      future(
         Ok(views.html.profil(coderGuy))
-      } recover {
-        case e: Exception => InternalServerError(e.getMessage)
-      }
+      )
+      // (SupervisorNode.ref ? InitQuery(gitHubUser)).mapTo[CoderGuy].map { coderGuy =>
+      //   Ok(views.html.profil(coderGuy))
+      // } recover {
+      //   case e: Exception => InternalServerError(e.getMessage)
+      // }
     }
   }
 
