@@ -40,16 +40,17 @@
         });
 
         $(document).on('click', '.results .result', function(e) {
-            var $gitHubUser = $(this),
-                gitHubUser = {
-                    username: $gitHubUser.find('.username').text(),
-                    fullname: $gitHubUser.find('.fullname').text(),
-                    language: $gitHubUser.find('.language').text()
-                };
-
-            $gitHubUser.addClass('selected');
-            $gitHubUser.addClass('hover');
-            CoderSide.navigate('/profil?' + $.param(gitHubUser));
+            if(!$('.results .result.selected').length) {
+                var $gitHubUser = $(this),
+                    gitHubUser = {
+                        username: $gitHubUser.find('.username').text(),
+                        fullname: $gitHubUser.find('.fullname').text(),
+                        language: $gitHubUser.find('.language').text()
+                    };
+                $gitHubUser.addClass('selected');
+                $gitHubUser.addClass('hover');
+                CoderSide.navigate('/profil?' + $.param(gitHubUser));
+            }
         });
 
         this.clearResults = function() {

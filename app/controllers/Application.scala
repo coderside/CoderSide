@@ -106,11 +106,11 @@ object Application extends Controller {
       future(
         Ok(views.html.profil(coderGuy))
       )
-      // (SupervisorNode.ref ? InitQuery(gitHubUser)).mapTo[CoderGuy].map { coderGuy =>
-      //   Ok(views.html.profil(coderGuy))
-      // } recover {
-      //   case e: Exception => InternalServerError(e.getMessage)
-      // }
+      (SupervisorNode.ref ? InitQuery(gitHubUser)).mapTo[CoderGuy].map { coderGuy =>
+        Ok(views.html.profil(coderGuy))
+      } recover {
+        case e: Exception => InternalServerError(e.getMessage)
+      }
     }
   }
 
