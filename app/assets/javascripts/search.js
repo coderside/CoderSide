@@ -6,7 +6,25 @@
     window.Search = function() {
         var self = this;
 
-        $(document).on('focus', '.search input[name=keywords]', function() {
+        var progressSpinner = new Spinner({
+            lines: 9,
+            length: 7,
+            width: 2.3,
+            radius: 10,
+            corners: 1,
+            rotate: 0,
+            color: 'grey',
+            speed: 1,
+            trail: 73,
+            shadow: false,
+            hwaccel: false,
+            className: 'spinner',
+            zIndex: 2e9,
+            top: '-15px',
+            left: 'auto'
+        });
+
+         $(document).on('focus', '.search input[name=keywords]', function() {
             var $search = $(this);
             var $github = $search.next('.icon-github');
             $github.css('color', '#393939');
@@ -81,6 +99,20 @@
             } else {
                 $iconGitHub.hide();
                 $loadingGitHub.show();
+            }
+        };
+
+       this.toggleProgressLoading = function() {
+            var $selected = $('.results .selected'),
+                $spinner = $selected.find('.spinner');
+
+            if($selected.length) {
+                if(!$spinner.length) {
+                    var target = $selected.find('.spinner-container')[0];
+                    progressSpinner.spin(target);
+                } else {
+                    $spinner.remove();
+                }
             }
         };
 

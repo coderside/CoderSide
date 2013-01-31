@@ -27,6 +27,9 @@ object Application extends Controller {
   def index = Action { implicit request =>
     Logger.debug("[Application] Welcome !")
     import models.PopularCoder.json._
+    models.github.GitHubAPI.repositoriesByUser("srenault").foreach { repos =>
+      println("REPOS ==> " + repos)
+    }
     Async {
       PopularCoder.top(10).map { coders =>
         Ok(views.html.index(coders.flatMap(_.asOpt[PopularCoder])))
@@ -47,13 +50,6 @@ object Application extends Controller {
     import GitHubAPI._
     Logger.debug("[Application] Pre-searching coder guy")
     Async {
-      val users = List(
-        GitHubUser("srenault", Some("RENAULT"), Some("scala"), None),
-        GitHubUser("srenault", Some("RENAUD"), Some("scala"), None)
-      )
-      future(
-        Ok(views.html.results(users))
-      )
       GitHubAPI.searchByFullname(keywords).map { gitHubUsers =>
         Ok(views.html.results(gitHubUsers))
       } recover {
@@ -69,43 +65,6 @@ object Application extends Controller {
     val gitHubUser = GitHubUser(username, name, lang)
     implicit val timeout = Timeout(Config.overviewTimeout)
     Async {
-      val coderGuy = CoderGuy(
-        Some(
-          GitHubUser(
-            "srenault",
-            Some("RENAULT"),
-            Some("Scala"),
-            Some(12),
-            Some("location")
-          )),
-        Some(
-          LinkedInUser(
-            "id",
-            "Sébastien",
-            "RENAULT",
-            "Web developper at @Zenexity",
-            None
-          )),
-        Some(
-          TwitterUser(
-            "srenaultcontact",
-            "Sébastien RENAULT",
-            "Web developper at Zenexity",
-            10,
-            None
-          )),
-        Some(
-          KloutUser(
-            "id",
-            "srenault",
-            10.00000111,
-            Nil,
-            Nil
-          ))
-      )
-      future(
-        Ok(views.html.profil(coderGuy))
-      )
       (SupervisorNode.ref ? InitQuery(gitHubUser)).mapTo[CoderGuy].map { coderGuy =>
         Ok(views.html.profil(coderGuy))
       } recover {

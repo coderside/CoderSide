@@ -8,11 +8,11 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import play.api.libs.oauth.{ OAuthCalculator, ConsumerKey, RequestToken }
-import utils.Config
+import utils.{ Config, CacheHelpers }
 import models.{ URLEncoder, Debug }
 import models.github.GitHubUser
 
-object LinkedInAPI extends URLEncoder with Debug {
+object LinkedInAPI extends URLEncoder with Debug with CacheHelpers {
 
   val signatureCalc = OAuthCalculator(
     ConsumerKey(Config.LinkedIn.key, Config.LinkedIn.secretKey),
@@ -32,19 +32,22 @@ object LinkedInAPI extends URLEncoder with Debug {
   def searchByFullname(firstname: String, lastname: String): Future[List[LinkedInUser]] = {
     val uri = "http://api.linkedin.com/v1/people-search:(people:(headline,first-name,last-name,id,picture-url))"
     val params = "?first-name=%s&last-name=%s&facet=industry,3,4,5,6,8,96,106,109,114,118&sort=relevance&format=json".format(encode(firstname), encode(lastname))
-
-    WS.url(uri + params)
-   .sign(signatureCalc)
-   .get().map(debug).map(response => (response.json, response.json \ "people" \ "values")) map {
-       case (_, JsArray(users)) => users.flatMap { user =>
-         readUser.reads(user).asOpt
-       }.toList
-       case (response, _) =>
-         if((response \ "people" \ "_total").asOpt[Int].filter(_ == 0).isDefined)
-           Nil
-         else
-           throw new LinkedInApiException("Failed seaching linkedIn user by fullname : " + firstname + " " + lastname)
-    }
+    val url = uri + params
+    WS.url(url)
+      .sign(signatureCalc)
+      .get().map(debug)
+      .map { response =>
+        val res = response.json
+        res -> (res \ "people" \ "values")
+      } map {
+        case (_, users: JsArray) => users.asOpt[List[LinkedInUser]] getOrElse Nil
+        case (response, _) =>
+          if((response \ "people" \ "_total").asOpt[Int].filter(_ == 0).isDefined) {
+            Nil
+          } else {
+            throw new LinkedInApiException("Failed seaching linkedIn user by fullname : " + firstname + " " + lastname)
+          }
+      }
   }
 }
 

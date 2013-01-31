@@ -3,23 +3,24 @@
   <li class="result">
     <div class="progress"></div>
     <div class="user">
+      <div class="hint"></div>
       <header>
         <span class="username">@gitHubUser.username</span>
         @gitHubUser.fullname.filter(!_.trim.isEmpty).map { fullname =>
         - <span class="fullname">@fullname</span>
         }
       </header>
+      <div class="spinner-container"></div>
       <div class="details">
         @gitHubUser.location.map { location =>
         <span>@location</span><span class="separator"></span>
         }
         @gitHubUser.language.map { language =>
-        <span class="language">@language</span > Guy<span class="separator"></span>
+        <span class="language">@language</span ><span class="separator"></span>
         }
         <span>@gitHubUser.reposCount repositories</span><span class="separator"></span>
         <span>@gitHubUser.followers followers</span>
       </div>
     </div>
-    <div class="hint"></div>
   </li>
   }

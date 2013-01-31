@@ -10,11 +10,11 @@ import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 import play.api.libs.oauth.{ OAuthCalculator, ConsumerKey, RequestToken }
-import utils.Config
+import utils. { Config, CacheHelpers }
 import models.{ URLEncoder, Debug }
 import models.github.GitHubUser
 
-object TwitterAPI extends URLEncoder with Debug {
+object TwitterAPI extends URLEncoder with Debug with CacheHelpers {
 
   val signatureCalc = OAuthCalculator(
     ConsumerKey(Config.Twitter.consumerKey, Config.Twitter.consumerSecret),
@@ -42,34 +42,30 @@ object TwitterAPI extends URLEncoder with Debug {
   }
 
   def searchBy(criteria: String): Future[List[TwitterUser]] = {
-    WS.url("https://api.twitter.com/1/users/search.json?q=" + encode(criteria))
+    val url = "https://api.twitter.com/1/users/search.json?q=" + encode(criteria)
+    WS.url(url)
       .sign(signatureCalc)
-      .get().map(_.json).map {
-      case JsArray(users) => users.flatMap { user =>
-        readUser.reads(user).asOpt
-      }.toList
+      .get() map(_.json) map {
+      case users: JsArray => users.asOpt[List[TwitterUser]] getOrElse Nil
       case _ => throw new TwitterApiException("Failed seaching twitter user by : " + criteria)
     }
   }
 
   def show(twitterID: String): Future[Option[TwitterUser]] = {
-    WS.url("https://api.twitter.com/1/users/show.json")
-    .withQueryString(
-      "user_id" -> twitterID,
-      "screen_name" -> twitterID
-    )
-    .sign(signatureCalc)
-    .get().map(response => readUser.reads(response.json).asOpt)
+    val url = "https://api.twitter.com/1/users/show.json?user_id=" + encode(twitterID) + "&screen_name=" + encode(twitterID)
+    WS.url(url)
+      .sign(signatureCalc)
+      .get().map (_.json.asOpt[TwitterUser])
   }
 
   def timeline(twitterID: String): Future[Option[TwitterTimeline]] = {
     val dateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss Z yyyy")
     val id = encode(twitterID)
-    val uri = "https://api.twitter.com/1.1/statuses/user_timeline.json?user_id=%s&screen_name=%s".format(id, id)
+    val url = "https://api.twitter.com/1.1/statuses/user_timeline.json?user_id=%s&screen_name=%s".format(id, id)
 
-    WS.url(uri)
-    .sign(signatureCalc)
-    .get().map(_.json).map {
+    WS.url(url)
+      .sign(signatureCalc)
+      .get().map(_.json) map {
       case JsArray(tweets) => Some(TwitterTimeline(
         tweets.flatMap { tweetOpt =>
           readTweet.reads(tweetOpt).asOpt.map {

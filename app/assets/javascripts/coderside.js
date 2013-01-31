@@ -51,9 +51,10 @@ $(document).ready(function() {
                 if(CoderSide.home.isFirstLoading()) {
                     CoderSide.home.empty();
                     CoderSide.loading.show();
+                } else {
+                    CoderSide.search.toggleProgressLoading();
                 }
                 var data = parseQueryString(params.queryString);
-
                 if(data.username && data.fullname && data.language) {
                     CoderSide.resolve('/progress?' + params.queryString, 'get');
                     jsRoutes.controllers.Application.profil(
@@ -63,6 +64,9 @@ $(document).ready(function() {
                     ).ajax().done(function(response) {
                         CoderSide.loading.hide();
                         CoderSide.profil.render(response);
+                        if(!CoderSide.home.isFirstLoading()) {
+                            CoderSide.search.toggleProgressLoading();
+                        }
                     });
                 }
             }
