@@ -63,7 +63,9 @@ object TwitterAPI extends URLEncoder with Debug with CacheHelpers {
       )
       .sign(signatureCalc)
       .get().map (implicit response => cachedResponseOrElse(url))
-      .map (_.asOpt[TwitterUser])
+      .map { twitterUser =>
+        twitterUser.asOpt[TwitterUser]
+      }
   }
 
   def timeline(twitterID: String): Future[Option[TwitterTimeline]] = {
@@ -74,7 +76,7 @@ object TwitterAPI extends URLEncoder with Debug with CacheHelpers {
     WS.url(url)
       .withHeaders(lastModifiedFor(url):_*)
       .sign(signatureCalc)
-      .get().map(debug).map (implicit response => cachedResponseOrElse(url))
+      .get().map (implicit response => cachedResponseOrElse(url))
       .map {
         case JsArray(tweets) => Some(TwitterTimeline(
           tweets.flatMap { tweetOpt =>

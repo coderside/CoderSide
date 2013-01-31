@@ -27,9 +27,6 @@ object Application extends Controller {
   def index = Action { implicit request =>
     Logger.debug("[Application] Welcome !")
     import models.PopularCoder.json._
-    //models.github.GitHubAPI.repositoriesByUser("srenault").foreach { repos =>
-      //println("REPOS ==> " + repos)
-  //}
     Async {
       PopularCoder.top(10).map { coders =>
         Ok(views.html.index(coders.flatMap(_.asOpt[PopularCoder])))

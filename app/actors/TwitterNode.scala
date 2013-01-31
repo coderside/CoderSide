@@ -8,6 +8,7 @@ import models.twitter._
 import Messages._
 
 class TwitterNode extends Actor with ActorLogging {
+
   def receive = {
     case TwitterNodeQuery(gitHubUser, kloutRef, gathererRef) => {
       log.debug("[TwitterNode] receiving new head query")
@@ -17,49 +18,55 @@ class TwitterNode extends Actor with ActorLogging {
     case TwitterUserQuery(gitHubUser, kloutRef, gathererRef) => {
       log.debug("[TwitterNode] Getting twitter profil")
 
-      def handleResponse(response: Try[List[TwitterUser]], notFound: => Unit)  = {
+      def handleResponse(response: List[TwitterUser], notFound: => Unit) = {
         response match {
-          case Success(Nil) => notFound
-          case Success(profils) => Twitter.matchUser(gitHubUser, profils) foreach { found =>
+          case Nil => notFound
+          case profils => Twitter.matchUser(gitHubUser, profils) foreach { found =>
             self ! TwitterTimelineQuery(found, gathererRef)
             kloutRef ! KloutNodeQuery(found, gathererRef)
-          }
-          case Failure(e) => {
-            log.error("[TwitterNode] Error while searching twitter user")
-            gathererRef ! ErrorQuery("Twitter", e) //twitter
-            gathererRef ! ErrorQuery("Klout", e) //klout
           }
         }
       }
 
+      val handleSearchError: PartialFunction[Throwable, Unit] = {
+        case e: Exception => {
+          log.error("[TwitterNode] Error while searching twitter user: " + e.getMessage)
+          gathererRef ! ErrorQuery("Twitter", e) //twitter
+          gathererRef ! ErrorQuery("Klout", e) //klout
+        }
+      }
+
       gitHubUser.fullname.filter(_ => gitHubUser.isFullnameOk) map { fname =>
-        TwitterAPI.searchBy(fname).onComplete { byFullname =>
-          handleResponse(byFullname,
-            TwitterAPI.searchBy(gitHubUser.username).onComplete { byUsername =>
+        TwitterAPI.searchBy(fname).map { byFullname =>
+          handleResponse(
+            byFullname,
+            TwitterAPI.searchBy(gitHubUser.username) map { byUsername =>
               handleResponse(byUsername, {
-                  gathererRef ! NotFound("Twitter")
-                  gathererRef ! NotFound("Klout")
-                }
+                gathererRef ! NotFound("Twitter")
+                gathererRef ! NotFound("Klout")
+              }
               )
-            }
+            } recover(handleSearchError)
           )
         }
       } getOrElse {
-        TwitterAPI.searchBy(gitHubUser.username).onComplete { byUsername =>
-          handleResponse(byUsername, {
-            gathererRef ! NotFound("Twitter")
-            gathererRef ! NotFound("Klout")
-          })
-        }
+        TwitterAPI.searchBy(gitHubUser.username) map { byUsername =>
+          handleResponse(
+            byUsername, {
+              gathererRef ! NotFound("Twitter")
+              gathererRef ! NotFound("Klout")
+            })
+        } recover(handleSearchError)
       }
     }
 
     case TwitterTimelineQuery(twitterUser, gathererRef) => {
       log.debug("[TwitterNode] Getting twitter timeline")
-      TwitterAPI.timeline(twitterUser.screenName).onComplete {
-        case Success(timeline) => gathererRef ! TwitterResult(twitterUser.copy(timeline = timeline))
-        case Failure(e) => {
-          log.error("[TwitterNode] Error while fetching twitter user timeline")
+      TwitterAPI.timeline(twitterUser.screenName) map { timeline =>
+        gathererRef ! TwitterResult(twitterUser.copy(timeline = timeline))
+      } recover {
+        case e: Exception => {
+          log.error("[TwitterNode] Error while fetching twitter user timeline: " + e.getMessage)
           gathererRef ! ErrorQuery("Twitter", e)
         }
       }

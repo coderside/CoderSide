@@ -15,13 +15,14 @@ class LinkedInNode extends Actor with ActorLogging {
         lastname  <- gitHubUser.lastname
       } yield {
         log.debug("[LinkedInNode] ok, firstname & lastname are valid")
-        LinkedInAPI.searchByFullname(firstname, lastname).onComplete {
-          case Success(Nil)  => gathererRef ! NotFound("linkedin")
-          case Success(profils) => LinkedIn.matchUser(gitHubUser, profils) foreach { found =>
+        LinkedInAPI.searchByFullname(firstname, lastname) map {
+          case Nil  => gathererRef ! NotFound("linkedin")
+          case profils => LinkedIn.matchUser(gitHubUser, profils) foreach { found =>
             gathererRef ! LinkedInResult(found)
           }
-          case Failure(e) => {
-            log.error("[LinkedInNode] Error while fetching linkedIn profil")
+        } recover {
+          case e: Exception => {
+            log.error("[LinkedInNode] Error while fetching linkedIn profil: " + e.getMessage)
             gathererRef ! ErrorQuery("LinkedIn", e)
           }
         }

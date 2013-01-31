@@ -15,7 +15,7 @@ trait CacheHelpers {
   val KEY_ETAG = "etag_"
   val KEY_RESPONSE = "response_"
 
-  val lastModifiedFormat = {
+  def lastModifiedFormat = {
     val format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz")
     format.setTimeZone(TimeZone.getTimeZone("GMT"));
     format
@@ -29,19 +29,19 @@ trait CacheHelpers {
     }
   }
 
-  def etagResponse(implicit response: Response): Option[JsValue] = {
+  def etagResponse(url: String)(implicit response: Response): Option[JsValue] = {
     for {
       etag <- etagFrom(response)
-      cachedResponse <- Cache.getAs[JsValue](KEY_RESPONSE + etag)
+      cachedResponse <- Cache.getAs[JsValue](KEY_RESPONSE + url)
     } yield {
       cachedResponse
     }
   }
 
-  def lastModifiedResponse(implicit response: Response): Option[JsValue] = {
+  def lastModifiedResponse(url: String)(implicit response: Response): Option[JsValue] = {
     for {
       lastModified <- lastModifiedFrom(response)
-      cachedResponse <- Cache.getAs[JsValue](KEY_RESPONSE + lastModified.getTime)
+      cachedResponse <- Cache.getAs[JsValue](KEY_RESPONSE + url)
     } yield {
       cachedResponse
     }
@@ -49,49 +49,51 @@ trait CacheHelpers {
 
   def cachedResponseFrom(
     url: String,
-    newEtag: (String, JsValue) => JsValue,
-    newLastModified: (Date, JsValue) => JsValue
+    newEtag: (String, JsValue) => Unit,
+    newLastModified: (Date, JsValue) => Unit
   )(implicit response: Response): JsValue = {
     if(response.status == 304) {
-      if(!etagResponse.isDefined && !lastModifiedResponse.isDefined) {
+      if(!etagResponse(url).isDefined && !lastModifiedResponse(url).isDefined) {
         Logger.debug("[CACHE] Not cached " + url)
       } else {
-        Logger.debug("[CACHE] From the cache] " + url)
+        Logger.debug("[CACHE] From the cache " + url)
       }
-      (etagResponse flatMap { etagResp =>
-        lastModifiedResponse orElse Some(etagResp)
-      } orElse lastModifiedResponse) getOrElse response.json
+      (etagResponse(url) flatMap { etagResp =>
+        lastModifiedResponse(url) orElse Some(etagResp)
+      } orElse lastModifiedResponse(url)) getOrElse response.json
     } else {
-      (etagFrom, lastModifiedFrom) match {
-        case (_, Some(lastModified)) => newLastModified(lastModified, response.json)
-        case (Some(etag), None) => newEtag(etag, response.json)
-        case _ => response.json
-      }
+      if(response.status == 200) {
+        (etagFrom, lastModifiedFrom) match {
+          case (_, Some(lastModified)) => {
+            newLastModified(lastModified, response.json)
+            response.json
+          }
+          case (Some(etag), None) => {
+            newEtag(etag, response.json)
+            response.json
+          }
+          case _ => response.json
+        }
+      } else response.json
     }
   }
 
   def cachedResponseOrElse(url: String)(implicit response: Response): JsValue = {
     cachedResponseFrom(
       url,
-      (etag, res) => {
-        cacheWithEtag(url, etag, res)
-        res
-      },
-      (lastModified, res) => {
-        cacheWithLastModified(url, lastModified, res)
-        res
-      }
+      (etag, res) => cacheWithEtag(url, etag, res),
+      (lastModified, res) => cacheWithLastModified(url, lastModified, res)
     )
   }
 
   def cacheWithLastModified(url: String, lastModified: Date, response: JsValue) {
     Cache.set(KEY_LASTMODIFIED + url, lastModifiedFormat.format(lastModified), Config.Cache.expiration)
-    Cache.set(KEY_RESPONSE+ lastModified.getTime, response, Config.Cache.expiration)
+    Cache.set(KEY_RESPONSE + url, response, Config.Cache.expiration)
   }
 
   def cacheWithEtag(url: String, etag: String, response: JsValue) {
     Cache.set(KEY_ETAG + url, etag, Config.Cache.expiration)
-    Cache.set(KEY_RESPONSE + etag, response, Config.Cache.expiration)
+    Cache.set(KEY_RESPONSE + url, response, Config.Cache.expiration)
   }
 
   def lastModifiedFor(url: String): Seq[(String, String)] = {

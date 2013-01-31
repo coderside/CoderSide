@@ -36,11 +36,11 @@
               <span class="desc">@repository.description</span>
               }
               <span class="social">
-                @repository.forks forks |
-                @repository.watchers watchers
                 @if(repository.contributions > 0) {
                 | @repository.contributions contributions
                 }
+                @repository.forks forks |
+                @repository.watchers watchers
               </span>
             </li>
             }
@@ -62,11 +62,11 @@
           <span class="desc">@repository.description</span>
           }
           <span class="social">
-            @repository.forks forks |
-            @repository.watchers watchers
             @if(repository.contributions > 0) {
             | @repository.contributions contributions
             }
+            @repository.forks forks |
+            @repository.watchers watchers
           </span>
         </div>
       </li>
