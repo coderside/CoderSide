@@ -14,9 +14,10 @@ class GitHubNode extends Actor with ActorLogging {
 
     case NodeQuery(gitHubUser, gathererRef) => {
       log.debug("[GitHubNode] receiving new head query")
-      GitHubAPI.repositoriesByUser(gitHubUser.username).onComplete {
-        case Success(repos) => self ! GitHubOrgQuery(gitHubUser.copy(repositories = repos), gathererRef)
-        case Failure(e) => {
+      GitHubAPI.repositoriesByUser(gitHubUser.username) map { repos =>
+        self ! GitHubOrgQuery(gitHubUser.copy(repositories = repos), gathererRef)
+      } recover {
+        case e: Exception => {
           log.error("[GitHubNode] Error while fetching user repositories")
           gathererRef ! ErrorQuery("GitHub", e)
         }
@@ -25,23 +26,19 @@ class GitHubNode extends Actor with ActorLogging {
 
     case GitHubOrgQuery(gitHubUser, gathererRef) => {
       log.debug("[GitHubNode] receiving GitHub organization query")
-      GitHubAPI.organizations(gitHubUser.username).onComplete {
-        case Success(organizations) =>
-          Promise.sequence(
-            organizations.map { org =>
-              GitHubAPI.repositoriesByOrg(org.login).map { repos =>
-                org.copy(repositories = repos)
-              }
-            }
-          ) onComplete {
-            case Success(orgs) => self ! GitHubContribQuery(gitHubUser.copy(organizations = orgs), gathererRef)
-            case Failure(e) => {
-              log.error("[GitHubNode] Error while fetching organization repositories")
-              gathererRef ! ErrorQuery("GitHub", e)
+      GitHubAPI.organizations(gitHubUser.username) map { organizations =>
+        Promise.sequence(
+          organizations.map { org =>
+            GitHubAPI.repositoriesByOrg(org.login).map { repos =>
+              org.copy(repositories = repos)
             }
           }
-        case Failure(e) => {
-          log.error("[GitHubNode] Error while fetching user organizations")
+        ) map { orgs =>
+          self ! GitHubContribQuery(gitHubUser.copy(organizations = orgs), gathererRef)
+        }
+      } recover {
+        case e: Exception => {
+          log.error("[GitHubNode] Error while fetching user organizations: " + e.getMessage)
           gathererRef ! ErrorQuery("GitHub", e)
         }
       }
@@ -64,18 +61,13 @@ class GitHubNode extends Actor with ActorLogging {
             org.copy(repositories =  repos)
           }
         }
-      ) onComplete {
-        case Success(orgs) => {
-          contributions(gitHubUser.repositories) onComplete {
-            case Success(repos) => gathererRef ! GitHubResult(gitHubUser.copy(organizations = orgs, repositories = repos))
-            case Failure(e) => {
-              log.error("[GitHubNode] Error while fetching contribution for organizations repositories")
-              gathererRef ! ErrorQuery("GitHub", e)
-            }
-          }
+      ) map { orgs =>
+        contributions(gitHubUser.repositories) map { repos =>
+          gathererRef ! GitHubResult(gitHubUser.copy(organizations = orgs, repositories = repos))
         }
-        case Failure(e) => {
-          log.error("[GitHubNode] Error while fetching contribution for his repositories")
+      } recover {
+        case e: Exception => {
+          log.error("[GitHubNode] Error while fetching contribution for his repositories: " + e.getMessage)
           gathererRef ! ErrorQuery("GitHub", e)
         }
       }

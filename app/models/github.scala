@@ -49,7 +49,7 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
     (
       (__ \ 'name).read[String] and
       (__ \ 'description).read[String] and
-      (__ \ 'language).read[String] and
+      (__ \ 'language).readNullable[String] and
       (__ \ 'html_url).read[String] and
       (__ \ 'owner \ 'login).read[String] and
       (__ \ 'forks_count).read[Int] and
@@ -77,11 +77,10 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
 
   def repositoriesByUser(username: String): Future[List[GitHubRepository]] = {
     val url = "https://api.github.com/users/%s/repos".format(encode(username))
-    println("[GITHUB] lastModified " + lastModifiedFor(url))
     WS.url(url + "?" + oauthURL)
       .withHeaders(lastModifiedFor(url):_*)
       .get().map { implicit response =>
-      (cachedResponseOrElse(url)) match {
+      cachedResponseOrElse(url) match {
         case repos: JsArray => repos.asOpt[List[GitHubRepository]] getOrElse Nil
         case r => throw new GitHubApiException("Failed getting repositories for : " + username)
       }
@@ -116,7 +115,7 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
     val url = "https://api.github.com/repos/%s/%s/contributors".format(encode(repository.owner), encode(repository.name))
     WS.url(url + "?" + oauthURL)
       .withHeaders(lastModifiedFor(url):_*)
-      .get().map { implicit request =>
+      .get().map { implicit response =>
       (cachedResponseOrElse(url)) match {
         case JsArray(contributors) => {
           contributors.map { contributor =>
@@ -165,7 +164,7 @@ case class GitHubUser(
 case class GitHubRepository(
   name: String,
   description: String,
-  language: String,
+  language: Option[String],
   url: String,
   owner: String,
   forks: Int,

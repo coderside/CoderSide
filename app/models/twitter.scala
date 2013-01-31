@@ -44,18 +44,26 @@ object TwitterAPI extends URLEncoder with Debug with CacheHelpers {
   def searchBy(criteria: String): Future[List[TwitterUser]] = {
     val url = "https://api.twitter.com/1/users/search.json?q=" + encode(criteria)
     WS.url(url)
+      .withHeaders(lastModifiedFor(url):_*)
       .sign(signatureCalc)
-      .get() map(_.json) map {
-      case users: JsArray => users.asOpt[List[TwitterUser]] getOrElse Nil
-      case _ => throw new TwitterApiException("Failed seaching twitter user by : " + criteria)
-    }
+      .get().map (implicit response => cachedResponseOrElse(url))
+      .map {
+        case users: JsArray => users.asOpt[List[TwitterUser]] getOrElse Nil
+        case _ => throw new TwitterApiException("Failed seaching twitter user by : " + criteria)
+      }
   }
 
   def show(twitterID: String): Future[Option[TwitterUser]] = {
-    val url = "https://api.twitter.com/1/users/show.json?user_id=" + encode(twitterID) + "&screen_name=" + encode(twitterID)
+    val url = "https://api.twitter.com/1/users/show.json"
     WS.url(url)
+      .withHeaders(lastModifiedFor(url):_*)
+      .withQueryString(
+         "user_id" -> twitterID,
+         "screen_name" -> twitterID
+      )
       .sign(signatureCalc)
-      .get().map (_.json.asOpt[TwitterUser])
+      .get().map (implicit response => cachedResponseOrElse(url))
+      .map (_.asOpt[TwitterUser])
   }
 
   def timeline(twitterID: String): Future[Option[TwitterTimeline]] = {
@@ -64,18 +72,20 @@ object TwitterAPI extends URLEncoder with Debug with CacheHelpers {
     val url = "https://api.twitter.com/1.1/statuses/user_timeline.json?user_id=%s&screen_name=%s".format(id, id)
 
     WS.url(url)
+      .withHeaders(lastModifiedFor(url):_*)
       .sign(signatureCalc)
-      .get().map(_.json) map {
-      case JsArray(tweets) => Some(TwitterTimeline(
-        tweets.flatMap { tweetOpt =>
-          readTweet.reads(tweetOpt).asOpt.map {
-            case (text, createdAt, retweeted, inReplyToStatus, inReplyToUser) =>
-              Tweet(text, dateFormat.parse(createdAt), retweeted, inReplyToStatus.isDefined, inReplyToUser.isDefined)
-          }
-        }.toList
-      ))
-      case _ => None
-    }
+      .get().map(debug).map (implicit response => cachedResponseOrElse(url))
+      .map {
+        case JsArray(tweets) => Some(TwitterTimeline(
+          tweets.flatMap { tweetOpt =>
+            readTweet.reads(tweetOpt).asOpt.map {
+              case (text, createdAt, retweeted, inReplyToStatus, inReplyToUser) =>
+                Tweet(text, dateFormat.parse(createdAt), retweeted, inReplyToStatus.isDefined, inReplyToUser.isDefined)
+            }
+          }.toList
+        ))
+        case _ => None
+      }
   }
 }
 

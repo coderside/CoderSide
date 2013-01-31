@@ -32,7 +32,7 @@ class KloutNode extends Actor with ActorLogging {
       }
     }
     case KloutUserQuery(kloutUser, gathererRef) => {
-      log.debug("[KloutNode] Getting profil influence")
+      log.debug("[KloutNode] Getting profil influence for " + kloutUser.id)
       KloutAPI.influence(kloutUser.id).onComplete {
         case Success(Influence(influencers, influencees)) => {
           Promise.sequence(

@@ -27,9 +27,9 @@ object Application extends Controller {
   def index = Action { implicit request =>
     Logger.debug("[Application] Welcome !")
     import models.PopularCoder.json._
-    models.github.GitHubAPI.repositoriesByUser("srenault").foreach { repos =>
-      println("REPOS ==> " + repos)
-    }
+    //models.github.GitHubAPI.repositoriesByUser("srenault").foreach { repos =>
+      //println("REPOS ==> " + repos)
+  //}
     Async {
       PopularCoder.top(10).map { coders =>
         Ok(views.html.index(coders.flatMap(_.asOpt[PopularCoder])))
@@ -41,7 +41,7 @@ object Application extends Controller {
     import models.PopularCoder.json._
     Async {
       PopularCoder.top(10).map { coders =>
-        Ok(views.html.search() + views.html.popular(coders.flatMap(_.asOpt[PopularCoder])))
+        Ok(views.html.search() += views.html.popular(coders.flatMap(_.asOpt[PopularCoder])))
       }
     }
   }
