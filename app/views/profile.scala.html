@@ -2,13 +2,13 @@
 
 @(coderGuy.linkedInUser, coderGuy.gitHubUser, coderGuy.twitterUser) match {
   case (Some(linkedIn), _, _) => {
-    @profil_header(linkedIn.fullName, linkedIn.headline, coderGuy.oneAvatar)
+    @profile_header(linkedIn.fullName, linkedIn.headline, coderGuy.oneAvatar)
   }
   case (None, _, Some(twitter)) => {
-    @profil_header(twitter.name, twitter.description, None)
+    @profile_header(twitter.name, twitter.description, None)
   }
   case (None, Some(gitHub), None) if(gitHub.fullname.isDefined) => {
-    @profil_header(gitHub.fullname.getOrElse(""), "", None)
+    @profile_header(gitHub.fullname.getOrElse(""), "", None)
   }
   case _ => {
   }

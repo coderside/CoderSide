@@ -55,7 +55,7 @@ object Application extends Controller {
     }
   }
 
-  def profil(username: String, fullname: String, language: String) = Action {
+  def profile(username: String, fullname: String, language: String) = Action {
     Logger.debug("[Application] Searching coder guy")
     val name = Option(fullname) filter (!_.trim.isEmpty)
     val lang = Option(language) filter (!_.trim.isEmpty) orElse Some("n/a")
@@ -63,7 +63,7 @@ object Application extends Controller {
     implicit val timeout = Timeout(Config.overviewTimeout)
     Async {
       (SupervisorNode.ref ? InitQuery(gitHubUser)).mapTo[CoderGuy].map { coderGuy =>
-        Ok(views.html.profil(coderGuy))
+        Ok(views.html.profile(coderGuy))
       } recover {
         case e: Exception => InternalServerError(e.getMessage)
       }

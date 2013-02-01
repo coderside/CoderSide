@@ -18,6 +18,10 @@
             return $('.home').text().trim() == '';
         };
 
+        this.fadeIn = function() {
+            $('.home').css('opacity', 1);
+        };
+
         this.toggleFade = function() {
             var $home = $('.home');
             if($home.css('opacity') == 0) {
@@ -38,6 +42,8 @@
 
         this.render = function(searchDOM) {
             $('.layout-content .home').html(searchDOM);
+            CoderSide.home.fade();
+            this.fadeIn();
         };
     };
 })();

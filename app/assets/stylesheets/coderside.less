@@ -2,13 +2,13 @@
 @import "commons.less";
 @import "colors.less";
 @import "layout.less";
+@import "popular.less";
 @import "search.less";
-@import "profil.less";
+@import "profile.less";
 @import "loading.less";
 
 .layout-content {
     .home {
-
         &.fade {
             .transition(opacity, 0.2s, ease);
         }
@@ -23,67 +23,6 @@
                 font-size: 18pt;
                 color: white;
                 text-align: center;
-            }
-        }
-
-        .popular {
-            padding-top: 20px;
-            padding-bottom: 40px;
-            background: @grey9;
-            border-top: 1px solid @grey11;
-            .box-shadow(inset 0px 1px 4px @grey13);
-
-            .top {
-                background: white;
-                width: 40%;
-                margin: auto;
-                border-radius: 4px;
-                padding-top: 5px;
-
-                h2 {
-                    margin-left: 10px;
-                    text-transform: uppercase;
-                    color: @black2;
-                    font-size: 20px;
-                    .font-display();
-                }
-
-                .coders {
-                    li {
-                        border-top: 1px solid white;
-                        header {
-                            font-size: 14px;
-                            .font-text-medium();
-                        }
-                        .desc {
-                            font-size: 12px;
-                            margin-top: 5px;
-                        }
-                        background: @grey2;
-                        padding: 8px;
-                        color: @marron2;
-                    }
-                }
-            }
-
-            footer {
-                display: none;
-                padding: 10px;
-                height: 44px;
-                color: white;
-                .gradient(@black5, @black3);
-
-                .twitter-account {
-                    text-decoration: none;
-                    color: white;
-                }
-                .twitter-button {
-                    vertical-align: -9px;
-                    display: inline-block;
-                    a {
-                        color: @black5;
-                    }
-                }
             }
         }
     }

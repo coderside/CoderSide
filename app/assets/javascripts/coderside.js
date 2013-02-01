@@ -7,7 +7,6 @@ $(document).ready(function() {
         '/' : {
             get: function() {
                 console.log('Welcome to CoderSide !');
-                CoderSide.home.notFirstLoading();
                 if(!CoderSide.home.exist()) {
                     jsRoutes.controllers.Application.home().ajax().done(function(response) {
                         CoderSide.home.render(response);
@@ -24,12 +23,12 @@ $(document).ready(function() {
                 if(params.keywords) {
                     if(CoderSide.home.exist()) {
                         CoderSide.search.disable();
-                        CoderSide.search.toggleLoading();
+                        CoderSide.search.toggleSearchLoading();
 
                         jsRoutes.controllers.Application.search(params.keywords).ajax().done(function(response) {
                             CoderSide.search.render(response);
                             CoderSide.search.enable();
-                            CoderSide.search.toggleLoading();
+                            CoderSide.search.toggleSearchLoading();
                             CoderSide.search.setInputSearch(params.keywords);
                         });
                     } else {
@@ -46,9 +45,9 @@ $(document).ready(function() {
                 }
             }
         },
-        '/profil?*queryString': {
+        '/profile?*queryString': {
             get: function(any, params) {
-                if(CoderSide.home.isFirstLoading()) {
+                if(CoderSide.home.isFirstLoading() || CoderSide.popular.oneSelected()) {
                     CoderSide.home.empty();
                     CoderSide.loading.show();
                 } else {
@@ -57,13 +56,13 @@ $(document).ready(function() {
                 var data = parseQueryString(params.queryString);
                 if(data.username && data.fullname && data.language) {
                     CoderSide.resolve('/progress?' + params.queryString, 'get');
-                    jsRoutes.controllers.Application.profil(
+                    jsRoutes.controllers.Application.profile(
                         data.username,
                         data.fullname,
                         data.language
                     ).ajax().done(function(response) {
                         CoderSide.loading.hide();
-                        CoderSide.profil.render(response);
+                        CoderSide.profile.render(response);
                         if(!CoderSide.home.isFirstLoading()) {
                             CoderSide.search.toggleProgressLoading();
                         }
@@ -105,7 +104,9 @@ $(document).ready(function() {
 
     CoderSide.home = new Home();
     CoderSide.search = new Search();
-    CoderSide.profil = new Profil();
+    CoderSide.profile = new Profile();
     CoderSide.loading = new Loading();
+    CoderSide.popular = new Popular();
+    CoderSide.navigation = new Navigation();
     CoderSide.start('/');
 });

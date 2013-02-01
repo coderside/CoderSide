@@ -6,7 +6,7 @@
     <h2>Popular</h2>
     <ul class="coders">
       @popularCoders.map { coder =>
-      <li>
+      <li data-username="@coder.pseudo" data-fullname="@coder.fullname" data-language="@coder.language.getOrElse("")">
         <header>@coder.pseudo - @coder.fullname</header>
         <p class="desc">@coder.description</p>
       </li>

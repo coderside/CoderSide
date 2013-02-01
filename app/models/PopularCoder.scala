@@ -23,14 +23,15 @@ case class PopularCoder(
   pseudo: String,
   fullname: Option[String],
   description: Option[String],
-  points: Long = 1
+  points: Long = 1,
+  language: Option[String] = None
 ) {
   def increment(): Future[Long] = {
     PopularCoder.increment(_id) collect { case Some(points) => points }
   }
 }
 
-object PopularCoder extends MongoHelpers with Function5[BSONObjectID,String, Option[String], Option[String], Long, PopularCoder]{
+object PopularCoder extends MongoHelpers with Function6[BSONObjectID,String, Option[String], Option[String], Long, Option[String], PopularCoder]{
   import json._
 
   val collectionName = "popular"
@@ -71,7 +72,8 @@ object PopularCoder extends MongoHelpers with Function5[BSONObjectID,String, Opt
         "pseudo" -> coder.pseudo,
         "fullname" -> coder.fullname,
         "description" -> coder.description,
-        "points" -> coder.points
+        "points" -> coder.points,
+        "language" -> coder.language
       )
     }
 
@@ -81,7 +83,8 @@ object PopularCoder extends MongoHelpers with Function5[BSONObjectID,String, Opt
       (__ \ 'pseudo).read[String] and
       (__ \ 'fullname).readNullable[String] and
       (__ \ 'description).readNullable[String] and
-      (__ \ 'points).read[Long]
+      (__ \ 'points).read[Long] and
+      (__ \ 'language).readNullable[String]
     )(PopularCoder)
   }
 }

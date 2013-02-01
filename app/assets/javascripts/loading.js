@@ -37,6 +37,7 @@
         this.show = function() {
             spinner.spin($target()[0]);
             //this.displayTimeline();
+            $progress().css('width', '0%');
             $container().show();
             isShown = true;
         };

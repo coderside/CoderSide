@@ -1,0 +1,48 @@
+@import "commons.less";
+@import "helpers.less";
+@import "colors.less";
+
+.popular {
+    padding-top: 20px;
+    padding-bottom: 40px;
+    background: @grey9;
+    border-top: 1px solid @grey11;
+    .box-shadow(inset 0px 1px 4px @grey13);
+
+    .top {
+        background: white;
+        width: 40%;
+        margin: auto;
+        border-radius: 4px;
+        padding-top: 5px;
+
+        h2 {
+            margin-left: 10px;
+            text-transform: uppercase;
+            color: @black2;
+            font-size: 20px;
+            .font-display();
+        }
+
+        .coders {
+            li {
+                cursor: pointer;
+                border-top: 1px solid white;
+                header {
+                    font-size: 14px;
+                    .font-text-medium();
+                }
+                .desc {
+                    font-size: 12px;
+                    margin-top: 5px;
+                }
+                background: @grey2;
+                padding: 8px;
+                color: @marron2;
+                a {
+                    color: @marron2;
+                }
+            }
+        }
+    }
+}

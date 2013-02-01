@@ -64,7 +64,9 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
           BSONObjectID.generate,
           github.profil.username,
           fullname,
-          twitterResult map(_.profil.description)
+          twitterResult map(_.profil.description),
+          1,
+          github.profil.language
         )
         PopularCoder.findByPseudo(github.profil.username)
         .collect { case Some(coderAsJson) => coderAsJson }

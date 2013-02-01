@@ -6,7 +6,7 @@
 GET     /                           controllers.Application.index
 GET     /home                       controllers.Application.home
 GET     /search                     controllers.Application.search(keywords: String)
-GET     /profil                     controllers.Application.profil(username: String, fullname: String, language: String)
+GET     /profile                    controllers.Application.profile(username: String, fullname: String, language: String)
 GET     /progress                   controllers.Application.progress(username: String, fullname: String, language: String)
 
 # Map static resources from the /public folder to the /assets URL path

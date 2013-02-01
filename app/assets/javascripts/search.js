@@ -67,7 +67,7 @@
                     };
                 $gitHubUser.addClass('selected');
                 $gitHubUser.addClass('hover');
-                CoderSide.navigate('/profil?' + $.param(gitHubUser));
+                CoderSide.navigate('/profile?' + $.param(gitHubUser));
             }
         });
 
@@ -89,7 +89,15 @@
             $('.results .selected .progress').css('width', value + '%');
         };
 
-        this.toggleLoading = function() {
+        this.hideSearchLoading = function() {
+           var $iconGitHub = $('.search .icon-github'),
+                $loadingGitHub = $('.search .loading-github');
+
+            $iconGitHub.show();
+            $loadingGitHub.hide();
+        };
+
+        this.toggleSearchLoading = function() {
             var $iconGitHub = $('.search .icon-github'),
                 $loadingGitHub = $('.search .loading-github');
 
@@ -148,9 +156,9 @@
                 $('.results .result:first').addClass('fade-in');
             }, 100);
 
-            if(!CoderSide.profil.isEmpty()) {
-                CoderSide.profil.toggleFade();
-                CoderSide.profil.empty();
+            if(!CoderSide.profile.isEmpty()) {
+                CoderSide.profile.toggleFade();
+                CoderSide.profile.empty();
                 CoderSide.home.toggleFade();
             }
         };
