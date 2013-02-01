@@ -3,6 +3,7 @@
 @font-text: OpenSansRegular, Helvetica;
 @font-text-light: OpenSansLight, Helvetica;
 @font-text-bold: OpenSansBold Helvetica;
+@font-text-half-bold: OpenSansSemibold;
 @font-display: OpenSansRegular, Helvetica;
 
 .font-text() {
@@ -11,7 +12,10 @@
 
 .font-text-bold() {
     font-family: @font-text-bold;
-    font-weight: 900;
+}
+
+.font-text-half-bold() {
+    font-family: @font-text-half-bold;
 }
 
 .font-text-medium() {
