@@ -159,11 +159,11 @@
             var d = Q.defer();
             var show = function($elt) {
                 setTimeout(function() {
-                    Zanimo.transform($elt[0], 'translate3d(105%, 0, 0)');
-                    if($elt.next().length) {
+                    if($elt.length) Zanimo.transform($elt[0], 'translate3d(105%, 0, 0)');
+                    if($elt.length && $elt.next().length) {
                         show($elt.next());
                     } else {
-                        d.resolve($elt[0]);
+                        if($elt.length) d.resolve($elt[0]); else d.reject();
                     }
                 }, 120);
             };
