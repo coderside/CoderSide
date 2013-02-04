@@ -32,19 +32,19 @@
             $.extend(dftOptions, options)
         );
 
-        var isShown = false;
-
-        this.show = function() {
+        this.fadeIn = function() {
+            var $parent = $container();
             spinner.spin($target()[0]);
-            //this.displayTimeline();
             $progress().css('width', '0%');
-            $container().show();
-            isShown = true;
+            $parent.show();
+            return Zanimo.transition($parent[0], 'opacity', 1, 200, 'ease');
         };
 
-        this.hide = function() {
-            $container().hide();
-            isShown = false;
+        this.fadeOut = function() {
+            var $parent = $container();
+            return Zanimo.transition($parent[0], 'opacity', 0, 200, 'ease').then(function() {
+                $parent.hide();
+            });
         };
 
         this.refreshSpinner = function(opt) {
@@ -77,12 +77,6 @@
                     fjs.parentNode.insertBefore(js,fjs);
                 }
             }(document,"script","twitter-wjs");
-        };
-
-        this.toggle = function() {
-            if(isShown) {
-                this.hide();
-            } else this.show();
         };
     };
 })();

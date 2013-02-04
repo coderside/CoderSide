@@ -20,7 +20,6 @@ $(document).ready(function() {
         '/search/:keywords': {
             get: function(any, params) {
                 CoderSide.home.notFirstLoading();
-                CoderSide.loading.hide();
                 if(params.keywords) {
                     if(CoderSide.home.exist()) {
                         CoderSide.search.disable();
@@ -49,7 +48,7 @@ $(document).ready(function() {
             get: function(any, params) {
                 if(CoderSide.home.isFirstLoading() || CoderSide.popular.oneSelected()) {
                     CoderSide.home.empty();
-                    CoderSide.loading.show();
+                    CoderSide.transitions.toLoading();
                 } else CoderSide.search.showProgress();
 
                 var data = parseQueryString(params.queryString);
@@ -60,7 +59,6 @@ $(document).ready(function() {
                         data.fullname,
                         data.language
                     ).ajax().done(function(response) {
-                        CoderSide.loading.hide();
                         CoderSide.profile.render(response);
                         CoderSide.transitions.toProfile().then(function() {
                             CoderSide.search.hideProgress();
@@ -81,7 +79,8 @@ $(document).ready(function() {
                     var eventSource = new EventSource(uri);
                     eventSource.onmessage = function(msg) {
                         var progress = JSON.parse(msg.data);
-                        if(CoderSide.home.isFirstLoading()) {
+                        if(progress >= 100) eventSource.close();
+                        if(CoderSide.home.isFirstLoading() || CoderSide.popular.oneSelected()) {
                             CoderSide.loading.progress(progress);
                         } else {
                             CoderSide.search.progress(progress);
