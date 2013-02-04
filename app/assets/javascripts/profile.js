@@ -14,36 +14,34 @@
             return $('.profile').text().trim() == '';
         };
 
+        this.fadeIn = function() {
+            var $profile = $('.profile');
+            var promiseOpacity = Zanimo.transition($profile[0], 'opacity', 1, 200, 'ease');
+            var promiseMargin = Zanimo.transition($profile[0], 'margin-left', 0, 200, 'ease');
+            return Q.all([promiseOpacity, promiseMargin]);
+        };
+
+        this.fadeOut = function() {
+            var $profile = $('.profile');
+            $profile.empty();
+            var promiseOpacity = Zanimo.transition($profile[0], 'opacity', 0, 200, 'ease');
+            var promiseMargin = Zanimo.transition($profile[0], 'margin-left', '35px', 200, 'ease');
+            return Q.all([promiseOpacity, promiseMargin]);
+        };
+
         this.toggleFade = function() {
             var $profile = $('.profile');
             if($profile.css('opacity') == 1) {
-                $profile.css('opacity', 0);
-                $profile.css('margin-left', '35px');
+                this.fadeOut();
             } else {
-                $profile.css('opacity', 1);
-                $profile.css('margin-left', '0');
+                this.fadeIn();
             }
         };
 
-        this.fade = function(content) {
-            $('.home').one(transitionend, function(e) {
-                e.stopPropagation();
-                if($(e.target).hasClass('home')) {
-                    if(self.isEmpty()) {
-                        $('.layout-content .profile').html(content);
-                        $('.layout-content .tweets li:last').addClass('last');
-                        $('.layout-content .organization:last li:last').addClass('last');
-                    } else {
-                        self.empty();
-                    }
-                    self.toggleFade();
-                }
-            });
-        };
-
         this.render = function(content) {
-            this.fade(content);
-            CoderSide.home.toggleFade();
+            $('.layout-content .profile').html(content);
+            $('.layout-content .tweets li:last').addClass('last');
+            $('.layout-content .organization:last li:last').addClass('last');
         };
     };
 })();

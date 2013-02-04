@@ -19,16 +19,23 @@
         };
 
         this.fadeIn = function() {
-            $('.home').css('opacity', 1);
+            var $home = $('.home');
+            return Zanimo.transition($home[0], 'opacity', 1, 200, 'ease');
+        };
+
+        this.fadeOut = function() {
+            var $home = $('.home');
+            $home.empty();
+            return Zanimo.transition($home[0], 'opacity', 0, 200, 'ease');
         };
 
         this.toggleFade = function() {
             var $home = $('.home');
             if($home.css('opacity') == 0) {
-                $home.css('opacity', 1);
+                this.fadeIn();
             } else {
                 $home.css('opacity', 0);
-                $home.empty();
+                this.fadeOut();
             }
         };
 
@@ -40,10 +47,10 @@
             $('.home').removeClass('first-loading');
         };
 
-        this.render = function(searchDOM) {
-            $('.layout-content .home').html(searchDOM);
-            CoderSide.home.fade();
-            this.fadeIn();
+        this.render = function(content) {
+            $('.layout-content .home').html(content);
+            //CoderSide.home.fade();
+            //this.fadeIn();
         };
     };
 })();

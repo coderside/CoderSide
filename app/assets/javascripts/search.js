@@ -24,7 +24,7 @@
             left: 'auto'
         });
 
-         $(document).on('focus', '.search input[name=keywords]', function() {
+        $(document).on('focus', '.search input[name=keywords]', function() {
             var $search = $(this);
             var $github = $search.next('.icon-github');
             $github.css('color', '#393939');
@@ -90,11 +90,17 @@
         };
 
         this.hideSearchLoading = function() {
-           var $iconGitHub = $('.search .icon-github'),
+            var $iconGitHub = $('.search .icon-github'),
                 $loadingGitHub = $('.search .loading-github');
-
             $iconGitHub.show();
             $loadingGitHub.hide();
+        };
+
+        this.showSearchLoading = function() {
+            var $iconGitHub = $('.search .icon-github'),
+                $loadingGitHub = $('.search .loading-github');
+            $iconGitHub.hide();
+            $loadingGitHub.show();
         };
 
         this.toggleSearchLoading = function() {
@@ -102,36 +108,36 @@
                 $loadingGitHub = $('.search .loading-github');
 
             if($iconGitHub.css('display') === 'none' || $iconGitHub.css('display') != 'block') {
-                $iconGitHub.show();
-                $loadingGitHub.hide();
+                this.hideSearchLoading();
             } else {
-                $iconGitHub.hide();
-                $loadingGitHub.show();
+                this.showSearchLoading();
             }
         };
 
-       this.toggleProgressLoading = function() {
+        this.showProgress = function() {
+            var $selected = $('.results .selected'),
+                $spinner = $selected.find('.spinner'),
+                target = $selected.find('.spinner-container')[0];
+            progressSpinner.spin(target);
+        };
+
+        this.hideProgress = function() {
+            var $selected = $('.results .selected'),
+                $spinner = $selected.find('.spinner');
+            $spinner.remove();
+        };
+
+        this.toggleProgress = function() {
             var $selected = $('.results .selected'),
                 $spinner = $selected.find('.spinner');
 
             if($selected.length) {
                 if(!$spinner.length) {
-                    var target = $selected.find('.spinner-container')[0];
-                    progressSpinner.spin(target);
+                    this.showProgress();
                 } else {
-                    $spinner.remove();
+                    this.hideProgress();
                 }
             }
-        };
-
-        this.fadeIn = function() {
-            $('.results .result').one(transitionend, function(e) {
-                e.stopPropagation();
-                if($(e.target).hasClass('result')) {
-                    var $next = $(this).next('li');
-                    if($next.length) $next.addClass('fade-in');
-                }
-            });
         };
 
         this.setInputSearch = function(keywords) {
@@ -148,19 +154,26 @@
             $('.search .submit-search').removeAttr('disabled');
         };
 
+        this.fadeIn = function() {
+            var $results = $('.results .result');
+            var d = Q.defer();
+            var show = function($elt) {
+                setTimeout(function() {
+                    Zanimo.transform($elt[0], 'translate3d(105%, 0, 0)');
+                    if($elt.next().length) {
+                        show($elt.next());
+                    } else {
+                        d.resolve($elt[0]);
+                    }
+                }, 120);
+            };
+            show($('.results .result:first'));
+            return d.promise;
+        };
+
         this.render = function(res) {
             $('.results').html(res);
             this.fadeIn();
-
-            setTimeout(function() {
-                $('.results .result:first').addClass('fade-in');
-            }, 100);
-
-            if(!CoderSide.profile.isEmpty()) {
-                CoderSide.profile.toggleFade();
-                CoderSide.profile.empty();
-                CoderSide.home.toggleFade();
-            }
         };
     };
 })();

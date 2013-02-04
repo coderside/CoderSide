@@ -52,6 +52,15 @@ object Application extends Controller {
       } recover {
         case e: Exception => InternalServerError(e.getMessage)
       }
+
+      // val users = List(
+      //   GitHubUser("srenault", Some("RENAULT"), Some("scala"), None),
+      //   GitHubUser("srenault", Some("RENAUD"), Some("scala"), None)
+      // )
+
+      // future(
+      //   Ok(views.html.results(users))
+      // )
     }
   }
 
@@ -67,6 +76,44 @@ object Application extends Controller {
       } recover {
         case e: Exception => InternalServerError(e.getMessage)
       }
+
+      // val coderGuy = CoderGuy(
+      //   Some(
+      //     GitHubUser(
+      //       "srenault",
+      //       Some("RENAULT"),
+      //       Some("Scala"),
+      //       Some(12),
+      //       Some("location")
+      //     )),
+      //   Some(
+      //     LinkedInUser(
+      //       "id",
+      //       "Sébastien",
+      //       "RENAULT",
+      //       "Web developper at @Zenexity",
+      //       None
+      //     )),
+      //   Some(
+      //     TwitterUser(
+      //       "srenaultcontact",
+      //       "Sébastien RENAULT",
+      //       "Web developper at Zenexity",
+      //       10,
+      //       None
+      //     )),
+      //   Some(
+      //     KloutUser(
+      //       "id",
+      //       "srenault",
+      //       10.00000111,
+      //       Nil,
+      //       Nil
+      //     ))
+      // )
+      // future(
+      //   Ok(views.html.profile(coderGuy))
+      // )
     }
   }
 

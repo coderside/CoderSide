@@ -14,6 +14,7 @@ $(document).ready(function() {
                 } else {
                     CoderSide.search.clear();
                 }
+                CoderSide.transitions.toHome();
             }
         },
         '/search/:keywords': {
@@ -23,23 +24,22 @@ $(document).ready(function() {
                 if(params.keywords) {
                     if(CoderSide.home.exist()) {
                         CoderSide.search.disable();
-                        CoderSide.search.toggleSearchLoading();
-
+                        CoderSide.search.showSearchLoading();
                         jsRoutes.controllers.Application.search(params.keywords).ajax().done(function(response) {
                             CoderSide.search.render(response);
                             CoderSide.search.enable();
-                            CoderSide.search.toggleSearchLoading();
+                            CoderSide.search.hideSearchLoading();
                             CoderSide.search.setInputSearch(params.keywords);
                         });
                     } else {
                         var promiseHome = jsRoutes.controllers.Application.home().ajax(),
                             promiseResults = jsRoutes.controllers.Application.search(params.keywords).ajax();
-
                         $.when(promiseHome, promiseResults).done(function(home, results) {
                             CoderSide.home.render(home[0]);
                             CoderSide.search.render(results[0]);
                             CoderSide.search.enable();
                             CoderSide.search.setInputSearch(params.keywords);
+                            CoderSide.transitions.toHome();
                         });
                     }
                 }
@@ -50,9 +50,8 @@ $(document).ready(function() {
                 if(CoderSide.home.isFirstLoading() || CoderSide.popular.oneSelected()) {
                     CoderSide.home.empty();
                     CoderSide.loading.show();
-                } else {
-                    CoderSide.search.toggleProgressLoading();
-                }
+                } else CoderSide.search.showProgress();
+
                 var data = parseQueryString(params.queryString);
                 if(data.username && data.fullname && data.language) {
                     CoderSide.resolve('/progress?' + params.queryString, 'get');
@@ -63,9 +62,9 @@ $(document).ready(function() {
                     ).ajax().done(function(response) {
                         CoderSide.loading.hide();
                         CoderSide.profile.render(response);
-                        if(!CoderSide.home.isFirstLoading()) {
-                            CoderSide.search.toggleProgressLoading();
-                        }
+                        CoderSide.transitions.toProfile().then(function() {
+                            CoderSide.search.hideProgress();
+                        });
                     });
                 }
             }
@@ -79,7 +78,6 @@ $(document).ready(function() {
                         data.fullname,
                         data.language
                     ).absoluteURL();
-
                     var eventSource = new EventSource(uri);
                     eventSource.onmessage = function(msg) {
                         var progress = JSON.parse(msg.data);
@@ -107,6 +105,6 @@ $(document).ready(function() {
     CoderSide.profile = new Profile();
     CoderSide.loading = new Loading();
     CoderSide.popular = new Popular();
-    CoderSide.navigation = new Navigation();
+    CoderSide.transitions = new Transitions();
     CoderSide.start('/');
 });
