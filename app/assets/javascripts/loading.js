@@ -34,8 +34,9 @@
 
         this.fadeIn = function() {
             var $parent = $container();
-            spinner.spin($target()[0]);
+            //spinner.spin($target()[0]);
             $progress().css('width', '0%');
+            this.displayTimeline();
             $parent.show();
             return Zanimo.transition($parent[0], 'opacity', 1, 200, 'ease');
         };
@@ -51,7 +52,6 @@
             spinner = new Spinner(
                 $.extend(dftOptions, opt)
             );
-
             $container().find('.spinner').remove();
             spinner.spin($target()[0]);
         };
@@ -65,7 +65,7 @@
             $progress().css('width', value + '%');
         };
 
-        this.displayTimeline = function() {
+        this.preLoadTimeline = function() {
             var timeline = '<a class="twitter-timeline" href="https://twitter.com/coderside" data-widget-id="294713405175111681"></a>';
             $container().find('.twitter-waiting').append(timeline);
             !function(d,s,id) {
@@ -77,6 +77,10 @@
                     fjs.parentNode.insertBefore(js,fjs);
                 }
             }(document,"script","twitter-wjs");
+        };
+
+        this.displayTimeline = function() {
+            $('.twitter-waiting').show();
         };
     };
 })();

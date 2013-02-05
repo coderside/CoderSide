@@ -16,9 +16,14 @@ import models.github.GitHubUser
 
 object TwitterAPI extends URLEncoder with Debug with CacheHelpers {
 
-  val signatureCalc = OAuthCalculator(
-    ConsumerKey(Config.Twitter.consumerKey, Config.Twitter.consumerSecret),
-    RequestToken(Config.Twitter.accessToken, Config.Twitter.accessTokenSecret)
+  val signatureCalcSearch = OAuthCalculator(
+    ConsumerKey(Config.Twitter.search.consumerKey, Config.Twitter.search.consumerSecret),
+    RequestToken(Config.Twitter.search.accessToken, Config.Twitter.search.accessTokenSecret)
+  )
+
+  val signatureCalcPopular = OAuthCalculator(
+    ConsumerKey(Config.Twitter.popular.consumerKey, Config.Twitter.popular.consumerSecret),
+    RequestToken(Config.Twitter.popular.accessToken, Config.Twitter.popular.accessTokenSecret)
   )
 
   implicit val readUser: Reads[TwitterUser] = {
@@ -45,7 +50,7 @@ object TwitterAPI extends URLEncoder with Debug with CacheHelpers {
     val url = "https://api.twitter.com/1/users/search.json?q=" + encode(criteria)
     WS.url(url)
       .withHeaders(lastModifiedFor(url):_*)
-      .sign(signatureCalc)
+      .sign(signatureCalcSearch)
       .get().map (implicit response => cachedResponseOrElse(url))
       .map {
         case users: JsArray => users.asOpt[List[TwitterUser]] getOrElse Nil
@@ -61,7 +66,7 @@ object TwitterAPI extends URLEncoder with Debug with CacheHelpers {
          "user_id" -> twitterID,
          "screen_name" -> twitterID
       )
-      .sign(signatureCalc)
+      .sign(signatureCalcSearch)
       .get().map (implicit response => cachedResponseOrElse(url))
       .map { twitterUser =>
         twitterUser.asOpt[TwitterUser]
@@ -75,7 +80,7 @@ object TwitterAPI extends URLEncoder with Debug with CacheHelpers {
 
     WS.url(url)
       .withHeaders(lastModifiedFor(url):_*)
-      .sign(signatureCalc)
+      .sign(signatureCalcSearch)
       .get().map (implicit response => cachedResponseOrElse(url))
       .map {
         case JsArray(tweets) => Some(TwitterTimeline(
@@ -88,6 +93,14 @@ object TwitterAPI extends URLEncoder with Debug with CacheHelpers {
         ))
         case _ => None
       }
+  }
+
+  def updateStatuses(status: String) = {
+    val url = "https://api.twitter.com/1.1/statuses/update.json?status=" + encode(status)
+    WS.url(url)
+      .sign(signatureCalcPopular)
+      .post("")
+      .map(_.json)
   }
 }
 

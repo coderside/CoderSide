@@ -4,7 +4,6 @@ import scala.concurrent.duration._
 import akka.actor.{ Actor, ActorRef, ActorLogging, ReceiveTimeout }
 import play.api.libs.iteratee.Concurrent
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import reactivemongo.bson.BSONObjectID
 import models.{ CoderGuy, PopularCoder }
 import utils.Config
 import Messages._
@@ -56,29 +55,7 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
         kloutResult map (_.profil),
         errors
       )
-
-      gitHubResult.foreach { github =>
-        import PopularCoder.json._
-        val fullname = linkedInResult.map(_.profil.fullName) orElse twitterResult.map(_.profil.name) orElse github.profil.fullname
-        val popularCoder = PopularCoder(
-          BSONObjectID.generate,
-          github.profil.username,
-          fullname,
-          twitterResult map(_.profil.description),
-          1,
-          github.profil.language
-        )
-        PopularCoder.findByPseudo(github.profil.username)
-        .collect { case Some(coderAsJson) => coderAsJson }
-        .map (_.asOpt[PopularCoder])
-        .collect { case Some(coder) => coder } map { coder =>
-          coder.increment()
-        } recover {
-          case e: NoSuchElementException => PopularCoder.uncheckedCreate(popularCoder)
-          case e: Exception => log.error("Error while saving popular coder info: " + e.getMessage)
-        }
-      }
-
+      PopularNode.ref ! UpdatePopular(coderGuy)
       clients foreach (_ ! coderGuy)
       headNode ! End(self)
     }

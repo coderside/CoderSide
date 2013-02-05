@@ -5,6 +5,7 @@ import models.github.{ GitHubUser, GitHubRepository, GitHubOrg }
 import models.twitter.{ TwitterUser, TwitterTimeline }
 import models.klout.KloutUser
 import models.linkedin.LinkedInUser
+import models.CoderGuy
 
 object Messages {
   //Node to Gatherer
@@ -53,4 +54,6 @@ object Messages {
   case class NewClient(client: ActorRef)
   //Children to Head
   case class End(headNode: ActorRef)
+  //Gatherer Node to Popular node
+  case class UpdatePopular(coderGuy: CoderGuy)
 }

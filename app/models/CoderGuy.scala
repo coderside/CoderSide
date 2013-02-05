@@ -1,5 +1,7 @@
 package models
 
+import play.api.mvc.RequestHeader
+import utils.Config
 import models.github._
 import models.twitter._
 import models.linkedin._
@@ -12,6 +14,22 @@ case class CoderGuy(
   kloutUser: Option[KloutUser],
   errors: Seq[(String, String)] = Nil
 ) {
+  def profileURL(): Option[String] = {
+    for {
+      username <- gitHubUser map (_.username)
+      language <- gitHubUser flatMap (_.language)
+      fullname <- oneFullname
+    } yield {
+      Config.baseURL + "/#" + controllers.routes.Application.profile(username, fullname, language).url
+    }
+  }
+
+  lazy val oneFullname: Option[String] = {
+    linkedInUser.map(_.fullName) orElse
+    twitterUser.map(_.name) orElse
+    gitHubUser.flatMap(_.fullname)
+  }
+
   lazy val oneAvatar: Option[String] = {
     val linkedInAvatar = for {
       linkedIn <- linkedInUser

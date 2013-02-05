@@ -6,6 +6,14 @@ import play.api.Play.current
 import scala.concurrent.duration._
 
 object Config {
+
+  lazy val baseURL: String = {
+    Play.configuration.getString("baseURL") getOrElse {
+      Logger.warn("[Config] Please provide base URL")
+      throw new ConfigException("Please provide base URL")
+    }
+  }
+
   lazy val gathererWaited: Int = {
     Play.configuration.getInt("gatherer.waited") getOrElse {
       Logger.warn("[Config] Please provide GathererNode waited value")
@@ -111,31 +119,63 @@ object Config {
   }
 
   object Twitter {
-    lazy val consumerKey: String = {
-      Play.configuration.getString("oauth.twitter.consumerkey").getOrElse {
-        Logger.warn("[Config] Please provide twitter consummer key")
-        throw new ConfigException("Please provide twitter consummer key")
+    object search {
+      lazy val consumerKey: String = {
+        Play.configuration.getString("oauth.twitter.search.consumerkey").getOrElse {
+          Logger.warn("[Config] Please provide twitter consummer key for search")
+          throw new ConfigException("Please provide twitter consummer key for search")
+        }
+      }
+
+      lazy val consumerSecret: String = {
+        Play.configuration.getString("oauth.twitter.search.consumersecret").getOrElse {
+          Logger.warn("[Config] Please provide twitter consummer secret for search")
+          throw new ConfigException("Please provide twitter consummer secret for search")
+        }
+      }
+
+      lazy val accessToken: String = {
+        Play.configuration.getString("oauth.twitter.search.accesstoken").getOrElse {
+          Logger.warn("[Config] Please provide twitter access token for search")
+          throw new ConfigException("Please provide twitter access token for search")
+        }
+      }
+
+      lazy val accessTokenSecret: String = {
+        Play.configuration.getString("oauth.twitter.search.accesstokensecret").getOrElse {
+          Logger.warn("[Config] Please provide twitter access token secret for search")
+          throw new ConfigException("Please provide twitter access token secret for search")
+        }
       }
     }
 
-    lazy val consumerSecret: String = {
-      Play.configuration.getString("oauth.twitter.consumersecret").getOrElse {
-        Logger.warn("[Config] Please provide twitter consummer secret")
-        throw new ConfigException("Please provide twitter consummer secret")
+    object popular {
+      lazy val consumerKey: String = {
+        Play.configuration.getString("oauth.twitter.popular.consumerkey").getOrElse {
+          Logger.warn("[Config] Please provide twitter consummer key for popular")
+          throw new ConfigException("Please provide twitter consummer key for popular")
+        }
       }
-    }
 
-    lazy val accessToken: String = {
-      Play.configuration.getString("oauth.twitter.accesstoken").getOrElse {
-        Logger.warn("[Config] Please provide twitter access token")
-        throw new ConfigException("Please provide twitter access token")
+      lazy val consumerSecret: String = {
+        Play.configuration.getString("oauth.twitter.popular.consumersecret").getOrElse {
+          Logger.warn("[Config] Please provide twitter consummer secret for popular")
+          throw new ConfigException("Please provide twitter consummer secret for popular")
+        }
       }
-    }
 
-    lazy val accessTokenSecret: String = {
-      Play.configuration.getString("oauth.twitter.accesstokensecret").getOrElse {
-        Logger.warn("[Config] Please provide twitter access token secret")
-        throw new ConfigException("Please provide twitter access token secret")
+      lazy val accessToken: String = {
+        Play.configuration.getString("oauth.twitter.popular.accesstoken").getOrElse {
+          Logger.warn("[Config] Please provide twitter access token for popular")
+          throw new ConfigException("Please provide twitter access token for popular")
+        }
+      }
+
+      lazy val accessTokenSecret: String = {
+        Play.configuration.getString("oauth.twitter.popular.accesstokensecret").getOrElse {
+          Logger.warn("[Config] Please provide twitter access token secret for popular")
+          throw new ConfigException("Please provide twitter access token secret for popular")
+        }
       }
     }
   }

@@ -4,6 +4,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import play.modules.reactivemongo.ReactiveMongoPlugin
 import play.api.Play.current
+import play.api.i18n.Messages
 import play.api.libs.json._
 import play.api.libs.json.Json._
 import play.api.libs.json.Reads._
@@ -37,6 +38,18 @@ object PopularCoder extends MongoHelpers with Function6[BSONObjectID,String, Opt
   val collectionName = "popular"
   val collection = ReactiveMongoPlugin.collection(collectionName)
 
+  def generateTweet(coderGuy: CoderGuy, ranks: Int, position: Int): String = {
+    val maybeTwitter = coderGuy.twitterUser map ("@" + _.screenName)
+    val identification = maybeTwitter getOrElse coderGuy.gitHubUser.flatMap(_.fullname)
+    coderGuy.profileURL.map { url =>
+      val key = if(ranks > 1) "popular.twitter.with.url.plurial" else "popular.twitter.with.url.singular"
+      Messages(key, identification, ranks, url)
+    } getOrElse {
+      val key = if(ranks > 1) "popular.twitter.plurial" else "popular.twitter.singular"
+      Messages(key, identification, ranks)
+    }
+  }
+
   def increment(id: BSONObjectID): Future[Option[Long]] = {
     ReactiveMongoPlugin.db.command(
       FindAndModify(
@@ -45,7 +58,7 @@ object PopularCoder extends MongoHelpers with Function6[BSONObjectID,String, Opt
         modify = Update(BSONDocument("$inc" -> BSONDocument("points" -> BSONInteger(1))), true)
       )
     ) map { maybeDoc =>
-      maybeDoc flatMap (_.getAs[BSONLong]("points") map (_.value))
+      maybeDoc flatMap (_.getAs[BSONDouble]("points") map (_.value.toLong))
     }
   }
 
