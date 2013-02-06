@@ -36,7 +36,7 @@ object LinkedInAPI extends URLEncoder with Debug with CacheHelpers {
     WS.url(url)
       .sign(signatureCalc)
       .get()
-      .map { response =>
+      .map(debug).map { response =>
         val res = response.json
         res -> (res \ "people" \ "values")
       } map {

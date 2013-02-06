@@ -1,11 +1,13 @@
 @(fullname: String, headline: String, avatar: Option[String])
 
 <div class="linkedIn">
-  @avatar.map { avatar =>
-  <img class="avatar" src="@avatar" />
+  @if(avatar.isDefined) {
+  <img class="avatar" src="@avatar.get" />
+  } else {
+  <img class="avatar default" src="@routes.Assets.at("images/github/gravatar-user-420.png")" />
   }
   <div class="info">
-    <span>@fullname</span>
-    <span>@headline</span>
+    <span class="fullname">@fullname</span>
+    <span class="headline">@headline</span>
   </div>
 </div>

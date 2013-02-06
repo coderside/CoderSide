@@ -11,7 +11,6 @@
 
 .linkedIn, .github, .twitter, .klout {
     padding: 15px 0px 15px 10%;
-    .font-text();
 }
 
 .profile {
@@ -31,16 +30,24 @@
 
         .avatar {
             float: left;
+            &.default {
+                height: 50px;
+            }
         }
 
         .info {
             float: left;
             margin-left: 20px;
             span {
-                font-size: 20px;
-                .font-text();
                 display: block;
                 padding: 8px;
+            }
+            .fullname {
+                font-size: 20px;
+                font-family: @font-text-half-bold;
+            }
+            .headline {
+                font-size: 17px;
             }
         }
     }
@@ -138,7 +145,7 @@
             }
 
             .pseudo {
-                font-weight: bold;
+                font-family: @font-text-half-bold
             }
         }
 
@@ -206,10 +213,13 @@
 
         dt {
             width: 20%;
+            font-size: 15px;
+            padding: 4px;
         }
 
         dd {
             width: 78%;
+            font-size: 14px;
         }
     }
 }

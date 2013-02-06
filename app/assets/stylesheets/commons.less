@@ -2,34 +2,12 @@
 
 @font-text: OpenSansRegular, Helvetica;
 @font-text-light: OpenSansLight, Helvetica;
-@font-text-bold: OpenSansBold Helvetica;
+@font-text-bold: OpenSansBold, Helvetica;
 @font-text-half-bold: OpenSansSemibold;
 @font-display: OpenSansRegular, Helvetica;
 
-.font-text() {
+a, p, span, li, dd, dt {
     font-family: @font-text;
-}
-
-.font-text-bold() {
-    font-family: @font-text-bold;
-}
-
-.font-text-half-bold() {
-    font-family: @font-text-half-bold;
-}
-
-.font-text-medium() {
-    font-family: @font-text-bold;
-    font-weight: 600;
-}
-
-.font-text-light() {
-    font-family: @font-text-light;
-    font-weight: 300;
-}
-
-.font-display() {
-    font-family: @font-display;
 }
 
 button {
@@ -38,17 +16,17 @@ button {
 
 h1 {
     font-size: 24px;
-    font-weight: bold;
+    font-family: @font-text-bold;
 }
 
 h2 {
     font-size: 18px;
-    font-weight: bold;
+    font-family: @font-text-bold;
 }
 
 h3 {
     font-size: 16px;
-    font-weight: bold;
+    font-family: @font-text-half-bold;
 }
 
 .avatar {
