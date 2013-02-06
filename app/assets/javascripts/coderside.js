@@ -17,7 +17,7 @@ $(document).ready(function() {
         '/' : {
             get: function() {
                 console.log('Welcome to CoderSide !');
-                CoderSide.loading.preLoadTimeline();
+                //CoderSide.loading.preLoadTimeline();
                 clearConnections();
                 if(!CoderSide.home.exist()) {
                     jsRoutes.controllers.Application.home().ajax().done(function(response) {

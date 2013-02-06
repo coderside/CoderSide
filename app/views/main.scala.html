@@ -44,6 +44,20 @@
         <script src="@routes.Assets.at("javascripts/libs/es5-shim.min.js")" type="text/javascript"></script>
     <![endif]-->
 
+    <script>
+       var timeline = '<a class="twitter-timeline" href="https://twitter.com/coderside" data-widget-id="294713405175111681"></a>';
+       $('.twitter-waiting').append(timeline);
+       !function(d,s,id) {
+          var js, fjs = d.getElementsByTagName(s)[0];
+          if(!d.getElementById(id)) {
+             js = d.createElement(s);
+             js.id=id;
+             js.src="//platform.twitter.com/widgets.js";
+             fjs.parentNode.insertBefore(js,fjs);
+            }
+       }(document,"script","twitter-wjs");
+    </script>
+
     <!-- Javascripts app -->
     <script src="@routes.Assets.at("javascripts/old.js")" type="text/javascript"></script>
     <script src="@routes.Assets.at("javascripts/helpers.js")" type="text/javascript"></script>
