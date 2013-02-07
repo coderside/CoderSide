@@ -9,13 +9,13 @@ import akka.pattern.ask
 import akka.util.Timeout
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.iteratee.Enumerator
-import models.github.GitHubUser
+import models.github.GitHubSearchedUser
 import utils.Config
 import Messages._
 
 class HeadNode() extends Actor with ActorLogging {
 
-  var requests: Map[GitHubUser, ActorRef] = Map.empty
+  var requests: Map[GitHubSearchedUser, ActorRef] = Map.empty
   def gathererNode(client: ActorRef) = context.actorOf(Props(new GathererNode(self)))
 
   val gitHubNode = context.actorOf(Props[GitHubNode])
@@ -24,27 +24,27 @@ class HeadNode() extends Actor with ActorLogging {
   val kloutNode = context.actorOf(Props[KloutNode])
 
   def receive = {
-    case HeadQuery(gitHubUser, client) => {
+    case HeadQuery(searchedUser, client) => {
       log.debug("[HeadNode] receiving new init query")
       val gathererRef = gathererNode(client)
-      if(!requests.get(gitHubUser).isDefined) {
+      if(!requests.get(searchedUser).isDefined) {
         log.debug("[HeadNode] Request added")
-        requests += (gitHubUser -> gathererRef)
-        gitHubNode   ! NodeQuery(gitHubUser, gathererRef)
-        linkedInNode ! NodeQuery(gitHubUser, gathererRef)
-        twitterNode  ! TwitterNodeQuery(gitHubUser, kloutNode, gathererRef)
+        requests += (searchedUser -> gathererRef)
+        gitHubNode   ! NodeQuery(searchedUser, gathererRef)
+        linkedInNode ! NodeQuery(searchedUser, gathererRef)
+        twitterNode  ! TwitterNodeQuery(searchedUser, kloutNode, gathererRef)
       }
-      requests.get(gitHubUser).foreach { gathererRef =>
+      requests.get(searchedUser).foreach { gathererRef =>
         gathererRef ! NewClient(client)
       }
     }
 
-    case AskProgress(gitHubUser) => {
+    case AskProgress(searchedUser) => {
       implicit val timeout = Timeout(20 seconds)
       val s = sender
       log.debug("[HeadNode] AskProgress received")
       def requestProgress(retries: Int) {
-        requests.get(gitHubUser).map { gathererRef =>
+        requests.get(searchedUser).map { gathererRef =>
           log.debug("[HeadNode] Ok, ask for progress channel")
           (gathererRef ? AskProgress).mapTo[Enumerator[Float]].onComplete {
             case Success(progress: Enumerator[Float]) => {
@@ -68,9 +68,9 @@ class HeadNode() extends Actor with ActorLogging {
 
     case End(gathererRef) => {
       log.debug("[HeadNode] End received !")
-      val found  = requests.find(_._2 == gathererRef)
+      val found  = requests.find { case (_, ref) =>  ref == gathererRef }
       if(found.isDefined) {
-        requests = requests.filter(_._2 != gathererRef)
+        requests = requests.filter { case (_, ref) => ref != gathererRef }
         context.stop(gathererRef)
       }
     }

@@ -1,7 +1,7 @@
 package actors
 
 import akka.actor.ActorRef
-import models.github.{ GitHubUser, GitHubRepository, GitHubOrg }
+import models.github._
 import models.twitter.{ TwitterUser, TwitterTimeline }
 import models.klout.KloutUser
 import models.linkedin.LinkedInUser
@@ -11,13 +11,17 @@ object Messages {
   //Node to Gatherer
   case class ErrorQuery(from: String, e: Throwable)
   //Application to Supervisor.
-  case class InitQuery(profil: GitHubUser)
+  case class InitQuery(searchedUser: GitHubSearchedUser)
   //Supervisor to Head
-  case class HeadQuery(gitHubUser: GitHubUser, client: ActorRef)
+  case class HeadQuery(searchedUser: GitHubSearchedUser, client: ActorRef)
   //Head to Children
-  case class NodeQuery(gitHubUser: GitHubUser, gatherer: ActorRef)
+  case class NodeQuery(searchedUser: GitHubSearchedUser, gatherer: ActorRef)
   //Head to Twitter Node
-  case class TwitterNodeQuery(gitHubUser: GitHubUser, klout: ActorRef, gatherer: ActorRef)
+  case class TwitterNodeQuery(
+    searchedUser: GitHubSearchedUser,
+    klout: ActorRef,
+    gatherer: ActorRef
+  )
   //Twitter Node to Klout Node
   case class KloutNodeQuery(twitterUser: TwitterUser, gatherer: ActorRef)
   //Klout to Klout
@@ -27,15 +31,19 @@ object Messages {
   //GitHub to GitHub
   case class GitHubContribQuery(gitHubUser: GitHubUser, gathererRef: ActorRef)
   //GitHub to Gatherer
-  case class GitHubResult(profil: GitHubUser)
+  case class GitHubResult(gitHubUser: GitHubUser)
   //LinkedIn to Gatherer
-  case class LinkedInResult(profil: LinkedInUser)
+  case class LinkedInResult(linkedInUser: LinkedInUser)
   //Klout to Gatherer
-  case class KloutResult(profil: KloutUser)
+  case class KloutResult(kloutUser: KloutUser)
   //Twitter to Gatherer
-  case class TwitterResult(profil: TwitterUser)
+  case class TwitterResult(twitterUser: TwitterUser)
   //Twitter to Twitter
-  case class TwitterUserQuery(gitHubUser: GitHubUser, klout: ActorRef, gatherer: ActorRef)
+  case class TwitterUserQuery(
+    searchedUser: GitHubSearchedUser,
+    klout: ActorRef,
+    gatherer: ActorRef
+  )
   //Twitter to Twitter
   case class TwitterTimelineQuery(twitterUser: TwitterUser, gatherer: ActorRef)
   //For Gatherer only. Check if the gatering is complete
@@ -49,7 +57,7 @@ object Messages {
   //Head Node to gatherer node
   object AskProgress
   //Supervisor Node to head node
-  case class AskProgress(gitHubUser: GitHubUser)
+  case class AskProgress(searchedUser: GitHubSearchedUser)
   //Supervisor Node to head node
   case class NewClient(client: ActorRef)
   //Children to Head

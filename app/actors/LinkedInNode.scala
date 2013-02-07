@@ -8,16 +8,16 @@ import Messages._
 
 class LinkedInNode extends Actor with ActorLogging {
   def receive = {
-    case NodeQuery(gitHubUser, gathererRef) => {
+    case NodeQuery(searchedUser, gathererRef) => {
       log.debug("[LinkedInNode] receiving new head query")
       (for {
-        firstname <- gitHubUser.firstname
-        lastname  <- gitHubUser.lastname
+        firstname <- searchedUser.firstname
+        lastname  <- searchedUser.lastname
       } yield {
         log.debug("[LinkedInNode] ok, firstname & lastname are valid")
         LinkedInAPI.searchByFullname(firstname, lastname) map {
           case Nil  => gathererRef ! NotFound("linkedin")
-          case profils => LinkedIn.matchUser(gitHubUser, profils) foreach { found =>
+          case profils => LinkedIn.matchUser(searchedUser, profils) foreach { found =>
             gathererRef ! LinkedInResult(found)
           }
         } recover {
@@ -27,7 +27,7 @@ class LinkedInNode extends Actor with ActorLogging {
           }
         }
       }) getOrElse {
-        log.info("[LinkedInNode] NotFound ! The firstname & lastname aren't valid: " + gitHubUser)
+        log.info("[LinkedInNode] NotFound ! The firstname & lastname aren't valid: " + searchedUser)
         gathererRef ! NotFound("LinkedIn")
       }
     }

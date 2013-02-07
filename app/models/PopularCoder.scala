@@ -24,15 +24,14 @@ case class PopularCoder(
   pseudo: String,
   fullname: Option[String],
   description: Option[String],
-  points: Long = 1,
-  language: Option[String] = None
+  points: Long = 1
 ) {
   def increment(): Future[Long] = {
     PopularCoder.increment(_id) collect { case Some(points) => points }
   }
 }
 
-object PopularCoder extends MongoHelpers with Function6[BSONObjectID,String, Option[String], Option[String], Long, Option[String], PopularCoder]{
+object PopularCoder extends MongoHelpers with Function5[BSONObjectID,String, Option[String], Option[String], Long, PopularCoder]{
   import json._
 
   val collectionName = "popular"
@@ -40,7 +39,7 @@ object PopularCoder extends MongoHelpers with Function6[BSONObjectID,String, Opt
 
   def generateTweet(coderGuy: CoderGuy, ranks: Int, position: Int): String = {
     val maybeTwitter = coderGuy.twitterUser map ("@" + _.screenName)
-    val identification = maybeTwitter getOrElse coderGuy.gitHubUser.flatMap(_.fullname)
+    val identification = maybeTwitter getOrElse coderGuy.gitHubUser.flatMap(_.name)
     coderGuy.profileURL.map { url =>
       val key = if(ranks > 1) "popular.twitter.with.url.plurial" else "popular.twitter.with.url.singular"
       Messages(key, identification, ranks, url)
@@ -85,8 +84,7 @@ object PopularCoder extends MongoHelpers with Function6[BSONObjectID,String, Opt
         "pseudo" -> coder.pseudo,
         "fullname" -> coder.fullname,
         "description" -> coder.description,
-        "points" -> coder.points,
-        "language" -> coder.language
+        "points" -> coder.points
       )
     }
 
@@ -96,8 +94,7 @@ object PopularCoder extends MongoHelpers with Function6[BSONObjectID,String, Opt
       (__ \ 'pseudo).read[String] and
       (__ \ 'fullname).readNullable[String] and
       (__ \ 'description).readNullable[String] and
-      (__ \ 'points).read[Long] and
-      (__ \ 'language).readNullable[String]
+      (__ \ 'points).read[Long]
     )(PopularCoder)
   }
 }

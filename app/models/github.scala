@@ -14,28 +14,24 @@ import utils.{ Config, CacheHelpers }
 
 object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
 
-  implicit val readUser: Reads[GitHubUser] =
+  implicit val readGitHubUser: Reads[GitHubUser] =
     (
-      (__ \ 'username).read[String] and
-      (__ \ 'fullname).readNullable[String] and
-      (__ \ 'language).readNullable[String] and
-      (__ \ 'followers).read[Int] and
-      (__ \ 'location).readNullable[String] and
-      (__ \ 'repos).read[Int]
-    )((username, fullname, language, followers, location, reposCount) =>
-      GitHubUser(username, fullname, language, Some(followers), location, Some(reposCount))
-    )
+      (__ \ 'login).read[String] and
+      (__ \ 'html_url).read[String] and
+      (__ \ 'hireable).read[Boolean] and
+      (__ \ 'followers).read[Long] and
+      (__ \ 'blog).readNullable[String] and
+      (__ \ 'bio).readNullable[String] and
+      (__ \ 'email).readNullable[String] and
+      (__ \ 'name).readNullable[String] and
+      (__ \ 'company).readNullable[String] and
+      (__ \ 'avatar_url).readNullable[String] and
+      (__ \ 'gravatar_id).readNullable[String] and
+      (__ \ 'location).readNullable[String]
+    )((login, url, hireable, followers, blog, bio, email, name, company, avatar, gravatar, location) =>
+      GitHubUser(login, url, hireable, followers, blog, bio, email, name, company, avatar, gravatar, location))
 
-  implicit val gitHubUserWrites = new Writes[GitHubUser] {
-    def writes(gu: GitHubUser): JsValue = {
-      Json.obj(
-        "username" -> gu.username,
-        "fullname" -> gu.fullname,
-        "language" -> gu.language,
-        "followers" -> gu.followers
-      )
-    }
-  }
+  implicit val formatSearchedUser = Json.format[GitHubSearchedUser]
 
   implicit val readOrganization: Reads[GitHubOrg] =
     (
@@ -61,15 +57,24 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
     )
   }
 
-  def oauthURL = "client_id=" + Config.GitHub.clientID + "&client_secret=" + Config.GitHub.clientSecret
+  val oauthURL = "client_id=" + Config.GitHub.clientID + "&client_secret=" + Config.GitHub.clientSecret
 
-  def searchByFullname(fullname: String): Future[List[GitHubUser]] = {
+  def profile(username: String): Future[Option[GitHubUser]] = {
+    val url = "https://api.github.com/users/" + encode(username)
+    WS.url(url + "?" + oauthURL)
+      .withHeaders(etagFor(url):_*)
+      .get().map { implicit response =>
+      cachedResponseOrElse(url).asOpt[GitHubUser]
+    }
+  }
+
+  def searchByFullname(fullname: String): Future[List[GitHubSearchedUser]] = {
     val url = "https://api.github.com/legacy/user/search/" + encode(fullname)
     WS.url(url + "?" + oauthURL)
       .withHeaders(etagFor(url):_*)
       .get().map { implicit response =>
       (cachedResponseOrElse(url) \ "users") match {
-        case users: JsArray => users.asOpt[List[GitHubUser]] getOrElse Nil
+        case users: JsArray => users.asOpt[List[GitHubSearchedUser]] getOrElse Nil
         case o => throw new GitHubApiException("Failed seaching gitHub user by fullname : " + fullname)
       }
     }
@@ -133,14 +138,30 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
 case class GitHubApiException(message: String) extends Exception
 
 case class GitHubUser(
-  username: String,
+  login: String,
+  htmlUrl: String,
+  hireable: Boolean,
+  followers: Long,
+  blog: Option[String] = None,
+  bio: Option[String] = None,
+  email: Option[String] = None,
+  name: Option[String] = None,
+  company: Option[String] = None,
+  avatarUrl: Option[String] = None,
+  gravatarId: Option[String] = None,
+  location: Option[String] = None,
+  language: Option[String] = None,
+  repositories: List[GitHubRepository] = Nil,
+  organizations: List[GitHubOrg] = Nil
+)
+
+case class GitHubSearchedUser(
+  login: String,
   fullname: Option[String],
   language: Option[String],
   followers: Option[Int] = None,
   location: Option[String] = None,
-  reposCount: Option[Int] = None,
-  repositories: List[GitHubRepository] = Nil,
-  organizations: List[GitHubOrg] = Nil
+  reposCount: Option[Int] = None
 ) {
 
   private def escapeSpecialCaracters(fullname: String): String = {

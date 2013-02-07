@@ -16,18 +16,18 @@ case class CoderGuy(
 ) {
   def profileURL(): Option[String] = {
     for {
-      username <- gitHubUser map (_.username)
+      login <- gitHubUser map (_.login)
       language <- gitHubUser flatMap (_.language)
       fullname <- oneFullname
     } yield {
-      Config.baseURL + "/#" + controllers.routes.Application.profile(username, fullname, language).url
+      Config.baseURL + "/#" + controllers.routes.Application.profile(login, fullname, language).url
     }
   }
 
   lazy val oneFullname: Option[String] = {
     linkedInUser.map(_.fullName) orElse
     twitterUser.map(_.name) orElse
-    gitHubUser.flatMap(_.fullname)
+    gitHubUser.flatMap(_.name)
   }
 
   lazy val oneAvatar: Option[String] = {
@@ -79,8 +79,8 @@ object CoderGuy {
   implicit val gitHubUserWrites = new Writes[GitHubUser] {
     def writes(gu: GitHubUser): JsValue = {
       Json.obj(
-        "username" -> gu.username,
-        "fullname" -> gu.fullname,
+        "username" -> gu.login,
+        "fullname" -> gu.name,
         "language" -> gu.language,
         "followers" -> gu.followers,
         "repositories" -> gu.repositories,

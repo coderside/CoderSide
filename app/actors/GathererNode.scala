@@ -49,10 +49,10 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
     case CheckResult => if(waited == 0) {
       log.info("[GathererNode] Gathering done !")
       val coderGuy = CoderGuy(
-        gitHubResult map (_.profil),
-        linkedInResult map(_.profil),
-        twitterResult map (_.profil),
-        kloutResult map (_.profil),
+        gitHubResult map (_.gitHubUser),
+        linkedInResult map(_.linkedInUser),
+        twitterResult map (_.twitterUser),
+        kloutResult map (_.kloutUser),
         errors
       )
       PopularNode.ref ! UpdatePopular(coderGuy)
@@ -71,25 +71,25 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
       self ! Decrement
     }
 
-    case gr @ GitHubResult(profil) => {
+    case gr @ GitHubResult(profile) => {
       log.debug("[GathererNode] receiving github repositories")
       gitHubResult = Some(gr)
       self ! Decrement
     }
 
-    case lr @ LinkedInResult(profil) => {
+    case lr @ LinkedInResult(profile) => {
       log.debug("[GathererNode] receiving linkedIn profil")
       linkedInResult = Some(lr)
       self ! Decrement
     }
 
-    case kr @ KloutResult(profil) => {
+    case kr @ KloutResult(profile) => {
       log.debug("[GathererNode] receiving klout influence")
       kloutResult = Some(kr)
       self ! Decrement
     }
 
-    case tr @ TwitterResult(profil) => {
+    case tr @ TwitterResult(profile) => {
       log.debug("[GathererNode] receiving twitter profil & timeline")
       twitterResult = Some(tr)
       self ! Decrement

@@ -7,8 +7,8 @@
   case (None, _, Some(twitter)) => {
     @profile_header(twitter.name, twitter.description, None)
   }
-  case (None, Some(gitHub), None) if(gitHub.fullname.isDefined) => {
-    @profile_header(gitHub.fullname.getOrElse(""), "", None)
+  case (None, Some(gitHub), None) if(gitHub.name.isDefined) => {
+    @profile_header(gitHub.name.getOrElse(""), "", None)
   }
   case _ => {
   }

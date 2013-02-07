@@ -14,17 +14,17 @@ class PopularNode() extends Actor with ActorLogging {
   def receive = {
     case UpdatePopular(coderGuy) => {
       coderGuy.gitHubUser foreach { gitHub =>
-        PopularCoder.findByPseudo(gitHub.username)
+        PopularCoder.findByPseudo(gitHub.login)
           .collect { case Some(coderAsJson) => coderAsJson }
           .map (_.asOpt[PopularCoder])
           .collect { case Some(coder) => coder } map { coder =>
           PopularCoder.top(10) foreach { beforeAsJson =>
             val popularBefore = beforeAsJson.flatMap (_.asOpt[PopularCoder]) map(_.pseudo)
-            val positionBefore = popularBefore indexOf(gitHub.username)
+            val positionBefore = popularBefore indexOf(gitHub.login)
             coder.increment() foreach { pts =>
               PopularCoder.top(10) foreach { afterAsJson =>
                 val popularAfter = afterAsJson flatMap (_.asOpt[PopularCoder]) map (_.pseudo)
-                val positionAfter = popularAfter indexOf(gitHub.username)
+                val positionAfter = popularAfter indexOf(gitHub.login)
                 if(positionAfter < positionBefore) {
                   //TwitterAPI.updateStatuses(PopularCoder.generateTweet(coderGuy, positionBefore - positionAfter, positionAfter))
                 }
@@ -35,11 +35,10 @@ class PopularNode() extends Actor with ActorLogging {
           case e: NoSuchElementException => {
             val popularCoder = PopularCoder(
               BSONObjectID.generate,
-              gitHub.username,
+              gitHub.login,
               coderGuy.oneFullname,
               coderGuy.twitterUser map(_.description),
-              1,
-              gitHub.language
+              1
             )
             PopularCoder.uncheckedCreate(popularCoder)
           }

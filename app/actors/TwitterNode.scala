@@ -10,18 +10,18 @@ import Messages._
 class TwitterNode extends Actor with ActorLogging {
 
   def receive = {
-    case TwitterNodeQuery(gitHubUser, kloutRef, gathererRef) => {
+    case TwitterNodeQuery(searchedUser, kloutRef, gathererRef) => {
       log.debug("[TwitterNode] receiving new head query")
-      self ! TwitterUserQuery(gitHubUser, kloutRef, gathererRef)
+      self ! TwitterUserQuery(searchedUser, kloutRef, gathererRef)
     }
 
-    case TwitterUserQuery(gitHubUser, kloutRef, gathererRef) => {
-      log.debug("[TwitterNode] Getting twitter profil")
+    case TwitterUserQuery(searchedUser, kloutRef, gathererRef) => {
+      log.debug("[TwitterNode] Getting twitter profile")
 
       def handleResponse(response: List[TwitterUser], notFound: => Unit) = {
         response match {
           case Nil => notFound
-          case profils => Twitter.matchUser(gitHubUser, profils) foreach { found =>
+          case profiles => Twitter.matchUser(searchedUser, profiles) foreach { found =>
             self ! TwitterTimelineQuery(found, gathererRef)
             kloutRef ! KloutNodeQuery(found, gathererRef)
           }
@@ -36,11 +36,11 @@ class TwitterNode extends Actor with ActorLogging {
         }
       }
 
-      gitHubUser.fullname.filter(_ => gitHubUser.isFullnameOk) map { fname =>
+      searchedUser.fullname.filter(_ => searchedUser.isFullnameOk) map { fname =>
         TwitterAPI.searchBy(fname).map { byFullname =>
           handleResponse(
             byFullname,
-            TwitterAPI.searchBy(gitHubUser.username) map { byUsername =>
+            TwitterAPI.searchBy(searchedUser.login) map { byUsername =>
               handleResponse(byUsername, {
                 gathererRef ! NotFound("Twitter")
                 gathererRef ! NotFound("Klout")
@@ -50,7 +50,7 @@ class TwitterNode extends Actor with ActorLogging {
           )
         }
       } getOrElse {
-        TwitterAPI.searchBy(gitHubUser.username) map { byUsername =>
+        TwitterAPI.searchBy(searchedUser.login) map { byUsername =>
           handleResponse(
             byUsername, {
               gathererRef ! NotFound("Twitter")

@@ -12,11 +12,16 @@ class GitHubNode extends Actor with ActorLogging {
 
   def receive = {
 
-    case NodeQuery(gitHubUser, gathererRef) => {
+    case NodeQuery(searchedUser, gathererRef) => {
       log.debug("[GitHubNode] receiving new head query")
-      GitHubAPI.repositoriesByUser(gitHubUser.username) map { repos =>
-        self ! GitHubOrgQuery(gitHubUser.copy(repositories = repos), gathererRef)
-      } recover {
+      (for {
+        maybeProfile <- GitHubAPI.profile(searchedUser.login)
+        if(maybeProfile.isDefined)
+        repos <- GitHubAPI.repositoriesByUser(searchedUser.login)
+      } yield {
+        val profileWithRepos = maybeProfile.get.copy(repositories = repos)
+        self ! GitHubOrgQuery(profileWithRepos, gathererRef)
+      }) recover {
         case e: Exception => {
           log.error("[GitHubNode] Error while fetching user repositories")
           gathererRef ! ErrorQuery("GitHub", e)
@@ -26,7 +31,7 @@ class GitHubNode extends Actor with ActorLogging {
 
     case GitHubOrgQuery(gitHubUser, gathererRef) => {
       log.debug("[GitHubNode] receiving GitHub organization query")
-      GitHubAPI.organizations(gitHubUser.username) map { organizations =>
+      GitHubAPI.organizations(gitHubUser.login) map { organizations =>
         Promise.sequence(
           organizations.map { org =>
             GitHubAPI.repositoriesByOrg(org.login).map { repos =>
@@ -54,7 +59,7 @@ class GitHubNode extends Actor with ActorLogging {
       def contributions(repositories: List[GitHubRepository]): Future[List[GitHubRepository]] = {
         Promise.sequence(
           repositories map { repository =>
-            GitHubAPI.contributions(gitHubUser.username, repository) map { contrib =>
+            GitHubAPI.contributions(gitHubUser.login, repository) map { contrib =>
               repository.copy(contributions = contrib)
             }
           }

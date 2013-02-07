@@ -10,7 +10,7 @@ import play.api.libs.functional.syntax._
 import play.api.libs.oauth.{ OAuthCalculator, ConsumerKey, RequestToken }
 import utils.{ Config, CacheHelpers }
 import models.{ URLEncoder, Debug }
-import models.github.GitHubUser
+import models.github.GitHubSearchedUser
 
 object LinkedInAPI extends URLEncoder with Debug with CacheHelpers {
 
@@ -52,9 +52,9 @@ object LinkedInAPI extends URLEncoder with Debug with CacheHelpers {
 }
 
 object LinkedIn {
-  def matchUser(gitHubUser: GitHubUser, linkedInUsers: List[LinkedInUser]): Option[LinkedInUser] = {
+  def matchUser(searchedUser: GitHubSearchedUser, linkedInUsers: List[LinkedInUser]): Option[LinkedInUser] = {
     val matchFullname = (user: LinkedInUser) => {
-      gitHubUser.fullname.filter { name =>
+      searchedUser.fullname.filter { name =>
         val gitHubName = name.toLowerCase.trim
         user.fullName.toLowerCase.trim == gitHubName ||
         user.fullName.split(" ").reverse.mkString(" ").toLowerCase.trim == gitHubName
