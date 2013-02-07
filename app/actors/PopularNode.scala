@@ -26,7 +26,7 @@ class PopularNode() extends Actor with ActorLogging {
                 val popularAfter = afterAsJson flatMap (_.asOpt[PopularCoder]) map (_.pseudo)
                 val positionAfter = popularAfter indexOf(gitHub.username)
                 if(positionAfter < positionBefore) {
-                  TwitterAPI.updateStatuses(PopularCoder.generateTweet(coderGuy, positionBefore - positionAfter, positionAfter))
+                  //TwitterAPI.updateStatuses(PopularCoder.generateTweet(coderGuy, positionBefore - positionAfter, positionAfter))
                 }
               }
             }
