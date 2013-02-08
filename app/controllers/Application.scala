@@ -46,16 +46,17 @@ object Application extends Controller {
   def search(keywords: String) = Action {
     import GitHubAPI._
     Logger.debug("[Application] Pre-searching coder guy")
-    Async {
-      GitHubAPI.searchByFullname(keywords).map { gitHubUsers =>
-        Ok(views.html.results(gitHubUsers))
-      } recover {
-        case e: Exception => {
-          e.printStackTrace
-          InternalServerError(e.getMessage)
-        }
-      }
-    }
+    Ok(views.html.results(models.Mock.searchedGitHubUser()))
+    // Async {
+    //   GitHubAPI.searchByFullname(keywords).map { gitHubUsers =>
+    //     Ok(views.html.results(gitHubUsers))
+    //   } recover {
+    //     case e: Exception => {
+    //       e.printStackTrace
+    //       InternalServerError(e.getMessage)
+    //     }
+    //   }
+    // }
   }
 
   def profile(username: String, fullname: String, language: String) = Action {
@@ -64,19 +65,17 @@ object Application extends Controller {
     val lang = Option(language) filter (!_.trim.isEmpty) orElse Some("n/a")
     val gitHubUser = GitHubSearchedUser(username, name, lang)
     implicit val timeout = Timeout(Config.overviewTimeout)
-    Async {
-      (SupervisorNode.ref ? InitQuery(gitHubUser)).mapTo[CoderGuy].map { coderGuy =>
-        println("#################################")
-        println(coderGuy.gitHubUser)
-        println("#################################")
-        Ok(views.html.profile(coderGuy))
-      } recover {
-        case e: Exception => {
-          e.printStackTrace
-          InternalServerError(e.getMessage)
-        }
-      }
-    }
+    Ok(views.html.profile(models.Mock.coderGuy))
+    // Async {
+    //   (SupervisorNode.ref ? InitQuery(gitHubUser)).mapTo[CoderGuy].map { coderGuy =>
+    //     Ok(views.html.profile(coderGuy))
+    //   } recover {
+    //     case e: Exception => {
+    //       e.printStackTrace
+    //       InternalServerError(e.getMessage)
+    //     }
+    //   }
+    // }
   }
 
   def progress(username: String, fullname: String, language: String) = Action {

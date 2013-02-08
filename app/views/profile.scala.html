@@ -1,18 +1,6 @@
 @(coderGuy: models.CoderGuy)(implicit lang: Lang)
 
-@(coderGuy.linkedInUser, coderGuy.gitHubUser, coderGuy.twitterUser) match {
-  case (Some(linkedIn), _, _) => {
-    @profile_header(linkedIn.fullName, linkedIn.headline, coderGuy.oneAvatar)
-  }
-  case (None, _, Some(twitter)) => {
-    @profile_header(twitter.name, twitter.description, None)
-  }
-  case (None, Some(gitHub), None) if(gitHub.name.isDefined) => {
-    @profile_header(gitHub.name.getOrElse(""), "", None)
-  }
-  case _ => {
-  }
-}
+@profile_header(coderGuy)
 
 @coderGuy.gitHubUser.map { github =>
 <div class="github">

@@ -9,7 +9,6 @@ import models.klout._
 
 case class CoderGuy(
   gitHubUser: Option[GitHubUser],
-  linkedInUser: Option[LinkedInUser],
   twitterUser: Option[TwitterUser],
   kloutUser: Option[KloutUser],
   errors: Seq[(String, String)] = Nil
@@ -24,23 +23,27 @@ case class CoderGuy(
     }
   }
 
+  lazy val oneBio: Option[String] = {
+    gitHubUser.flatMap(_.bio) orElse
+    twitterUser.map(_.description)
+  }
+
   lazy val oneFullname: Option[String] = {
-    linkedInUser.map(_.fullName) orElse
-    twitterUser.map(_.name) orElse
-    gitHubUser.flatMap(_.name)
+    gitHubUser.flatMap(_.name) orElse
+    twitterUser.map(_.name)
   }
 
   lazy val oneAvatar: Option[String] = {
-    val linkedInAvatar = for {
-      linkedIn <- linkedInUser
-      avatar <- linkedIn.pictureUrl
-    } yield avatar
-
-    val twitterAvatar = for {
+    val maybeTwitterAvatar = for {
       twitter <- twitterUser
       avatar <- twitter.avatar
     } yield avatar
-    linkedInAvatar orElse twitterAvatar
+
+    val maybeGitHubAvatar = for {
+      gitHub <- gitHubUser
+      avatar <- gitHub.avatarUrl
+    } yield avatar
+    maybeGitHubAvatar orElse maybeTwitterAvatar
   }
 }
 
@@ -171,7 +174,6 @@ object CoderGuy {
     def writes(cg: CoderGuy): JsValue = {
       Json.obj(
         "gitHubUser"      -> cg.gitHubUser,
-        "linkedInUser"    -> cg.linkedInUser,
         "twitterUser"     -> cg.twitterUser,
         "kloutUser"       -> cg.kloutUser,
         "errors"          -> errorsAsJson(cg.errors)

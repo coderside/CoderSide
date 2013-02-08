@@ -1,13 +1,17 @@
-@(fullname: String, headline: String, avatar: Option[String])
+@(coderGuy: models.CoderGuy)
 
 <div class="linkedIn">
-  @if(avatar.isDefined) {
-  <img class="avatar" src="@avatar.get" />
+  @if(coderGuy.oneAvatar.isDefined) {
+  <img class="avatar" src="@coderGuy.oneAvatar.get" />
   } else {
   <img class="avatar default" src="@routes.Assets.at("images/github/gravatar-user-420.png")" />
   }
   <div class="info">
-    <span class="fullname">@fullname</span>
-    <span class="headline">@headline</span>
+    @coderGuy.oneFullname.map { fullname =>
+      <span class="fullname">@fullname</span>
+    }
+    @coderGuy.oneBio.map { bio =>
+      <span class="headline">bio</span>
+    }
   </div>
 </div>

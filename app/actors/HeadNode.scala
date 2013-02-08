@@ -19,7 +19,6 @@ class HeadNode() extends Actor with ActorLogging {
   def gathererNode(client: ActorRef) = context.actorOf(Props(new GathererNode(self)))
 
   val gitHubNode = context.actorOf(Props[GitHubNode])
-  val linkedInNode = context.actorOf(Props[LinkedInNode])
   val twitterNode = context.actorOf(Props[TwitterNode])
   val kloutNode = context.actorOf(Props[KloutNode])
 
@@ -31,7 +30,6 @@ class HeadNode() extends Actor with ActorLogging {
         log.debug("[HeadNode] Request added")
         requests += (searchedUser -> gathererRef)
         gitHubNode   ! NodeQuery(searchedUser, gathererRef)
-        linkedInNode ! NodeQuery(searchedUser, gathererRef)
         twitterNode  ! TwitterNodeQuery(searchedUser, kloutNode, gathererRef)
       }
       requests.get(searchedUser).foreach { gathererRef =>

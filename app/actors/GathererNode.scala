@@ -50,7 +50,6 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
       log.info("[GathererNode] Gathering done !")
       val coderGuy = CoderGuy(
         gitHubResult map (_.gitHubUser),
-        linkedInResult map(_.linkedInUser),
         twitterResult map (_.twitterUser),
         kloutResult map (_.kloutUser),
         errors
