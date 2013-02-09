@@ -6,6 +6,37 @@
 @font-text-half-bold: OpenSansSemibold;
 @font-display: OpenSansRegular, Helvetica;
 
+.btn {
+    border: 1px solid grey;
+    border-radius: 3px;
+    width: 100px;
+    height: 38px;
+    text-transform: uppercase;
+    margin-left: 10px;
+    font-size: 16pt;
+    text-align: center;
+    line-height: 1px;
+    font-family: @font-text-light;
+
+    &.white {
+        background: @grey1;
+        color: @black2;
+
+        &:hover {
+            border-color: black;
+            background: white;
+        }
+    }
+}
+
+a {
+    text-decoration: none;
+}
+
+.icon {
+    font-size: 14px;
+}
+
 a, p, span, li, dd, dt {
     font-family: @font-text;
 }

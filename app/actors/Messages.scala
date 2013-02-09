@@ -55,8 +55,6 @@ object Messages {
   //Gatherer Node to client
   case class Progress(request: String)
   //Head Node to gatherer node
-  object AskProgress
-  //Supervisor Node to head node
   case class AskProgress(searchedUser: GitHubSearchedUser)
   //Supervisor Node to head node
   case class NewClient(client: ActorRef)

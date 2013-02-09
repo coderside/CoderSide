@@ -57,8 +57,10 @@ class HeadNode() extends Actor with ActorLogging {
         } getOrElse {
           if(retries > 0) {
             log.debug("[HeadNode] Retrying to get progress channel: " + retries)
-            context.system.scheduler.scheduleOnce(1 seconds)(requestProgress(retries - 1))
-          } else s ! new Exception("Can't find progress channel")
+            context.system.scheduler.scheduleOnce(5 seconds)(requestProgress(retries - 1))
+          } else {
+            s ! new Exception("Can't find progress channel")
+          }
         }
       }
       requestProgress(3)
