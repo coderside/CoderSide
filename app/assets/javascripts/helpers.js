@@ -1,5 +1,5 @@
 /**
- * utils.js
+ * helpers.js
  */
 
 (function() {
@@ -22,6 +22,4 @@
         }
         return params;
     };
-
-    window.transitionend = 'transitionend webkitTransitionEnd oTransitionEnd otransitionend';
 })();

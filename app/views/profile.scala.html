@@ -85,7 +85,7 @@
   @twitter.timeline.map { timeline =>
   <ul class="tweets">
     @timeline.tweets.map { tweet =>
-    <li>@tweet.text</li>
+    <li>@Html(tweet.pretty)</li>
     }
   </ul>
   }

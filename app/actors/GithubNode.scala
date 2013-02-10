@@ -19,7 +19,7 @@ class GitHubNode extends Actor with ActorLogging {
         if(maybeProfile.isDefined)
         repos <- GitHubAPI.repositoriesByUser(searchedUser.login)
       } yield {
-        val profileWithRepos = maybeProfile.get.copy(repositories = repos)
+        val profileWithRepos = maybeProfile.get.copy(repositories = repos, language = searchedUser.language)
         self ! GitHubOrgQuery(profileWithRepos, gathererRef)
       }) recover {
         case e: Exception => {

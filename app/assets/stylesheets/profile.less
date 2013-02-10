@@ -46,7 +46,10 @@
             padding-left: 15px;
 
             .bio {
-                margin-top: 5px;
+                margin-top: 10px;
+                font-size: 13px;
+                width: 600px;
+                line-height: 1.5;
             }
 
             .identity {
@@ -176,7 +179,17 @@
             background: @grey2;
             font-size: 14px;
 
+            .tweet-link {
+                color: @red2;
+            }
+
             li {
+                a {
+                    color: @red2;
+                    &:hover {
+                        text-decoration: underline;
+                    }
+                }
                 padding: 15px;
                 margin-top: 10px;
 
