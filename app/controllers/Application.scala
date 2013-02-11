@@ -46,51 +46,49 @@ object Application extends Controller {
   def search(keywords: String) = Action {
     import GitHubAPI._
     Logger.debug("[Application] Pre-searching coder guy")
-    Ok(views.html.results(models.Mock.searchedGitHubUser()))
-    // Async {
-    //   GitHubAPI.searchByFullname(keywords).map { gitHubUsers =>
-    //     Ok(views.html.results(gitHubUsers))
-    //   } recover {
-    //     case e: Exception => {
-    //       e.printStackTrace
-    //       InternalServerError(e.getMessage)
-    //     }
-    //   }
-    // }
+    //Ok(views.html.results(models.Mock.searchedGitHubUser()))
+    Async {
+      GitHubAPI.searchByFullname(keywords).map { gitHubUsers =>
+        Ok(views.html.results(gitHubUsers))
+      } recover {
+        case e: Exception => {
+          e.printStackTrace
+          InternalServerError(e.getMessage)
+        }
+      }
+    }
   }
 
-  def profile(username: String, fullname: String, language: String) = Action {
+  def profile(username: String, fullname: String) = Action {
     Logger.debug("[Application] Searching coder guy")
     val name = Option(fullname) filter (!_.trim.isEmpty)
-    val lang = Option(language) filter (!_.trim.isEmpty) orElse Some("n/a")
-    val gitHubUser = GitHubSearchedUser(username, name, lang)
+    val gitHubUser = GitHubSearchedUser(username, name)
     implicit val timeout = Timeout(Config.overviewTimeout)
-    Ok(views.html.profile(models.Mock.coderGuy))
-    // Async {
-    //   (SupervisorNode.ref ? InitQuery(gitHubUser)).mapTo[CoderGuy].map { coderGuy =>
-    //     Ok(views.html.profile(coderGuy))
-    //   } recover {
-    //     case e: Exception => {
-    //       e.printStackTrace
-    //       InternalServerError(e.getMessage)
-    //     }
-    //   }
-    // }
+    //Ok(views.html.profile(models.Mock.coderGuy))
+    Async {
+      (SupervisorNode.ref ? InitQuery(gitHubUser)).mapTo[CoderGuy].map { coderGuy =>
+        Ok(views.html.profile(coderGuy))
+      } recover {
+        case e: Exception => {
+          e.printStackTrace
+          InternalServerError(e.getMessage)
+        }
+      }
+    }
   }
 
-  def progress(username: String, fullname: String, language: String) = Action {
+  def progress(username: String, fullname: String) = Action {
     val name = Option(fullname) filter (!_.trim.isEmpty)
-    val lang = Option(language) filter (!_.trim.isEmpty) orElse Some("n/a")
-    val gitHubUser = GitHubSearchedUser(username, name, lang)
+    val gitHubUser = GitHubSearchedUser(username, name)
     Async {
       implicit val timeout = Timeout(20.seconds)
-      (SupervisorNode.ref ? AskProgress(gitHubUser)).mapTo[Enumerator[Float]].map { progress =>
-        implicit val progressPulling = Comet.CometMessage[Float](_.toString)
+      (SupervisorNode.ref ? AskProgress(gitHubUser)).mapTo[Enumerator[Double]].map { progress =>
+        implicit val progressPulling = Comet.CometMessage[Double](_.toString)
         Ok.stream(progress &> EventSource())
           .withHeaders(CONTENT_TYPE -> "text/event-stream")
       } recover {
         case e: Exception => {
-          //e.printStackTrace
+          e.printStackTrace
           InternalServerError(e.getMessage)
         }
       }

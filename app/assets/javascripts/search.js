@@ -62,8 +62,7 @@
                 var $gitHubUser = $(this),
                     gitHubUser = {
                         username: $gitHubUser.find('.username').text(),
-                        fullname: $gitHubUser.find('.fullname').text(),
-                        language: $gitHubUser.find('.language').text()
+                        fullname: $gitHubUser.find('.fullname').text()
                     };
                 $gitHubUser.addClass('selected');
                 $gitHubUser.addClass('hover');

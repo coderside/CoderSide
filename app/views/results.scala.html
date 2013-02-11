@@ -1,9 +1,9 @@
 @(gitHubUsers: List[models.github.GitHubSearchedUser])(implicit lang: Lang)
   @gitHubUsers.sortBy(u => -u.followers.getOrElse(0)).map { gitHubUser =>
   <li class="result">
+    <div class="hint"></div>
     <div class="progress"></div>
     <div class="user">
-      <div class="hint"></div>
       <header>
         <span class="username">@gitHubUser.login</span>
         @gitHubUser.fullname.filter(!_.trim.isEmpty).map { fullname =>

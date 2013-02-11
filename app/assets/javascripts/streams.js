@@ -19,6 +19,7 @@
             progressES = new EventSource(uri);
             progressES.onmessage = function(msg) {
                 var progress = JSON.parse(msg.data);
+                console.log(progress);
                 if(progress >= 100) progressES.close();
                 if(CoderSide.home.isFirstLoading() || CoderSide.popular.oneSelected()) {
                     CoderSide.loading.progress(progress);

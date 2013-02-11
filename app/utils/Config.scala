@@ -14,8 +14,8 @@ object Config {
     }
   }
 
-  lazy val gathererWaited: Int = {
-    Play.configuration.getInt("gatherer.waited") getOrElse {
+  lazy val gathererWaited: Double = {
+    Play.configuration.getDouble("gatherer.waited") getOrElse {
       Logger.warn("[Config] Please provide GathererNode waited value")
       throw new ConfigException("Please provide GathererNode waited value")
     }

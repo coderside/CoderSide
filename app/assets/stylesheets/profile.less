@@ -54,6 +54,7 @@
         .info {
             float: left;
             padding-left: 15px;
+            width: 60%;
 
             .bio {
                 margin-top: 10px;
@@ -155,6 +156,21 @@
         color: @black4;
         padding-top: 0px;
 
+        .pretty-tweet {
+            a {
+                color: @red2;
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+
+            .tweet-link {
+                color: @red2;
+                display: inline;
+                padding: 0;
+            }
+        }
+
         .logo {
             background: url(../images/twitter/logo.png) no-repeat;
             background-size: 100%;
@@ -167,6 +183,7 @@
             margin-top: 10px;
             border: 1px solid @grey3;
             background: @grey4;
+            .pretty-tweet;
 
             span {
                 padding: 5px;
@@ -188,20 +205,12 @@
             border: 1px solid @grey3;
             background: @grey2;
             font-size: 14px;
-
-            .tweet-link {
-                color: @red2;
-            }
+            .pretty-tweet;
 
             li {
-                a {
-                    color: @red2;
-                    &:hover {
-                        text-decoration: underline;
-                    }
-                }
                 padding: 15px;
                 margin-top: 10px;
+                .pretty-tweet;
 
                 &:not(.last) {
                     border-bottom: 1px solid white;

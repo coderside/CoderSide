@@ -38,7 +38,7 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
       (__ \ 'login).read[String] and
       (__ \ 'repos_url).read[String] and
       (__ \ 'avatar_url).readNullable[String] and
-      (__ \ 'url).read[String]
+      (__ \ 'html_url).read[String]
     )((login, reposUrl, avatarUrl, url) => GitHubOrg(login, reposUrl, avatarUrl, url))
 
   implicit val readRepository: Reads[GitHubRepository] = {
@@ -158,7 +158,7 @@ case class GitHubUser(
 case class GitHubSearchedUser(
   login: String,
   fullname: Option[String],
-  language: Option[String],
+  language: Option[String] = None,
   followers: Option[Int] = None,
   location: Option[String] = None,
   reposCount: Option[Int] = None

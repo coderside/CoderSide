@@ -8,8 +8,7 @@
             var $coder = $(this),
                 coder = {
                     username: $coder.data('username'),
-                    fullname: $coder.data('fullname'),
-                    language: $coder.data('language')
+                    fullname: $coder.data('fullname')
                 };
             $('.popular .coders li').removeClass('selected');
             $coder.addClass('selected');

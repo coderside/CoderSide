@@ -20,6 +20,7 @@ class GitHubNode extends Actor with ActorLogging {
         repos <- GitHubAPI.repositoriesByUser(searchedUser.login)
       } yield {
         val profileWithRepos = maybeProfile.get.copy(repositories = repos, language = searchedUser.language)
+        gathererRef ! Decrement
         self ! GitHubOrgQuery(profileWithRepos, gathererRef)
       }) recover {
         case e: Exception => {
@@ -39,6 +40,7 @@ class GitHubNode extends Actor with ActorLogging {
             }
           }
         ) map { orgs =>
+          gathererRef ! Decrement
           self ! GitHubContribQuery(gitHubUser.copy(organizations = orgs), gathererRef)
         } recover {
           case e: Exception => {

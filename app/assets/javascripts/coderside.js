@@ -66,29 +66,27 @@ $(document).ready(function() {
                 } else CoderSide.search.showProgress();
 
                 var data = parseQueryString(params.queryString);
-                if(data.username && data.fullname && data.language) {
-                    CoderSide.resolve('/progress?' + params.queryString, 'get');
+                if(data.username && data.fullname) {
                     currentRequest = jsRoutes.controllers.Application.profile(
                         data.username,
-                        data.fullname,
-                        data.language
+                        data.fullname
                     ).ajax().done(function(response) {
                         CoderSide.profile.render(response);
                         CoderSide.transitions.toProfile().then(function() {
                             CoderSide.search.hideProgress();
                         });
                     });
+                    CoderSide.resolve('/progress?' + params.queryString, 'get');
                 }
             }
         },
         '/progress?*queryString': {
             get: function(any, params) {
                 var data = parseQueryString(params.queryString);
-                if(data.username && data.fullname && data.language && EventSource) {
+                if(data.username && data.fullname && EventSource) {
                     CoderSide.streams.progress(
                         data.username,
-                        data.fullname,
-                        data.language
+                        data.fullname
                     );
                 }
             }

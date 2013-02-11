@@ -13,7 +13,7 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
 
   context.setReceiveTimeout(Config.gathererTimeout)
 
-  val progress = Concurrent.broadcast[Float]
+  val progress = Concurrent.broadcast[Double]
   private var clients: List[ActorRef] = Nil
 
   private var waited = Config.gathererWaited
@@ -23,7 +23,7 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
   private var twitterResult: Option[TwitterResult] = None
   private var errors: Seq[(String, String)] = Nil
 
-  def computeProgress(): Float = 100 - ((waited / 4F) * 100)
+  def computeProgress(): Double = (100 - ((waited / Config.gathererWaited) * 100))
 
   def receive = {
     case AskProgress => {
@@ -76,12 +76,6 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
       self ! Decrement
     }
 
-    case lr @ LinkedInResult(profile) => {
-      log.debug("[GathererNode] receiving linkedIn profil")
-      linkedInResult = Some(lr)
-      self ! Decrement
-    }
-
     case kr @ KloutResult(profile) => {
       log.debug("[GathererNode] receiving klout influence")
       kloutResult = Some(kr)
@@ -89,7 +83,7 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
     }
 
     case tr @ TwitterResult(profile) => {
-      log.debug("[GathererNode] receiving twitter profil & timeline")
+      log.debug("[GathererNode] receiving twitter profile & timeline")
       twitterResult = Some(tr)
       self ! Decrement
     }

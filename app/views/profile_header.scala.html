@@ -16,7 +16,7 @@
       <h1 class="fullname">@fullname</h1>
     }
     @coderGuy.oneBio.map { bio =>
-      <p class="bio">@bio</p>
+      <p class="bio">@Html(bio)</p>
     }
     </div>
     @coderGuy.gitHubUser.map { gitHubUser =>
@@ -26,31 +26,31 @@
           <span class="followers">@gitHubUser.followers followers</span>
         </div>
       }
-      @gitHubUser.blog.map { blog =>
+      @gitHubUser.blog.filter(!_.trim.isEmpty).map { blog =>
         <div class="details">
           <span class="icon icon-globe"></span>
-          <a href="@blog" class="blog">@blog</a>
+          <a href="http://@blog" class="blog">@blog</a>
         </div>
       }
-      @gitHubUser.email.map { email =>
+      @gitHubUser.email.filter(!_.trim.isEmpty).map { email =>
         <div class="details">
           <span class="icon icon-envelope"></span>
           <span class="email">@email</span>
         </div>
       }
-      @gitHubUser.company.map { company =>
+      @gitHubUser.company.filter(!_.trim.isEmpty).map { company =>
         <div class="details">
           <span class="icon icon-building"></span>
           <span class="company">@company</span>
         </div>
       }
-      @gitHubUser.location.map { location =>
+      @gitHubUser.location.filter(!_.trim.isEmpty).map { location =>
         <div class="details">
           <span class="icon icon-pushpin"></span>
           <span class="location">@location</span>
         </div>
       }
-      @gitHubUser.language.map { language =>
+      @gitHubUser.language.filter(!_.trim.isEmpty).map { language =>
         <div class="details">
           <span class="icon icon-wrench"></span>
           <span class="language">@language</span>

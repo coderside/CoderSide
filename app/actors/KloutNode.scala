@@ -16,7 +16,10 @@ class KloutNode extends Actor with ActorLogging {
       KloutAPI.kloutID(twitterUser.screenName) map {
         case Some(kloutID) => {
           KloutAPI.kloutUser(kloutID) map {
-            case Some(kloutUser) => self ! KloutUserQuery(kloutUser, gathererRef)
+            case Some(kloutUser) => {
+              gathererRef ! Decrement
+              self ! KloutUserQuery(kloutUser, gathererRef)
+            }
             case None => gathererRef ! NotFound("Klout")
           } recover {
             case e: Exception => {

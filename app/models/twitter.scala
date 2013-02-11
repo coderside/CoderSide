@@ -144,15 +144,9 @@ object Twitter {
       twitterUser -> scoring(twitterUser, 0, conditions)
     }.sortBy (_._2).lastOption.map(_._1)
   }
-}
 
-case class Tweet(
-  text: String,
-  createdAt: Date,
-  retweeted: Boolean,
-  inReplyToUser: Boolean,
-  inReplyToStatus: Boolean
-) {
+  def pretty(text: String) = prettyHash(prettyUsername(prettyLink(text)))
+
   def prettyLink(text: String) = {
     val reg = new Regex("""(?i)(https?|ftp|file|http):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|]""")
     reg.replaceAllIn(text, link => """<a href="%s">%s</a>""".format(link, link));
@@ -167,8 +161,16 @@ case class Tweet(
     val reg = new Regex("""#(\w+)""", "hash")
     reg.replaceAllIn(text, m => """<span class="tweet-link">#</span><a href="http://search.twitter.com/search?q=%s">%s</a>""".format("%23" + (m group "hash"), m group "hash"));
   }
+}
 
-  def pretty = prettyHash(prettyUsername(prettyLink(text)))
+case class Tweet(
+  text: String,
+  createdAt: Date,
+  retweeted: Boolean,
+  inReplyToUser: Boolean,
+  inReplyToStatus: Boolean
+) {
+  def pretty = Twitter.pretty(text)
 }
 
 case class TwitterUser(
@@ -178,6 +180,9 @@ case class TwitterUser(
   followers: Int,
   avatar: Option[String],
   timeline: Option[TwitterTimeline] = None
-)
+) {
+  import Twitter._
+  def prettyDesc = Twitter.pretty(description)
+}
 
 case class TwitterApiException(message: String) extends Exception
