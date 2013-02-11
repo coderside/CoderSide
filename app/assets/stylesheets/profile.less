@@ -17,6 +17,16 @@
     opacity: 0;
     margin-left: 35px;
 
+    h2, h3 {
+        a {
+            text-decoration: none;
+            color: black;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+
     &.fade {
         .transition(opacity, 0.2s, ease);
         .transition(margin-left, 0.2s, ease);

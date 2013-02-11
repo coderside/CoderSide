@@ -2,7 +2,11 @@
 
 <div class="headline">
   @if(coderGuy.oneAvatar.isDefined) {
-  <img class="avatar" src="@coderGuy.oneAvatar.get" />
+  @coderGuy.gitHubUser.map { gitHub =>
+  <a href="@gitHub.htmlUrl">
+    <img class="avatar" src="@coderGuy.oneAvatar.get" />
+  </a>
+  }
   } else {
   <img class="avatar default" src="@routes.Assets.at("images/github/gravatar-user-420.png")" />
   }
