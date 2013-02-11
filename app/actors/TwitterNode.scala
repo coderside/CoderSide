@@ -12,7 +12,7 @@ class TwitterNode extends Actor with ActorLogging {
   def receive = {
     case TwitterNodeQuery(searchedUser, kloutRef, gathererRef) => {
       log.debug("[TwitterNode] receiving new head query")
-      gathererRef ! Decrement
+      gathererRef ! Decrement()
       self ! TwitterUserQuery(searchedUser, kloutRef, gathererRef)
     }
 
@@ -23,7 +23,7 @@ class TwitterNode extends Actor with ActorLogging {
         response match {
           case Nil => notFound
           case profiles => Twitter.matchUser(searchedUser, profiles) foreach { found =>
-            gathererRef ! Decrement
+            gathererRef ! Decrement()
             self ! TwitterTimelineQuery(found, gathererRef)
             kloutRef ! KloutNodeQuery(found, gathererRef)
           }
@@ -33,8 +33,8 @@ class TwitterNode extends Actor with ActorLogging {
       val handleSearchError: PartialFunction[Throwable, Unit] = {
         case e: Exception => {
           log.error("[TwitterNode] Error while searching twitter user: " + e.getMessage)
-          gathererRef ! ErrorQuery("Twitter", e) //twitter
-          gathererRef ! ErrorQuery("Klout", e) //klout
+          gathererRef ! ErrorQuery("Twitter", e, 2) //twitter
+          gathererRef ! ErrorQuery("Klout", e, 2) //klout
         }
       }
 
@@ -44,8 +44,8 @@ class TwitterNode extends Actor with ActorLogging {
             byFullname,
             TwitterAPI.searchBy(searchedUser.login) map { byUsername =>
               handleResponse(byUsername, {
-                gathererRef ! NotFound("Twitter")
-                gathererRef ! NotFound("Klout")
+                gathererRef ! NotFound("Twitter", 2)
+                gathererRef ! NotFound("Klout", 2)
               }
               )
             } recover(handleSearchError)
@@ -55,8 +55,8 @@ class TwitterNode extends Actor with ActorLogging {
         TwitterAPI.searchBy(searchedUser.login) map { byUsername =>
           handleResponse(
             byUsername, {
-              gathererRef ! NotFound("Twitter")
-              gathererRef ! NotFound("Klout")
+              gathererRef ! NotFound("Twitter", 2)
+              gathererRef ! NotFound("Klout", 2)
             })
         } recover(handleSearchError)
       }
@@ -69,7 +69,7 @@ class TwitterNode extends Actor with ActorLogging {
       } recover {
         case e: Exception => {
           log.error("[TwitterNode] Error while fetching twitter user timeline: " + e.getMessage)
-          gathererRef ! ErrorQuery("Twitter", e)
+          gathererRef ! ErrorQuery("Twitter", e, 1)
         }
       }
     }

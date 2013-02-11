@@ -18,7 +18,6 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
 
   private var waited = Config.gathererWaited
   private var gitHubResult: Option[GitHubResult] = None
-  private var linkedInResult: Option[LinkedInResult] = None
   private var kloutResult: Option[KloutResult] = None
   private var twitterResult: Option[TwitterResult] = None
   private var errors: Seq[(String, String)] = Nil
@@ -38,8 +37,8 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
       clients = clients :+ client
     }
 
-    case Decrement => {
-      waited = waited - 1
+    case Decrement(nb) => {
+      waited = waited - nb
       log.debug("[GatererNode] Decrementing to " + waited)
       val (_, pushHere) = progress
       pushHere.push(computeProgress())
@@ -59,33 +58,33 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
       headNode ! End(self)
     }
 
-    case NotFound(message) => {
+    case NotFound(message, notProcessed) => {
       log.info("[GathererNode] NotFound from %s well received".format(message))
-      self ! Decrement
+      self ! Decrement(notProcessed)
     }
 
-    case ErrorQuery(from, e) => {
+    case ErrorQuery(from, e, notProcessed) => {
       log.info("[GathererNode] Error well received: " + e.getMessage)
       errors = (from, e.getMessage) +: errors
-      self ! Decrement
+      self ! Decrement(notProcessed)
     }
 
     case gr @ GitHubResult(profile) => {
       log.debug("[GathererNode] receiving github repositories")
       gitHubResult = Some(gr)
-      self ! Decrement
+      self ! Decrement()
     }
 
     case kr @ KloutResult(profile) => {
       log.debug("[GathererNode] receiving klout influence")
       kloutResult = Some(kr)
-      self ! Decrement
+      self ! Decrement()
     }
 
     case tr @ TwitterResult(profile) => {
       log.debug("[GathererNode] receiving twitter profile & timeline")
       twitterResult = Some(tr)
-      self ! Decrement
+      self ! Decrement()
     }
 
     case ReceiveTimeout => {

@@ -13,6 +13,6 @@ object ApplicationBuild extends Build {
     )
 
     val main = play.Project(appName, appVersion, appDependencies).settings(
-      resolvers += "sgodbillon" at "https://bitbucket.org/sgodbillon/repository/raw/master/snapshots/"
+      resolvers := "typesafe" at "http://repo.typesafe.com/typesafe/repo"
     )
 }

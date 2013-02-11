@@ -4,12 +4,11 @@ import akka.actor.ActorRef
 import models.github._
 import models.twitter.{ TwitterUser, TwitterTimeline }
 import models.klout.KloutUser
-import models.linkedin.LinkedInUser
 import models.CoderGuy
 
 object Messages {
   //Node to Gatherer
-  case class ErrorQuery(from: String, e: Throwable)
+  case class ErrorQuery(from: String, e: Throwable, notProcessed: Int)
   //Application to Supervisor.
   case class InitQuery(searchedUser: GitHubSearchedUser)
   //Supervisor to Head
@@ -32,8 +31,6 @@ object Messages {
   case class GitHubContribQuery(gitHubUser: GitHubUser, gathererRef: ActorRef)
   //GitHub to Gatherer
   case class GitHubResult(gitHubUser: GitHubUser)
-  //LinkedIn to Gatherer
-  case class LinkedInResult(linkedInUser: LinkedInUser)
   //Klout to Gatherer
   case class KloutResult(kloutUser: KloutUser)
   //Twitter to Gatherer
@@ -49,9 +46,9 @@ object Messages {
   //For Gatherer only. Check if the gatering is complete
   object CheckResult
   //For Gatherer only. Decrement the rest of waited sub results
-  object Decrement
+  case class Decrement(nb: Int = 1)
   //Node to Gatherer
-  case class NotFound(message: String)
+  case class NotFound(message: String, notProcessed: Int)
   //Gatherer Node to client
   case class Progress(request: String)
   //Head Node to gatherer node

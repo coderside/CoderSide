@@ -17,22 +17,22 @@ class KloutNode extends Actor with ActorLogging {
         case Some(kloutID) => {
           KloutAPI.kloutUser(kloutID) map {
             case Some(kloutUser) => {
-              gathererRef ! Decrement
+              gathererRef ! Decrement()
               self ! KloutUserQuery(kloutUser, gathererRef)
             }
-            case None => gathererRef ! NotFound("Klout")
+            case None => gathererRef ! NotFound("Klout", 2)
           } recover {
             case e: Exception => {
               log.error("[KloutNode] Error while getting klout user: " + e.getMessage)
-              gathererRef ! ErrorQuery("Klout", e)
+              gathererRef ! ErrorQuery("Klout", e, 2)
             }
           }
         }
-        case None => gathererRef ! NotFound("Klout")
+        case None => gathererRef ! NotFound("Klout", 2)
       } recover {
         case e: Exception => {
           log.error("[KloutNode] Error while getting klout ID: " + e.getMessage)
-          gathererRef ! ErrorQuery("Klout", e)
+          gathererRef ! ErrorQuery("Klout", e, 2)
         }
       }
     }
@@ -53,14 +53,14 @@ class KloutNode extends Actor with ActorLogging {
           } recover {
             case e: Exception => {
               log.error("[KloutNode] Error while getting influence (second part): " + e.getMessage)
-              gathererRef ! ErrorQuery("Klout", e)
+              gathererRef ! ErrorQuery("Klout", e, 1)
             }
           }
         }
       } recover {
         case e: Exception => {
           log.error("[KloutNode] Error while getting influence ID (first part): " + e.getMessage)
-          gathererRef ! ErrorQuery("Klout", e)
+          gathererRef ! ErrorQuery("Klout", e, 1)
         }
       }
     }

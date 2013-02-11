@@ -20,12 +20,12 @@ class GitHubNode extends Actor with ActorLogging {
         repos <- GitHubAPI.repositoriesByUser(searchedUser.login)
       } yield {
         val profileWithRepos = maybeProfile.get.copy(repositories = repos, language = searchedUser.language)
-        gathererRef ! Decrement
+        gathererRef ! Decrement()
         self ! GitHubOrgQuery(profileWithRepos, gathererRef)
       }) recover {
         case e: Exception => {
           log.error("[GitHubNode] Error while fetching user repositories")
-          gathererRef ! ErrorQuery("GitHub", e)
+          gathererRef ! ErrorQuery("GitHub", e, 3)
         }
       }
     }
@@ -40,18 +40,18 @@ class GitHubNode extends Actor with ActorLogging {
             }
           }
         ) map { orgs =>
-          gathererRef ! Decrement
           self ! GitHubContribQuery(gitHubUser.copy(organizations = orgs), gathererRef)
+          gathererRef ! Decrement()
         } recover {
           case e: Exception => {
             log.error("[GitHubNode] Error while fetching user organizations repos: " + e.getMessage)
-            gathererRef ! ErrorQuery("GitHub", e)
+            gathererRef ! ErrorQuery("GitHub", e, 2)
           }
         }
       } recover {
         case e: Exception => {
           log.error("[GitHubNode] Error while fetching user organizations: " + e.getMessage)
-          gathererRef ! ErrorQuery("GitHub", e)
+          gathererRef ! ErrorQuery("GitHub", e, 2)
         }
       }
     }
@@ -80,14 +80,14 @@ class GitHubNode extends Actor with ActorLogging {
           case e: Exception => {
             e.printStackTrace
             log.error("[GitHubNode] Error while fetching contribution for his repositories: " + e.getMessage)
-            gathererRef ! ErrorQuery("GitHub", e)
+            gathererRef ! ErrorQuery("GitHub", e, 1)
           }
         }
       } recover {
         case e: Exception => {
           e.printStackTrace
           log.error("[GitHubNode] Error while fetching contribution for his repositories: " + e.getMessage)
-          gathererRef ! ErrorQuery("GitHub", e)
+          gathererRef ! ErrorQuery("GitHub", e, 1)
         }
       }
     }

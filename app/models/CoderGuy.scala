@@ -4,7 +4,6 @@ import play.api.mvc.RequestHeader
 import utils.Config
 import models.github._
 import models.twitter._
-import models.linkedin._
 import models.klout._
 
 case class CoderGuy(
@@ -23,13 +22,13 @@ case class CoderGuy(
   }
 
   lazy val oneBio: Option[String] = {
-    gitHubUser.flatMap(_.bio) orElse
-    twitterUser.map(_.prettyDesc)
+    gitHubUser.flatMap(_.bio) filter(!_.trim.isEmpty) orElse
+    twitterUser.map(_.prettyDesc) filter(!_.trim.isEmpty)
   }
 
   lazy val oneFullname: Option[String] = {
-    gitHubUser.flatMap(_.name) orElse
-    twitterUser.map(_.name)
+    gitHubUser.flatMap(_.name) filter(!_.trim.isEmpty) orElse
+    twitterUser.map(_.name) filter(!_.trim.isEmpty)
   }
 
   lazy val oneAvatar: Option[String] = {

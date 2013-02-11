@@ -38,7 +38,7 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
       (__ \ 'login).read[String] and
       (__ \ 'repos_url).read[String] and
       (__ \ 'avatar_url).readNullable[String] and
-      (__ \ 'html_url).read[String]
+      (__ \ 'url).read[String]
     )((login, reposUrl, avatarUrl, url) => GitHubOrg(login, reposUrl, avatarUrl, url))
 
   implicit val readRepository: Reads[GitHubRepository] = {
@@ -82,7 +82,7 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
 
   def repositoriesByUser(username: String): Future[List[GitHubRepository]] = {
     val url = "https://api.github.com/users/%s/repos".format(encode(username))
-    WS.url(url + "?" + oauthURL)
+    WS.url(url + "?sort=pushed&direction=asc" + oauthURL)
       .withHeaders(lastModifiedFor(url):_*)
       .get().map { implicit response =>
       cachedResponseOrElse(url) match {
@@ -108,9 +108,12 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
     val url = "https://api.github.com/users/%s/orgs".format(encode(username))
     WS.url(url + "?" + oauthURL)
       .withHeaders(lastModifiedFor(url):_*)
-      .get().map { implicit response =>
+      .get().map(debug).map { implicit response =>
       (cachedResponseOrElse(url)) match {
-        case orgs: JsArray => orgs.asOpt[List[GitHubOrg]] getOrElse Nil
+        case orgs: JsArray => {
+          println(orgs.as[List[GitHubOrg]])
+          orgs.asOpt[List[GitHubOrg]] getOrElse Nil
+        }
         case r => throw new GitHubApiException("Failed getting organizations for : " + username)
       }
     }

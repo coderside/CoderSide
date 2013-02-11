@@ -15,12 +15,10 @@ import akka.util.Timeout
 import actors.{ SupervisorNode, GathererNode }
 import actors.Messages.{ InitQuery, AskProgress }
 import models.github._
-import models.{ CoderGuy, PopularCoder }
-import utils.Config
-
-import models.linkedin._
 import models.twitter._
 import models.klout._
+import models.{ CoderGuy, PopularCoder }
+import utils.Config
 
 object Application extends Controller {
 
