@@ -13,6 +13,6 @@ object ApplicationBuild extends Build {
     )
 
     val main = play.Project(appName, appVersion, appDependencies).settings(
-      resolvers := "typesafe" at "http://repo.typesafe.com/typesafe/repo"
+      resolvers := Seq("typesafe" at "http://repo.typesafe.com/typesafe/repo")
     )
 }

@@ -33,12 +33,33 @@
         );
 
         this.fadeIn = function() {
-            var $parent = $container();
-            //spinner.spin($target()[0]);
-            $progress().css('width', '0%');
-            this.displayTimeline();
-            $parent.show();
-            return Zanimo.transition($parent[0], 'opacity', 1, 200, 'ease');
+            var self = this,
+                $spinContainer = $('.spin-container');
+            spinner.spin($spinContainer[0]);
+            var fadeInTimeline = function(retry) {
+                var $parent = $('.twitter-waiting');
+                return function() {
+                    if((retry || 0) < 3) {
+                        var $waiting = $('.twitter-waiting'),
+                            $timeline = $('iframe.twitter-timeline');
+                        $progress().css('width', '10%');
+                        if($timeline.length) {
+                            $spinContainer.empty();
+                            $waiting.show();
+                            $timeline.show();
+                            Zanimo.transition($waiting[0], 'opacity', 1, 500, 'ease');
+                            Zanimo.transition($timeline[0], 'opacity', 1, 500, 'ease');
+                        } else {
+                            retry = retry ? (retry + 1) : 1;
+                            setTimeout(fadeInTimeline(retry), 1000);
+                        }
+                    }
+                };
+            };
+            var $loading = $container();
+            $loading.show();
+            Zanimo.transition($loading[0], 'opacity', 1, 200, 'ease');
+            fadeInTimeline()();
         };
 
         this.fadeOut = function() {
@@ -77,10 +98,6 @@
                     fjs.parentNode.insertBefore(js,fjs);
                 }
             }(document,"script","twitter-wjs");
-        };
-
-        this.displayTimeline = function() {
-            $('.twitter-waiting').show();
         };
     };
 })();
