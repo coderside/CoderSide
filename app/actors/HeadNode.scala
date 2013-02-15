@@ -1,6 +1,7 @@
 package actors
 
 import scala.util.{ Success, Failure }
+import scala.concurrent.Future
 import scala.concurrent.duration._
 import akka.actor.OneForOneStrategy
 import akka.actor.SupervisorStrategy._
@@ -15,7 +16,10 @@ import Messages._
 
 class HeadNode() extends Actor with ActorLogging {
 
-  var requests: Map[GitHubSearchedUser, ActorRef] = Map.empty
+  var currentRequests: Map[GitHubSearchedUser, ActorRef] = Map.empty
+  var waitingClients: Map[GitHubSearchedUser, ActorRef] = Map.empty
+  var waitingListeners: Map[GitHubSearchedUser, List[ActorRef]] = Map.empty
+
   def gathererNode(client: ActorRef) = context.actorOf(Props(new GathererNode(self)))
 
   val gitHubNode = context.actorOf(Props[GitHubNode])
@@ -23,57 +27,71 @@ class HeadNode() extends Actor with ActorLogging {
   val kloutNode = context.actorOf(Props[KloutNode])
 
   def receive = {
+
     case HeadQuery(searchedUser, client) => {
       log.debug("[HeadNode] receiving new init query")
       val gathererRef = gathererNode(client)
-      if(!requests.get(searchedUser).isDefined) {
-        log.debug("[HeadNode] Request added")
-        requests += (searchedUser -> gathererRef)
-        gitHubNode   ! NodeQuery(searchedUser, gathererRef)
-        twitterNode  ! TwitterNodeQuery(searchedUser, kloutNode, gathererRef)
-      }
-      requests.get(searchedUser).foreach { gathererRef =>
-        gathererRef ! NewClient(client)
+      (currentRequests.get(searchedUser), waitingListeners.get(searchedUser)) match {
+        case (None, None) => waitingClients += (searchedUser -> client)
+        case (None, Some(listeners)) => {
+          currentRequests += (searchedUser -> gathererRef)
+          launchSearch(gathererRef, searchedUser)
+          waitingListeners -= searchedUser
+          gathererRef ! NewClient(client)
+          listeners foreach (giveProgressStream(gathererRef, _))
+        }
+        case (Some(_), _) => gathererRef ! NewClient(client)
       }
     }
 
     case AskProgress(searchedUser) => {
-      implicit val timeout = Timeout(20 seconds)
-      val s = sender
       log.debug("[HeadNode] AskProgress received")
-      def requestProgress(retries: Int) {
-        requests.get(searchedUser).map { gathererRef =>
-          log.debug("[HeadNode] Ok, ask for progress channel")
-          (gathererRef ? AskProgress).mapTo[Enumerator[Float]].onComplete {
-            case Success(progress: Enumerator[Float]) => {
-              log.debug("[HeadNode] Ok, I received progress channel :)")
-              s ! progress
-            }
-            case Failure(e) => {
-              log.error("[HeadNode] failed getting progress")
-              sender ! e
-            }
-          }
-        } getOrElse {
-          if(retries > 0) {
-            log.debug("[HeadNode] Retrying to get progress channel: " + retries)
-            context.system.scheduler.scheduleOnce(5 seconds)(requestProgress(retries - 1))
-          } else {
-            s ! new Exception("Can't find progress channel")
+      (currentRequests.get(searchedUser), waitingClients.get(searchedUser)) match {
+        case (Some(gathererRef), _) => giveProgressStream(gathererRef, sender)
+        case (None, Some(client)) => {
+          val gathererRef = gathererNode(client)
+          currentRequests += (searchedUser -> gathererRef)
+          waitingClients -= searchedUser
+          launchSearch(gathererRef, searchedUser)
+          giveProgressStream(gathererRef, sender)
+          gathererRef ! NewClient(client)
+        }
+        case (None, None) => {
+          waitingListeners.get(searchedUser) match {
+            case Some(listeners) => waitingListeners += (searchedUser -> (sender :: listeners))
+            case None => waitingListeners += (searchedUser -> List(sender))
           }
         }
       }
-      requestProgress(3)
     }
 
     case End(gathererRef) => {
       log.debug("[HeadNode] End received !")
-      val found  = requests.find { case (_, ref) =>  ref == gathererRef }
+      val found  = currentRequests find { case (_, ref) =>  ref == gathererRef }
       if(found.isDefined) {
-        requests = requests.filter { case (_, ref) => ref != gathererRef }
+        currentRequests = currentRequests filter { case (_, ref) => ref != gathererRef }
         context.stop(gathererRef)
       }
     }
+  }
+
+  private def giveProgressStream(gathererRef: ActorRef, listener: ActorRef) = {
+    implicit val timeout = Timeout(20 seconds)
+    (gathererRef ? AskProgress).mapTo[Enumerator[Double]].map {
+      case (progress: Enumerator[Double]) => {
+        log.debug("[HeadNode] Ok, I received progress channel :)")
+        listener ! progress
+      }
+      case e: Exception => {
+        log.error("[HeadNode] failed getting progress")
+        listener ! e
+      }
+    }
+  }
+
+  private def launchSearch(gathererRef: ActorRef, searchedUser: GitHubSearchedUser) = {
+    gitHubNode   ! NodeQuery(searchedUser, gathererRef)
+    twitterNode  ! TwitterNodeQuery(searchedUser, kloutNode, gathererRef)
   }
 
   override def supervisorStrategy =

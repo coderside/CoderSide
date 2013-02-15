@@ -35,14 +35,14 @@
         this.fadeIn = function() {
             var self = this,
                 $spinContainer = $('.spin-container');
-            spinner.spin($spinContainer[0]);
+            //spinner.spin($spinContainer[0]);
             var fadeInTimeline = function(retry) {
                 var $parent = $('.twitter-waiting');
                 return function() {
                     if((retry || 0) < 3) {
                         var $waiting = $('.twitter-waiting'),
                             $timeline = $('iframe.twitter-timeline');
-                        $progress().css('width', '10%');
+                        $progress().css('width', '0%');
                         if($timeline.length) {
                             $spinContainer.empty();
                             $waiting.show();
@@ -78,11 +78,6 @@
         };
 
         this.progress = function(value) {
-            if(value >= 50) {
-                this.refreshSpinner({
-                    color: 'white'
-                });
-            }
             $progress().css('width', value + '%');
         };
 
