@@ -10,9 +10,9 @@ import play.api.libs.functional.syntax._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import models.twitter.TwitterUser
 import utils.Config
-import models.URLEncoder
+import models.{ URLEncoder, Debug }
 
-object KloutAPI extends URLEncoder {
+object KloutAPI extends URLEncoder with Debug {
 
   implicit val readInfluence: Reads[KloutUser] = {
     (
@@ -22,7 +22,7 @@ object KloutAPI extends URLEncoder {
     )((id, nick, score) => KloutUser(id, nick, score))
   }
 
-  implicit val readUser: Reads[KloutUser] = {
+  val readUser: Reads[KloutUser] = {
     (
       (__ \ 'kloutId).read[String] and
       (__ \ 'nick).read[String] and
@@ -67,12 +67,8 @@ object KloutAPI extends URLEncoder {
     WS.url(uri)
       .withQueryString("key" -> Config.Klout.key)
       .get().map(_.json).map { influence =>
-        val influencers = (influence \ "myInfluencers" \\ "entity").flatMap { influencer =>
-          readInfluence.reads(influencer).asOpt
-        }.toList
-        val influencees = (influence \ "myInfluencees" \\ "entity").flatMap { influencee =>
-          readInfluence.reads(influencee).asOpt
-        }.toList
+        val influencers = JsArray(influence \ "myInfluencers" \\ "entity").as[List[KloutUser]]
+        val influencees = JsArray(influence \ "myInfluencees" \\ "entity").as[List[KloutUser]]
         Influence(influencers, influencees)
     }
   }

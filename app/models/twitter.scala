@@ -60,13 +60,9 @@ object TwitterAPI extends URLEncoder with Debug with CacheHelpers {
   }
 
   def show(twitterID: String): Future[Option[TwitterUser]] = {
-    val url = "https://api.twitter.com/1/users/show.json"
+    val url = "https://api.twitter.com/1/users/show.json?user_id=%s&screen_name=%s".format(twitterID, twitterID)
     WS.url(url)
       .withHeaders(lastModifiedFor(url):_*)
-      .withQueryString(
-         "user_id" -> twitterID,
-         "screen_name" -> twitterID
-      )
       .sign(signatureCalcSearch)
       .get().map (implicit response => cachedResponseOrElse(url))
       .map { twitterUser =>
