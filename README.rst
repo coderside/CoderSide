@@ -1,5 +1,5 @@
 ########
-CoderGuy
+CoderSide
 ########
 
 - Don't you ever ask google for having more information about one coder guy ?
@@ -17,11 +17,11 @@ How does it work ?
 This application is a mashup that takes data from several others web apps :
 
 - LinkedIn : current job (headline).
-- GitHub : repositories, number of followers & forks.
-- Twitter : description, number of followers, timeline.
+- GitHub : repositories, followers, forks, contributions.
+- Twitter : description, followers, timeline.
 - Klout : score, influencers, influencees and their Twitter/Klout account.
 
-CoderGuy assume that the searched coder guy must have a GitHub account. This is the entry point of the application.
+CoderSide assume that the searched coder guy must have a GitHub account. This is the entry point of the application.
 
 Process
 -------
@@ -31,12 +31,6 @@ The process of the application is quite short & simple :
 1. Search on GitHub the coder guy by his fullname (or others criteria like his pseudo).
 2. The search can return more than one GitHub account. You have to select the good one.
 3. Once selected, the searching process is launch. This can take some seconds to return a result.
-
-Limitation
-----------
-
-| Twitter limits the application to 150 requests per hour.
-| The GitHub limitation is 60 requests per hour.
 
 Technical solution
 ==================
@@ -109,20 +103,8 @@ HeadNode
 GitHubNode
 ^^^^^^^^^^
 
-| GitHubNode plays with GitHub API to retrieve the repositories of the searched guy.
+| GitHubNode plays with GitHub API to retrieve the profile & the repositories of the searched guy.
 | Once done, it sends the result to GathererNode.
-
-LinkedInNode
-^^^^^^^^^^^^
-
-| LinkedInNode plays with LinkedIn API to retrieve some extra data like the avatar & the headline of the searched guy.
-| We can't search a user on LinkedIn with an identifier like address email.
-| The only choice is to use the fullname of the GutHub account to query LinkedIn.
-| To improve the query, I combine the fullname with the "industry" facet offered by LinkedIn.
-| I use all facets that are related to computering.
-| Obviously, the search returns more than one LinkedIn account.
-| The challange was to select the good one. The idea is to use some information from GitHub account to optimize the result.
-| Finally, the found LinkedIn account is sent to GathererNode.
 
 TwitterNode
 ^^^^^^^^^^^
@@ -189,20 +171,6 @@ Drawbacks
    | But the node N2 doesn't know what data to send to the client.
 
 To resolve those two concerns, we could centralize the data through a database.
-
-Setting Up
-==========
-
-| To run CoderGuy, you only need the amazing playframework 2.1-RC1 (scala).
-| If you can't wait anymore to use CoderGuy, I deploy it on dotcloud here : http://coderguy-typsafe.dotcloud.com
-| It's just a free account, so be patient while using the application.
-| It's possible that the number of requests against API (GitHub or Twitter) exceeds the limit.
-| As a workaround, just run CoderGuy on your computer.
-
-Note
-====
-
-I was the only developper who works on this project.
 
 Licence
 =======
