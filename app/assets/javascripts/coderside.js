@@ -17,7 +17,6 @@ $(document).ready(function() {
         '/' : {
             get: function() {
                 console.log('Welcome to CoderSide !');
-                //CoderSide.loading.preLoadTimeline();
                 clearConnections();
                 if(!CoderSide.home.exist()) {
                     jsRoutes.controllers.Application.home().ajax().done(function(response) {
@@ -66,10 +65,10 @@ $(document).ready(function() {
                 } else CoderSide.search.showProgress();
 
                 var data = parseQueryString(params.queryString);
-                if(data.username && data.fullname) {
+                if(data.username) {
                     currentRequest = jsRoutes.controllers.Application.profile(
                         data.username,
-                        data.fullname
+                        data.fullname || ""
                     ).ajax().done(function(response) {
                         CoderSide.profile.render(response);
                         CoderSide.transitions.toProfile().then(function() {
@@ -83,7 +82,7 @@ $(document).ready(function() {
         '/progress?*queryString': {
             get: function(any, params) {
                 var data = parseQueryString(params.queryString);
-                if(data.username && data.fullname && EventSource) {
+                if(data.username) {
                     CoderSide.streams.progress(
                         data.username,
                         data.fullname
