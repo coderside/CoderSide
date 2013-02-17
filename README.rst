@@ -76,7 +76,7 @@ Scatter-Gatherer design
 
 Here how I organize the searching process through the actors :
 
-.. image:: CoderGuy/raw/master/readme/scatter-gather-small.png
+.. image:: CoderSide/raw/master/readme/scatter-gather-small.png
 
 For the next part, I will describe each actor.
 
@@ -155,7 +155,7 @@ NB : To test it with a single computer, you need to use two different browsers.
 Drawbacks
 ---------
 
-| CoderGuy doesn't work like we would want in a clustered environment.
+| CoderSide doesn't work like we would want in a clustered environment.
 | Why ?
 
 | There are two main issues :
