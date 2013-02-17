@@ -82,6 +82,7 @@ class HeadNode() extends Actor with ActorLogging {
         log.debug("[HeadNode] Ok, I received progress channel :)")
         listener ! progress
       }
+    } recover {
       case e: Exception => {
         log.error("[HeadNode] failed getting progress")
         listener ! e
