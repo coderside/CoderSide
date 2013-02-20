@@ -13,13 +13,13 @@
       <li class="organization">
         <header>
           <img class="avatar" src="@org.avatarUrl" />
-          <h2><a href="http://@org.url">@org.login</a></h2>
+          <h2>@org.login</h2>
         </header>
         <div class="info">
           <ul>
             @org.repositories.sortBy(r => -r.contributions).map { repository =>
             <li class="repository">
-              <h3><a href="@repository.url">@repository.name</a></h3>
+              <h3><a target="_blank" href="@repository.url">@repository.name</a></h3>
               @if(!repository.description.trim.isEmpty) {
               <span class="desc">@repository.description</span>
               }
@@ -49,7 +49,7 @@
     <ul class="personal">
       @github.repositories.sortBy(r => -r.contributions).map { repository =>
       <li class="repository">
-        <h3><a href="@repository.url">@repository.name</a></h3>
+        <h3><a target="_blank" href="@repository.url">@repository.name</a></h3>
         <div class="info">
           @if(!repository.description.trim.isEmpty) {
           <span class="desc">@repository.description</span>

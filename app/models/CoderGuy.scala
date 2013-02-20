@@ -40,7 +40,9 @@ case class CoderGuy(
     val maybeGitHubAvatar = for {
       gitHub <- gitHubUser
       avatar <- gitHub.avatarUrl
+      if(avatar != Config.gitHubDftAvatar)
     } yield avatar
+
     maybeGitHubAvatar orElse maybeTwitterAvatar
   }
 }

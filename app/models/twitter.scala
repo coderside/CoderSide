@@ -145,17 +145,17 @@ object Twitter {
 
   def prettyLink(text: String) = {
     val reg = new Regex("""(?i)(https?|ftp|file|http):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|]""")
-    reg.replaceAllIn(text, link => """<a href="%s">%s</a>""".format(link, link));
+    reg.replaceAllIn(text, link => """<a target="_blank" href="%s">%s</a>""".format(link, link));
   }
 
   def prettyUsername(text: String) = {
     val reg = new Regex("""@(\w+)""", "username")
-    reg.replaceAllIn(text, m => """<span class="tweet-link">@</span><a href="http://www.twitter.com/%s">%s</a>""".format(m group "username", m group "username"));
+    reg.replaceAllIn(text, m => """<span class="tweet-link">@</span><a target="_blank" href="http://www.twitter.com/%s">%s</a>""".format(m group "username", m group "username"));
   }
 
   def prettyHash(text: String) = {
     val reg = new Regex("""#(\w+)""", "hash")
-    reg.replaceAllIn(text, m => """<span class="tweet-link">#</span><a href="http://search.twitter.com/search?q=%s">%s</a>""".format("%23" + (m group "hash"), m group "hash"));
+    reg.replaceAllIn(text, m => """<span class="tweet-link">#</span><a target="_blank" href="http://search.twitter.com/search?q=%s">%s</a>""".format("%23" + (m group "hash"), m group "hash"));
   }
 }
 

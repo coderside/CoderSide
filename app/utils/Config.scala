@@ -7,6 +7,13 @@ import scala.concurrent.duration._
 
 object Config {
 
+  lazy val gitHubDftAvatar: String = {
+    Play.configuration.getString("github.avatar.dft") getOrElse {
+      Logger.warn("[Config] Please provide default github avatar")
+      throw new ConfigException("Please provide default github avatar")
+    }
+  }
+
   lazy val baseURL: String = {
     Play.configuration.getString("baseURL") getOrElse {
       Logger.warn("[Config] Please provide base URL")
