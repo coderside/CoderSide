@@ -16,7 +16,6 @@ How does it work ?
 
 This application is a mashup that takes data from several others web apps :
 
-- LinkedIn : current job (headline).
 - GitHub : repositories, followers, forks, contributions.
 - Twitter : description, followers, timeline.
 - Klout : score, influencers, influencees and their Twitter/Klout account.
@@ -76,7 +75,7 @@ Scatter-Gatherer design
 
 Here how I organize the searching process through the actors :
 
-.. image:: CoderSide/raw/master/readme/scatter-gather-small.png
+.. image:: /CoderSide/raw/master/readme/scatter-gather-small.png
 
 For the next part, I will describe each actor.
 
@@ -90,15 +89,15 @@ SupervisorNode
 HeadNode
 ^^^^^^^^
 
-| The HeaderNode have the role to create (at the start) the GitHubNode, LinkedInNode TwitterNode & KloutNode.
+| The HeaderNode have the role to create (at the start) the GitHubNode, TwitterNode & KloutNode.
 | HeadNode handles two types of requests come from the SupervisorNode :
 
  - Launch the searching process.
  - Ask for a stream to have realtime information about the progression of the search.
 
-| When it receives a request for launching a search, it creates an instance of GathererNode, then broadcasts it to GitHubNode, LinkedInNode and TwitterNode.
+| When it receives a request for launching a search, it creates an instance of GathererNode, then broadcasts it to GitHubNode and TwitterNode.
 | After that, it waits for a message to stop the GathererNode.
-| In the event of failure of one search node (GiHubNode, TwitterNode, KloutNode, LinkedInNode), it's automatically restarted.
+| In the event of failure of one search node (GiHubNode, TwitterNode, KloutNode), it's automatically restarted.
 
 GitHubNode
 ^^^^^^^^^^
@@ -135,7 +134,7 @@ GathererNode
 ^^^^^^^^^^^^
 
 | GathererNode is the only actor that is recreated for each request (by the HeadNode).
-| It's role is to gather all the results come from GitHubNode, LinkedInNode, TwitterNode & KloutNode.
+| It's role is to gather all the results come from GitHubNode, TwitterNode & KloutNode.
 | While building the final result, it sends through the stream (grey arrow from GathererNode to Client) the current progress of the searching process.
 | Once all results have been gathered, it sends the final result to clients and closes the stream.
 | In the case where the GathererNode doesn't receive all the result within a duration, it cancels the search and asks the HeadNode to stop it.
