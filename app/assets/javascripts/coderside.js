@@ -12,9 +12,10 @@ $(document).ready(function() {
         cancelAnyRequest();
         CoderSide.streams.closeProgress();
     };
+
     window.handleError = function() {
         alert('An error occured : please retry later.');
-        CoderSide.transitions.toHome();
+        CoderSide.navigate('/');
     };
 
     CoderSide = new Simrou({
