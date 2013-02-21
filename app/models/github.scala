@@ -18,7 +18,7 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
     (
       (__ \ 'login).read[String] and
       (__ \ 'html_url).read[String] and
-      (__ \ 'hireable).read[Boolean] and
+      (__ \ 'hireable).readNullable[Boolean] and
       (__ \ 'followers).read[Long] and
       (__ \ 'blog).readNullable[String] and
       (__ \ 'bio).readNullable[String] and
@@ -29,9 +29,17 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
       (__ \ 'gravatar_id).readNullable[String] and
       (__ \ 'location).readNullable[String]
     )((login, url, hireable, followers, blog, bio, email, name, company, avatar, gravatar, location) =>
-      GitHubUser(login, url, hireable, followers, blog, bio, email, name, company, avatar, gravatar, location))
+      GitHubUser(login, url, hireable.filter(_ == true).isDefined, followers, blog, bio, email, name, company, avatar, gravatar, location))
 
-  implicit val formatSearchedUser = Json.format[GitHubSearchedUser]
+  implicit val readSearchedUser: Reads[GitHubSearchedUser] =
+    (
+      (__ \ 'login).read[String] and
+      (__ \ 'fullname).readNullable[String] and
+      (__ \ 'language).readNullable[String] and
+      (__ \ 'followers).readNullable[Int] and
+      (__ \ 'location).readNullable[String] and
+      (__ \ 'public_repo_count).readNullable[Int]
+    )(GitHubSearchedUser)
 
   implicit val readOrganization: Reads[GitHubOrg] =
     (

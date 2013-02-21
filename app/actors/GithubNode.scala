@@ -24,7 +24,7 @@ class GitHubNode extends Actor with ActorLogging {
         self ! GitHubOrgQuery(profileWithRepos, gathererRef)
       }) recover {
         case e: Exception => {
-          log.error("[GitHubNode] Error while fetching user repositories")
+          log.error("[GitHubNode] Error while fetching user repositories: " + e.getMessage)
           gathererRef ! ErrorQuery("GitHub", e, 3)
         }
       }

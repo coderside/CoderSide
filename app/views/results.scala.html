@@ -12,14 +12,20 @@
       </header>
       <div class="spinner-container"></div>
       <div class="details">
-        @gitHubUser.location.map { location =>
+        @gitHubUser.location.filter(!_.trim.isEmpty).map { location =>
         <span>@location</span><span class="separator"></span>
         }
         @gitHubUser.language.map { language =>
-        <span class="language">@language</span ><span class="separator"></span>
+        <span class="language">@language</span >
         }
-        <span>@gitHubUser.reposCount repositories</span><span class="separator"></span>
-        <span>@gitHubUser.followers followers</span>
+        @gitHubUser.reposCount.filter(_ > 0).map { reposCount =>
+        <span class="separator"></span>
+        <span>@reposCount repositories</span>
+        }
+        @gitHubUser.followers.filter(_ > 0).map { followers =>
+        <span class="separator"></span>
+        <span>@followers followers</span>
+        }
       </div>
     </div>
   </li>

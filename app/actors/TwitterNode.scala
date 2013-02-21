@@ -50,7 +50,7 @@ class TwitterNode extends Actor with ActorLogging {
               )
             } recover(handleSearchError)
           )
-        }
+        } recover(handleSearchError)
       } getOrElse {
         TwitterAPI.searchBy(searchedUser.login) map { byUsername =>
           handleResponse(

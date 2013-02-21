@@ -52,7 +52,7 @@ object TwitterAPI extends URLEncoder with Debug with CacheHelpers {
     WS.url(url)
       .withHeaders(lastModifiedFor(url):_*)
       .sign(signatureCalcSearch)
-      .get().map (implicit response => cachedResponseOrElse(url))
+      .get().map(debug).map (implicit response => cachedResponseOrElse(url))
       .map {
         case users: JsArray => users.asOpt[List[TwitterUser]] getOrElse Nil
         case _ => throw new TwitterApiException("Failed seaching twitter user by : " + criteria)
@@ -64,7 +64,7 @@ object TwitterAPI extends URLEncoder with Debug with CacheHelpers {
     WS.url(url)
       .withHeaders(lastModifiedFor(url):_*)
       .sign(signatureCalcSearch)
-      .get().map (implicit response => cachedResponseOrElse(url))
+      .get().map(debug).map (implicit response => cachedResponseOrElse(url))
       .map { twitterUser =>
         twitterUser.asOpt[TwitterUser]
       }

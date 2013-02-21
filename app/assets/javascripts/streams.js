@@ -28,9 +28,7 @@
                         CoderSide.search.progress(progress);
                     }
                 };
-                progressES.onerror = function() {
-                    console.log('Error while getting progress update');
-                };
+                progressES.onerror = handleError
             }
         };
     };
