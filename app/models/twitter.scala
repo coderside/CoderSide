@@ -52,7 +52,7 @@ object TwitterAPI extends URLEncoder with Debug with CacheHelpers {
     WS.url(url)
       .withHeaders(lastModifiedFor(url):_*)
       .sign(signatureCalcSearch)
-      .get().map(debug).map (implicit response => cachedResponseOrElse(url))
+      .get().map (implicit response => cachedResponseOrElse(url))
       .map {
         case users: JsArray => users.asOpt[List[TwitterUser]] getOrElse Nil
         case _ => throw new TwitterApiException("Failed seaching twitter user by : " + criteria)
@@ -64,7 +64,7 @@ object TwitterAPI extends URLEncoder with Debug with CacheHelpers {
     WS.url(url)
       .withHeaders(lastModifiedFor(url):_*)
       .sign(signatureCalcSearch)
-      .get().map(debug).map (implicit response => cachedResponseOrElse(url))
+      .get().map (implicit response => cachedResponseOrElse(url))
       .map { twitterUser =>
         twitterUser.asOpt[TwitterUser]
       }
@@ -141,19 +141,21 @@ object Twitter {
     }.sortBy (_._2).lastOption.map(_._1)
   }
 
-  def pretty(text: String) = prettyHash(prettyUsername(prettyLink(text)))
+  def pretty(text: String) = prettyRT(prettyHash(prettyUsername(prettyLink(text))))
 
-  def prettyLink(text: String) = {
+  def prettyLink(text: String): String  = {
     val reg = new Regex("""(?i)(https?|ftp|file|http):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|]""")
     reg.replaceAllIn(text, link => """<a target="_blank" href="%s">%s</a>""".format(link, link));
   }
 
-  def prettyUsername(text: String) = {
+  def prettyRT(text: String): String = """^RT""".r.replaceFirstIn(text, "<b>RT</b>")
+
+  def prettyUsername(text: String): String = {
     val reg = new Regex("""@(\w+)""", "username")
     reg.replaceAllIn(text, m => """<span class="tweet-link">@</span><a target="_blank" href="http://www.twitter.com/%s">%s</a>""".format(m group "username", m group "username"));
   }
 
-  def prettyHash(text: String) = {
+  def prettyHash(text: String): String = {
     val reg = new Regex("""#(\w+)""", "hash")
     reg.replaceAllIn(text, m => """<span class="tweet-link">#</span><a target="_blank" href="http://search.twitter.com/search?q=%s">%s</a>""".format("%23" + (m group "hash"), m group "hash"));
   }
