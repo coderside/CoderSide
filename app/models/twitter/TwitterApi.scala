@@ -34,7 +34,7 @@ object TwitterAPI extends URLEncoder with Debug with CacheHelpers {
       .get().map (implicit response => cachedResponseOrElse(url))
       .map {
         case users: JsArray => TwitterJson.readUsers.reads(users).recoverTotal { error =>
-          Logger.error("An error occured while reading twitter users : " + error.toString)
+          Logger.error("An error occured while reading twitter users : " + error)
           Nil
         }
         case _ => throw new TwitterApiException("Failed seaching twitter user by : " + criteria)
@@ -49,7 +49,7 @@ object TwitterAPI extends URLEncoder with Debug with CacheHelpers {
       .get().map (implicit response => cachedResponseOrElse(url))
       .map { twitterUser =>
         TwitterJson.readUser.reads(twitterUser).map(Some(_)).recoverTotal { error =>
-          Logger.error("An error occured while reading a twitter user: " + error.toString)
+          Logger.error("An error occured while reading a twitter user: " + error)
           None
         }
       }

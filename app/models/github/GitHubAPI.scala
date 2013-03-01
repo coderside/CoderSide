@@ -23,7 +23,7 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
       GitHubJson.readGitHubUser.reads(cachedResponseOrElse(url)).map { user =>
         Some(user)
       }.recoverTotal { error =>
-        Logger.error("An error occurred while reading github profile: " + error.toString)
+        Logger.error("An error occurred while reading github profile: " + error)
         None
       }
     }
@@ -36,7 +36,7 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
       .get().map { implicit response =>
       (cachedResponseOrElse(url) \ "users") match {
         case users: JsArray => GitHubJson.readSearchedUsers.reads(users).recoverTotal { error =>
-          Logger.error("An occured while reading searched github profile: " + error.toString)
+          Logger.error("An occured while reading searched github profile: " + error)
           Nil
         }
         case o => throw new GitHubApiException("Failed seaching gitHub user by fullname : " + fullname)
@@ -51,7 +51,7 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
       .get().map { implicit response =>
       cachedResponseOrElse(url) match {
         case repos: JsArray => GitHubJson.readRepositories.reads(repos).recoverTotal { error =>
-          Logger.error("An occured while reading github user repositories: " + error.toString)
+          Logger.error("An occured while reading github user repositories: " + error)
           Nil
         }
         case r => throw new GitHubApiException("Failed getting repositories for : " + username)
@@ -66,7 +66,7 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
       .get().map { implicit response =>
       (cachedResponseOrElse(url)) match {
         case repos: JsArray => GitHubJson.readRepositories.reads(repos).recoverTotal { error =>
-          Logger.error("An occured while reading github org repositories: " + error.toString)
+          Logger.error("An occured while reading github org repositories: " + error)
           Nil
         }
         case r => throw new GitHubApiException("Failed getting repositories for : " + org)
@@ -82,7 +82,7 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
       (cachedResponseOrElse(url)) match {
         case orgs: JsArray => {
           GitHubJson.readOrganizations.reads(orgs).recoverTotal { error =>
-            Logger.error("An error occured while reading github organizations: " + error.toString)
+            Logger.error("An error occured while reading github organizations: " + error)
             Nil
           }
         }

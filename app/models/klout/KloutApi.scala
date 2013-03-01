@@ -52,12 +52,12 @@ object KloutAPI extends URLEncoder with Debug {
       .get().map(_.json).map { influence =>
         val influencersAsJson = JsArray(influence \ "myInfluencers" \\ "entity")
         val influencers = KloutJson.readInfluences.reads(influencersAsJson).recoverTotal { error =>
-          Logger.error("An error occurred while reading klout influencers: " + error.toString)
+          Logger.error("An error occurred while reading klout influencers: " + error)
           Nil
         }
         val influenceesAsJson = JsArray(influence \ "myInfluencees" \\ "entity")
         val influencees = KloutJson.readInfluences.reads(influenceesAsJson).recoverTotal { error =>
-          Logger.error("An error occurred while reading klout influencees: " + error.toString)
+          Logger.error("An error occurred while reading klout influencees: " + error)
           Nil
         }
         Influence(influencers, influencees)
