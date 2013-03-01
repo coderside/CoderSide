@@ -10,19 +10,19 @@ import Messages._
 class TwitterNode extends Actor with ActorLogging {
 
   def receive = {
-    case TwitterNodeQuery(searchedUser, kloutRef, gathererRef) => {
+    case TwitterNodeQuery(user, kloutRef, gathererRef) => {
       log.debug("[TwitterNode] receiving new head query")
       gathererRef ! Decrement()
-      self ! TwitterUserQuery(searchedUser, kloutRef, gathererRef)
+      self ! TwitterUserQuery(user, kloutRef, gathererRef)
     }
 
-    case TwitterUserQuery(searchedUser, kloutRef, gathererRef) => {
+    case TwitterUserQuery(user, kloutRef, gathererRef) => {
       log.debug("[TwitterNode] Getting twitter profile")
 
       def handleResponse(response: List[TwitterUser], notFound: => Unit) = {
         response match {
           case Nil => notFound
-          case profiles => Twitter.matchUser(searchedUser, profiles) foreach { found =>
+          case profiles => Twitter.matchUser(user, profiles) foreach { found =>
             gathererRef ! Decrement()
             self ! TwitterTimelineQuery(found, gathererRef)
             kloutRef ! KloutNodeQuery(found, gathererRef)
@@ -38,11 +38,11 @@ class TwitterNode extends Actor with ActorLogging {
         }
       }
 
-      searchedUser.fullname.filter(_ => searchedUser.isFullnameOk) map { fname =>
+      user.name.map { fname =>
         TwitterAPI.searchBy(fname).map { byFullname =>
           handleResponse(
             byFullname,
-            TwitterAPI.searchBy(searchedUser.login) map { byUsername =>
+            TwitterAPI.searchBy(user.login) map { byUsername =>
               handleResponse(byUsername, {
                 gathererRef ! NotFound("Twitter", 2)
                 gathererRef ! NotFound("Klout", 2)
@@ -52,7 +52,7 @@ class TwitterNode extends Actor with ActorLogging {
           )
         } recover(handleSearchError)
       } getOrElse {
-        TwitterAPI.searchBy(searchedUser.login) map { byUsername =>
+        TwitterAPI.searchBy(user.login) map { byUsername =>
           handleResponse(
             byUsername, {
               gathererRef ! NotFound("Twitter", 2)

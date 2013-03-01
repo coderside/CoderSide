@@ -57,16 +57,18 @@ object Application extends Controller {
     }
   }
 
-  def profile(username: String, fullname: String) = Action {
-    Logger.debug("[Application] Searching coder guy")
-    val name = Option(fullname) filter (!_.trim.isEmpty)
-    val gitHubUser = GitHubSearchedUser(username, name)
+  def profile(username: String) = Action {
+    Logger.debug("[Application] Searching coder guy : " + username)
     implicit val timeout = Timeout(Config.overviewTimeout)
     //Ok(views.html.profile(models.Mock.coderGuy))
     Async {
-      (SupervisorNode.ref ? InitQuery(gitHubUser)).mapTo[CoderGuy].map { coderGuy =>
+      (for {
+        user <- GitHubAPI.profile(username)
+        if(user.isDefined)
+        coderGuy <- (SupervisorNode.ref ? InitQuery(user.get)).mapTo[CoderGuy]
+      } yield {
         Ok(views.html.profile(coderGuy))
-      } recover {
+      }) recover {
         case e: Exception => {
           e.printStackTrace
           InternalServerError(e.getMessage)
@@ -75,12 +77,10 @@ object Application extends Controller {
     }
   }
 
-  def progress(username: String, fullname: String) = Action {
-    val name = Option(fullname) filter (!_.trim.isEmpty)
-    val gitHubUser = GitHubSearchedUser(username, name)
+  def progress(username: String) = Action {
     Async {
       implicit val timeout = Timeout(20.seconds)
-      (SupervisorNode.ref ? AskProgress(gitHubUser)).mapTo[Enumerator[Double]].map { progress =>
+      (SupervisorNode.ref ? AskProgress(username)).mapTo[Enumerator[Double]].map { progress =>
         implicit val progressPulling = Comet.CometMessage[Double](_.toString)
         Ok.stream(progress &> EventSource())
           .withHeaders(CONTENT_TYPE -> "text/event-stream")

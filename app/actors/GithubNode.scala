@@ -12,14 +12,14 @@ class GitHubNode extends Actor with ActorLogging {
 
   def receive = {
 
-    case NodeQuery(searchedUser, gathererRef) => {
+    case NodeQuery(user, gathererRef) => {
       log.debug("[GitHubNode] receiving new head query")
       (for {
-        maybeProfile <- GitHubAPI.profile(searchedUser.login)
+        maybeProfile <- GitHubAPI.profile(user.login)
         if(maybeProfile.isDefined)
-        repos <- GitHubAPI.repositoriesByUser(searchedUser.login)
+        repos <- GitHubAPI.repositoriesByUser(user.login)
       } yield {
-        val profileWithRepos = maybeProfile.get.copy(repositories = repos, language = searchedUser.language)
+        val profileWithRepos = maybeProfile.get.copy(repositories = repos, language = user.language)
         gathererRef ! Decrement()
         self ! GitHubOrgQuery(profileWithRepos, gathererRef)
       }) recover {

@@ -137,25 +137,7 @@ case class GitHubSearchedUser(
   followers: Option[Int] = None,
   location: Option[String] = None,
   reposCount: Option[Int] = None
-) {
-
-  private def escapeSpecialCaracters(fullname: String): String = {
-    val specialCaracters = """[^\w \tÀÂÇÈÉÊËÎÔÙÛàâçèéêëîôùû-]""".r
-    specialCaracters.replaceAllIn(fullname, "").trim
-  }
-
-  val firstname: Option[String] = fullname.flatMap { name =>
-    val str = escapeSpecialCaracters(name).split(" ")
-    if(str.size > 1) Some(str(0)) else None
-  }
-
-  val lastname: Option[String] = fullname.flatMap { name =>
-    val str = escapeSpecialCaracters(name).split(" ")
-    if(str.size > 1) Some(str.tail.mkString) else None
-  }
-
-  def isFullnameOk: Boolean = firstname.isDefined && lastname.isDefined
-}
+)
 
 case class GitHubRepository(
   name: String,

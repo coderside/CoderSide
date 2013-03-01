@@ -10,15 +10,15 @@ import akka.pattern.ask
 import akka.util.Timeout
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.iteratee.Enumerator
-import models.github.GitHubSearchedUser
+import models.github.GitHubUser
 import utils.Config
 import Messages._
 
 class HeadNode() extends Actor with ActorLogging {
 
-  var currentRequests: Map[GitHubSearchedUser, ActorRef] = Map.empty
-  var waitingClients: Map[GitHubSearchedUser, ActorRef] = Map.empty
-  var waitingListeners: Map[GitHubSearchedUser, List[ActorRef]] = Map.empty
+  var currentRequests: Map[GitHubUser, ActorRef] = Map.empty
+  var waitingClients: Map[GitHubUser, ActorRef] = Map.empty
+  var waitingListeners: Map[String, List[ActorRef]] = Map.empty
 
   def gathererNode(client: ActorRef) = context.actorOf(Props(new GathererNode(self)))
 
@@ -28,15 +28,15 @@ class HeadNode() extends Actor with ActorLogging {
 
   def receive = {
 
-    case HeadQuery(searchedUser, client) => {
+    case HeadQuery(user, client) => {
       log.debug("[HeadNode] receiving new init query")
       val gathererRef = gathererNode(client)
-      (currentRequests.get(searchedUser), waitingListeners.get(searchedUser)) match {
-        case (None, None) => waitingClients += (searchedUser -> client)
+      (currentRequests.get(user), waitingListeners.get(user.login)) match {
+        case (None, None) => waitingClients += (user -> client)
         case (None, Some(listeners)) => {
-          currentRequests += (searchedUser -> gathererRef)
-          launchSearch(gathererRef, searchedUser)
-          waitingListeners -= searchedUser
+          currentRequests += (user -> gathererRef)
+          launchSearch(gathererRef, user)
+          waitingListeners -= user.login
           gathererRef ! NewClient(client)
           listeners foreach (giveProgressStream(gathererRef, _))
         }
@@ -44,22 +44,27 @@ class HeadNode() extends Actor with ActorLogging {
       }
     }
 
-    case AskProgress(searchedUser) => {
+    case AskProgress(login) => {
       log.debug("[HeadNode] AskProgress received")
-      (currentRequests.get(searchedUser), waitingClients.get(searchedUser)) match {
-        case (Some(gathererRef), _) => giveProgressStream(gathererRef, sender)
-        case (None, Some(client)) => {
+
+      def byLogin(r: (GitHubUser, ActorRef)) = r match {
+        case (user, _) => user.login == login
+      }
+
+      (currentRequests.find(byLogin), waitingClients.find(byLogin)) match {
+        case (Some((_, gathererRef)), _) => giveProgressStream(gathererRef, sender)
+        case (None, Some((user, client))) => {
           val gathererRef = gathererNode(client)
-          currentRequests += (searchedUser -> gathererRef)
-          waitingClients -= searchedUser
-          launchSearch(gathererRef, searchedUser)
+          currentRequests += (user -> gathererRef)
+          waitingClients -= user
+          launchSearch(gathererRef, user)
           giveProgressStream(gathererRef, sender)
           gathererRef ! NewClient(client)
         }
         case (None, None) => {
-          waitingListeners.get(searchedUser) match {
-            case Some(listeners) => waitingListeners += (searchedUser -> (sender :: listeners))
-            case None => waitingListeners += (searchedUser -> List(sender))
+          waitingListeners.find { case (userName, _) => userName == login } match {
+            case Some((user, listeners)) => waitingListeners += (user -> (sender :: listeners))
+            case None => waitingListeners += (login -> List(sender))
           }
         }
       }
@@ -90,9 +95,9 @@ class HeadNode() extends Actor with ActorLogging {
     }
   }
 
-  private def launchSearch(gathererRef: ActorRef, searchedUser: GitHubSearchedUser) = {
-    gitHubNode   ! NodeQuery(searchedUser, gathererRef)
-    twitterNode  ! TwitterNodeQuery(searchedUser, kloutNode, gathererRef)
+  private def launchSearch(gathererRef: ActorRef, user: GitHubUser) = {
+    gitHubNode   ! NodeQuery(user, gathererRef)
+    twitterNode  ! TwitterNodeQuery(user, kloutNode, gathererRef)
   }
 
   override def supervisorStrategy =

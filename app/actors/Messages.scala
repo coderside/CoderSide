@@ -10,14 +10,14 @@ object Messages {
   //Node to Gatherer
   case class ErrorQuery(from: String, e: Throwable, notProcessed: Int)
   //Application to Supervisor.
-  case class InitQuery(searchedUser: GitHubSearchedUser)
+  case class InitQuery(user: GitHubUser)
   //Supervisor to Head
-  case class HeadQuery(searchedUser: GitHubSearchedUser, client: ActorRef)
+  case class HeadQuery(user: GitHubUser, client: ActorRef)
   //Head to Children
-  case class NodeQuery(searchedUser: GitHubSearchedUser, gatherer: ActorRef)
+  case class NodeQuery(user: GitHubUser, gatherer: ActorRef)
   //Head to Twitter Node
   case class TwitterNodeQuery(
-    searchedUser: GitHubSearchedUser,
+    user: GitHubUser,
     klout: ActorRef,
     gatherer: ActorRef
   )
@@ -37,7 +37,7 @@ object Messages {
   case class TwitterResult(twitterUser: TwitterUser)
   //Twitter to Twitter
   case class TwitterUserQuery(
-    searchedUser: GitHubSearchedUser,
+    user: GitHubUser,
     klout: ActorRef,
     gatherer: ActorRef
   )
@@ -52,7 +52,7 @@ object Messages {
   //Gatherer Node to client
   case class Progress(request: String)
   //Head Node to gatherer node
-  case class AskProgress(searchedUser: GitHubSearchedUser)
+  case class AskProgress(username: String)
   //Supervisor Node to head node
   case class NewClient(client: ActorRef)
   //Children to Head

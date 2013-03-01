@@ -17,7 +17,7 @@ case class CoderGuy(
       login <- gitHubUser map (_.login)
       fullname <- oneFullname
     } yield {
-      Config.baseURL + "/#" + controllers.routes.Application.profile(login, fullname).url
+      Config.baseURL + "/#" + controllers.routes.Application.profile(login).url
     }
   }
 

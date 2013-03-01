@@ -12,7 +12,7 @@ import play.Logger
 import play.api.libs.oauth.{ OAuthCalculator, ConsumerKey, RequestToken }
 import utils. { Config, CacheHelpers }
 import models.{ URLEncoder, Debug }
-import models.github.GitHubSearchedUser
+import models.github.GitHubUser
 
 object TwitterAPI extends URLEncoder with Debug with CacheHelpers {
 
@@ -92,13 +92,13 @@ case class TwitterTimeline(tweets: List[Tweet]) {
 }
 
 object Twitter {
-  def matchUser(searchedUser: GitHubSearchedUser, twitterUsers: List[TwitterUser]): Option[TwitterUser] = {
-    val matchPseudo = (user: TwitterUser)      => user.screenName.toLowerCase.trim == searchedUser.login.toLowerCase.trim
-    val matchPseudoPart = (user: TwitterUser)  => user.screenName.toLowerCase.trim.contains(searchedUser.login.toLowerCase.trim)
-    def containsLanguage = (user: TwitterUser) => user.description.toLowerCase.contains(searchedUser.language)
+  def matchUser(gitHubUser: GitHubUser, twitterUsers: List[TwitterUser]): Option[TwitterUser] = {
+    val matchPseudo = (user: TwitterUser)      => user.screenName.toLowerCase.trim == gitHubUser.login.toLowerCase.trim
+    val matchPseudoPart = (user: TwitterUser)  => user.screenName.toLowerCase.trim.contains(gitHubUser.login.toLowerCase.trim)
+    def containsLanguage = (user: TwitterUser) => user.description.toLowerCase.contains(gitHubUser.language)
     def containsGitHub = (user: TwitterUser)   => user.description.toLowerCase.contains("github")
     val matchFullname = (user: TwitterUser) => {
-      searchedUser.fullname.filter { name =>
+      gitHubUser.name.filter { name =>
         val gitHubName = name.toLowerCase.trim
         user.name.toLowerCase.trim ==  gitHubName ||
         user.name.split(" ").reverse.mkString(" ").toLowerCase.trim == gitHubName
