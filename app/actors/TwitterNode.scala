@@ -13,7 +13,27 @@ class TwitterNode extends Actor with ActorLogging {
     case TwitterNodeQuery(user, kloutRef, gathererRef) => {
       log.debug("[TwitterNode] receiving new head query")
       gathererRef ! Decrement()
-      self ! TwitterUserQuery(user, kloutRef, gathererRef)
+      (for {
+        socialProfileOpt <- user.socialProfile
+        if(socialProfileOpt.isDefined)
+        twitterProfileOpt <- socialProfileOpt.get.twitterProfile
+        if(twitterProfileOpt.isDefined)
+      } yield {
+        log.debug("### Ok, Using Fullcontact ! ###")
+        gathererRef ! Decrement()
+        self ! TwitterTimelineQuery(twitterProfileOpt.get, gathererRef)
+        kloutRef ! KloutNodeQuery(twitterProfileOpt.get, gathererRef)
+      }).recover {
+        case e: NoSuchElementException => {
+          log.debug("### We don't use fullcontact so I hope the matching will be correct ###")
+          self ! TwitterUserQuery(user, kloutRef, gathererRef)
+        }
+        case e: Exception => {
+          log.error("[TwitterNode] Error while searching twitter user: " + e.getMessage)
+          gathererRef ! ErrorQuery("Twitter", e, 2) //twitter
+          gathererRef ! ErrorQuery("Klout", e, 2) //klout
+        }
+      }
     }
 
     case TwitterUserQuery(user, kloutRef, gathererRef) => {

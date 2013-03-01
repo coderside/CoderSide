@@ -3,6 +3,7 @@ package models.github
 import java.util.Date
 import scala.concurrent.Future
 import scala.concurrent.future
+import play.api.libs.concurrent.Promise
 import scala.util.control.Exception._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.Logger
@@ -128,7 +129,16 @@ case class GitHubUser(
   language: Option[String] = None,
   repositories: List[GitHubRepository] = Nil,
   organizations: List[GitHubOrg] = Nil
-)
+) {
+  import models.fullcontact.{ FullContact, FullContactAPI }
+
+  def socialProfile: Future[Option[FullContact]] = {
+    email.map(FullContactAPI.searchByEmail(_)) getOrElse {
+      Logger.warn("Can't find sociale profile by email.")
+      future(None)
+    }
+  }
+}
 
 case class GitHubSearchedUser(
   login: String,

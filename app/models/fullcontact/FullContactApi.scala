@@ -9,6 +9,8 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.ws._
 import utils.Config
 import models.{ URLEncoder, Debug }
+import models.twitter.TwitterUser
+import models.twitter.TwitterAPI
 
 object FullContactAPI extends URLEncoder with Debug {
 
@@ -39,14 +41,25 @@ case class FullContactProfile(
   `type`: String,
   typeId: String,
   typeName: String,
-  username: String,
-  id: String,
+  username: Option[String],
+  id: Option[String],
   url: String
 )
 
 case class FullContact(
   photos: List[FullContactPhoto],
-  profiles: List[FullContactProfile]
-)
+  socialProfiles: List[FullContactProfile]
+) {
+  def twitterProfile: Future[Option[TwitterUser]] = {
+    socialProfiles.collectFirst {
+      case profile: FullContactProfile if(profile.`type` == "twitter") => profile.username
+    } collect { case Some(login) => login } map { login =>
+      TwitterAPI.show(login)
+    } getOrElse {
+      Logger.warn("Can't find twitter profile in the social profile get from fullcontact")
+      future(None)
+    }
+  }
+}
 
 case class FullContactApiException(message: String) extends Exception

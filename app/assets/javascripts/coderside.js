@@ -71,10 +71,7 @@ $(document).ready(function() {
 
                 var data = parseQueryString(params.queryString);
                 if(data.username) {
-                    currentRequest = jsRoutes.controllers.Application.profile(
-                        data.username,
-                        data.fullname || ""
-                    ).ajax().done(function(response) {
+                    currentRequest = jsRoutes.controllers.Application.profile(data.username).ajax().done(function(response) {
                         CoderSide.profile.render(response);
                         CoderSide.transitions.toProfile().then(function() {
                             CoderSide.search.hideProgress();
@@ -88,10 +85,7 @@ $(document).ready(function() {
             get: function(any, params) {
                 var data = parseQueryString(params.queryString);
                 if(data.username) {
-                    CoderSide.streams.progress(
-                        data.username,
-                        data.fullname
-                    );
+                    CoderSide.streams.progress(data.username);
                 }
             }
         },

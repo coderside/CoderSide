@@ -7,8 +7,7 @@
         $(document).on('click', '.popular .coders li', function(e) {
             var $coder = $(this),
                 coder = {
-                    username: $coder.data('username'),
-                    fullname: $coder.data('fullname')
+                    username: $coder.data('username')
                 };
             $('.popular .coders li').removeClass('selected');
             $coder.addClass('selected');
