@@ -1,69 +1,17 @@
 package models.github
 
+import java.util.Date
 import scala.concurrent.Future
 import scala.concurrent.future
-import java.util.Date
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.util.control.Exception._
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.Logger
 import play.api.libs.ws._
-import play.api.libs.json._
-import play.api.libs.json.Reads._
-import play.api.libs.functional.syntax._
+import play.api.libs.json.JsArray
 import models.{ URLEncoder, Debug }
 import utils.{ Config, CacheHelpers }
 
 object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
-
-  implicit val readGitHubUser: Reads[GitHubUser] =
-    (
-      (__ \ 'login).read[String] and
-      (__ \ 'html_url).read[String] and
-      (__ \ 'hireable).readNullable[Boolean] and
-      (__ \ 'followers).read[Long] and
-      (__ \ 'blog).readNullable[String] and
-      (__ \ 'bio).readNullable[String] and
-      (__ \ 'email).readNullable[String] and
-      (__ \ 'name).readNullable[String] and
-      (__ \ 'company).readNullable[String] and
-      (__ \ 'avatar_url).readNullable[String] and
-      (__ \ 'gravatar_id).readNullable[String] and
-      (__ \ 'location).readNullable[String]
-    )((login, url, hireable, followers, blog, bio, email, name, company, avatar, gravatar, location) =>
-      GitHubUser(login, url, hireable.filter(_ == true).isDefined, followers, blog, bio, email, name, company, avatar, gravatar, location))
-
-  implicit val readSearchedUser: Reads[GitHubSearchedUser] =
-    (
-      (__ \ 'login).read[String] and
-      (__ \ 'fullname).readNullable[String] and
-      (__ \ 'language).readNullable[String] and
-      (__ \ 'followers).readNullable[Int] and
-      (__ \ 'location).readNullable[String] and
-      (__ \ 'public_repo_count).readNullable[Int]
-    )(GitHubSearchedUser)
-
-  implicit val readOrganization: Reads[GitHubOrg] =
-    (
-      (__ \ 'login).read[String] and
-      (__ \ 'repos_url).read[String] and
-      (__ \ 'avatar_url).readNullable[String] and
-      (__ \ 'url).read[String]
-    )((login, reposUrl, avatarUrl, url) => GitHubOrg(login, reposUrl, avatarUrl, url))
-
-  implicit val readRepository: Reads[GitHubRepository] = {
-    (
-      (__ \ 'name).read[String] and
-      (__ \ 'description).read[String] and
-      (__ \ 'language).readNullable[String] and
-      (__ \ 'html_url).read[String] and
-      (__ \ 'owner \ 'login).read[String] and
-      (__ \ 'forks_count).read[Int] and
-      (__ \ 'watchers_count).read[Int] and
-      (__ \ 'fork).read[Boolean] and
-      (__ \ 'updated_at).read[Date]
-    ) ((name, desc, lang, htmlUrl, owner, forks, watchers, fork, updatedAt) =>
-      GitHubRepository(name, desc, lang, htmlUrl, owner, forks, watchers, fork, updatedAt)
-    )
-  }
 
   val oauthURL = "client_id=" + Config.GitHub.clientID + "&client_secret=" + Config.GitHub.clientSecret
 
@@ -72,7 +20,12 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
     WS.url(url + "?" + oauthURL)
       .withHeaders(etagFor(url):_*)
       .get().map { implicit response =>
-      cachedResponseOrElse(url).asOpt[GitHubUser]
+      GitHubJson.readGitHubUser.reads(cachedResponseOrElse(url)).map { user =>
+        Some(user)
+      }.recoverTotal { error =>
+        Logger.error("An error occurred while reading github profile: " + error.toString)
+        None
+      }
     }
   }
 
@@ -82,7 +35,10 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
       .withHeaders(etagFor(url):_*)
       .get().map { implicit response =>
       (cachedResponseOrElse(url) \ "users") match {
-        case users: JsArray => users.asOpt[List[GitHubSearchedUser]] getOrElse Nil
+        case users: JsArray => GitHubJson.readSearchedUsers.reads(users).recoverTotal { error =>
+          Logger.error("An occured while reading searched github profile: " + error.toString)
+          Nil
+        }
         case o => throw new GitHubApiException("Failed seaching gitHub user by fullname : " + fullname)
       }
     }
@@ -94,7 +50,10 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
       .withHeaders(lastModifiedFor(url):_*)
       .get().map { implicit response =>
       cachedResponseOrElse(url) match {
-        case repos: JsArray => repos.asOpt[List[GitHubRepository]] getOrElse Nil
+        case repos: JsArray => GitHubJson.readRepositories.reads(repos).recoverTotal { error =>
+          Logger.error("An occured while reading github user repositories: " + error.toString)
+          Nil
+        }
         case r => throw new GitHubApiException("Failed getting repositories for : " + username)
       }
     }
@@ -106,7 +65,10 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
       .withHeaders(lastModifiedFor(url):_*)
       .get().map { implicit response =>
       (cachedResponseOrElse(url)) match {
-        case repos: JsArray => repos.asOpt[List[GitHubRepository]] getOrElse Nil
+        case repos: JsArray => GitHubJson.readRepositories.reads(repos).recoverTotal { error =>
+          Logger.error("An occured while reading github org repositories: " + error.toString)
+          Nil
+        }
         case r => throw new GitHubApiException("Failed getting repositories for : " + org)
       }
     }
@@ -119,7 +81,10 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
       .get().map { implicit response =>
       (cachedResponseOrElse(url)) match {
         case orgs: JsArray => {
-          orgs.asOpt[List[GitHubOrg]] getOrElse Nil
+          GitHubJson.readOrganizations.reads(orgs).recoverTotal { error =>
+            Logger.error("An error occured while reading github organizations: " + error.toString)
+            Nil
+          }
         }
         case r => throw new GitHubApiException("Failed getting organizations for : " + username)
       }

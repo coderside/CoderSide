@@ -3,32 +3,15 @@ package models.klout
 import scala.concurrent.Future
 import scala.concurrent.future
 import scala.util.control.Exception._
+import play.Logger
 import play.api.libs.ws._
-import play.api.libs.json._
-import play.api.libs.json.Reads._
-import play.api.libs.functional.syntax._
+import play.api.libs.json.JsArray
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import models.twitter.TwitterUser
 import utils.Config
 import models.{ URLEncoder, Debug }
 
 object KloutAPI extends URLEncoder with Debug {
-
-  implicit val readInfluence: Reads[KloutUser] = {
-    (
-      (__ \ 'payload \ 'kloutId).read[String] and
-      (__ \ 'payload \ 'nick).read[String] and
-      (__ \ 'payload \ 'score \ 'score).read[Double]
-    )((id, nick, score) => KloutUser(id, nick, score))
-  }
-
-  val readUser: Reads[KloutUser] = {
-    (
-      (__ \ 'kloutId).read[String] and
-      (__ \ 'nick).read[String] and
-      (__ \ 'score \ 'score).read[Double]
-    )((id, nick, score) => KloutUser(id, nick, score))
-  }
 
   def kloutID(twitterID: String): Future[Option[String]] = {
     WS.url("http://api.klout.com/v2/identity.json/twitter")
@@ -48,7 +31,7 @@ object KloutAPI extends URLEncoder with Debug {
       .withQueryString("key" -> Config.Klout.key)
       .get().map { response =>
         catching(classOf[Exception]).opt(response.json).flatMap { json =>
-          readUser.reads(json).asOpt
+          KloutJson.readUser.reads(json).asOpt
         }
       }
   }
@@ -67,8 +50,16 @@ object KloutAPI extends URLEncoder with Debug {
     WS.url(uri)
       .withQueryString("key" -> Config.Klout.key)
       .get().map(_.json).map { influence =>
-        val influencers = JsArray(influence \ "myInfluencers" \\ "entity").as[List[KloutUser]]
-        val influencees = JsArray(influence \ "myInfluencees" \\ "entity").as[List[KloutUser]]
+        val influencersAsJson = JsArray(influence \ "myInfluencers" \\ "entity")
+        val influencers = KloutJson.readInfluences.reads(influencersAsJson).recoverTotal { error =>
+          Logger.error("An error occurred while reading klout influencers: " + error.toString)
+          Nil
+        }
+        val influenceesAsJson = JsArray(influence \ "myInfluencees" \\ "entity")
+        val influencees = KloutJson.readInfluences.reads(influenceesAsJson).recoverTotal { error =>
+          Logger.error("An error occurred while reading klout influencees: " + error.toString)
+          Nil
+        }
         Influence(influencers, influencees)
     }
   }

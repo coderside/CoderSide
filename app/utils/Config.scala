@@ -125,6 +125,15 @@ object Config {
     }
   }
 
+  object fullcontact {
+    lazy val key: String = {
+      Play.configuration.getString("oauth.fullcontact.key") getOrElse {
+        Logger.warn("[Config] Please provide fullcontact api key")
+        throw new ConfigException("Please provide fullcontact api key")
+      }
+    }
+  }
+
   object Twitter {
     object search {
       lazy val consumerKey: String = {

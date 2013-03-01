@@ -1,15 +1,14 @@
 package models.twitter
 
+import java.util.Date
+import java.text.SimpleDateFormat
 import scala.util.matching.Regex
 import scala.concurrent.Future
 import scala.concurrent.future
-import java.util.Date
-import java.text.SimpleDateFormat
+import play.api.libs.json.JsArray
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.ws._
-import play.api.libs.json._
-import play.api.libs.json.Reads._
-import play.api.libs.functional.syntax._
+import play.Logger
 import play.api.libs.oauth.{ OAuthCalculator, ConsumerKey, RequestToken }
 import utils. { Config, CacheHelpers }
 import models.{ URLEncoder, Debug }
@@ -27,26 +26,6 @@ object TwitterAPI extends URLEncoder with Debug with CacheHelpers {
     RequestToken(Config.Twitter.popular.accessToken, Config.Twitter.popular.accessTokenSecret)
   )
 
-  implicit val readUser: Reads[TwitterUser] = {
-    (
-      (__ \ 'screen_name).read[String] and
-      (__ \ 'name).read[String] and
-      (__ \ 'description).read[String] and
-      (__ \ 'followers_count).read[Int] and
-      (__ \ 'profile_image_url).readNullable[String]
-    )((screenName, name, desc, followers, avatar) => TwitterUser(screenName, name, desc, followers, avatar))
-  }
-
-  implicit val readTweet = {
-    (
-      (__ \ 'text).read[String] and
-      (__ \ 'created_at).read[String] and
-      (__ \ 'retweeted).read[Boolean] and
-      (__ \ 'in_reply_to_user_id).read[Option[String]] and
-      (__ \ 'in_reply_to_status_id_str).readNullable[Option[String]]
-    ) tupled
-  }
-
   def searchBy(criteria: String): Future[List[TwitterUser]] = {
     val url = "https://api.twitter.com/1/users/search.json?q=" + encode(criteria)
     WS.url(url)
@@ -54,7 +33,10 @@ object TwitterAPI extends URLEncoder with Debug with CacheHelpers {
       .sign(signatureCalcSearch)
       .get().map (implicit response => cachedResponseOrElse(url))
       .map {
-        case users: JsArray => users.asOpt[List[TwitterUser]] getOrElse Nil
+        case users: JsArray => TwitterJson.readUsers.reads(users).recoverTotal { error =>
+          Logger.error("An error occured while reading twitter users : " + error.toString)
+          Nil
+        }
         case _ => throw new TwitterApiException("Failed seaching twitter user by : " + criteria)
       }
   }
@@ -66,7 +48,10 @@ object TwitterAPI extends URLEncoder with Debug with CacheHelpers {
       .sign(signatureCalcSearch)
       .get().map (implicit response => cachedResponseOrElse(url))
       .map { twitterUser =>
-        twitterUser.asOpt[TwitterUser]
+        TwitterJson.readUser.reads(twitterUser).map(Some(_)).recoverTotal { error =>
+          Logger.error("An error occured while reading a twitter user: " + error.toString)
+          None
+        }
       }
   }
 
@@ -82,7 +67,7 @@ object TwitterAPI extends URLEncoder with Debug with CacheHelpers {
       .map {
         case JsArray(tweets) => Some(TwitterTimeline(
           tweets.flatMap { tweetOpt =>
-            readTweet.reads(tweetOpt).asOpt.map {
+            TwitterJson.readTweet.reads(tweetOpt).asOpt.map {
               case (text, createdAt, retweeted, inReplyToStatus, inReplyToUser) =>
                 Tweet(text, dateFormat.parse(createdAt), retweeted, inReplyToStatus.isDefined, inReplyToUser.isDefined)
             }
