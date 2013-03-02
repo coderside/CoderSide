@@ -4,7 +4,8 @@ import scala.concurrent.duration._
 import akka.actor.{ Actor, ActorRef, ActorLogging, ReceiveTimeout }
 import play.api.libs.iteratee.Concurrent
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import models.{ CoderGuy, PopularCoder }
+import models.CoderGuy
+import models.popular.PopularCoder
 import utils.Config
 import Messages._
 

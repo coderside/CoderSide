@@ -1,9 +1,9 @@
-@(popularCoders: List[models.PopularCoder])(implicit lang: Lang)
+@(popularCoders: List[models.popular.PopularCoder])(implicit lang: Lang)
 
 @if(popularCoders.length > 0) {
 <div class="popular">
   <div class="top">
-    <h2>Popular</h2>
+    <h2>Popular Search</h2>
     <ul class="coders">
       @popularCoders.map { coder =>
       <li data-username="@coder.pseudo">

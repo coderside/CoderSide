@@ -1,14 +1,12 @@
-package models
+package models.popular
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import play.modules.reactivemongo.ReactiveMongoPlugin
 import play.api.Play.current
 import play.api.i18n.Messages
-import play.api.libs.json._
-import play.api.libs.json.Json._
-import play.api.libs.json.Reads._
-import play.api.libs.functional.syntax._
+import play.api.libs.json.Json
+import play.api.libs.json.JsValue
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.modules.reactivemongo._
 import play.modules.reactivemongo.PlayBsonImplicits._
@@ -17,7 +15,7 @@ import reactivemongo.api.{ QueryBuilder, QueryOpts }
 import reactivemongo.core.commands.{ FindAndModify, Update }
 import reactivemongo.bson.handlers.DefaultBSONHandlers._
 import reactivemongo.bson._
-import utils.MongoHelpers
+import models.CoderGuy
 
 case class PopularCoder(
   _id: BSONObjectID,
@@ -31,21 +29,19 @@ case class PopularCoder(
   }
 }
 
-object PopularCoder extends MongoHelpers with Function5[BSONObjectID,String, Option[String], Option[String], Long, PopularCoder]{
-  import json._
-
+object PopularCoder extends Function5[BSONObjectID,String, Option[String], Option[String], Long, PopularCoder]{
   val collectionName = "popular"
   val collection = ReactiveMongoPlugin.collection(collectionName)
 
-  def generateTweet(coderGuy: CoderGuy, ranks: Int, position: Int): String = {
+  def generateTweet(coderGuy: CoderGuy, pts: Long): Option[String] = {
     val maybeTwitter = coderGuy.twitterUser map ("@" + _.screenName)
     val identification = maybeTwitter getOrElse coderGuy.gitHubUser.flatMap(_.name)
-    coderGuy.profileURL.map { url =>
-      val key = if(ranks > 1) "popular.twitter.with.url.plurial" else "popular.twitter.with.url.singular"
-      Messages(key, identification, ranks, url)
-    } getOrElse {
-      val key = if(ranks > 1) "popular.twitter.plurial" else "popular.twitter.singular"
-      Messages(key, identification, ranks)
+    coderGuy.profileURL.flatMap { url =>
+      pts match {
+        case pts: Long if(pts == 1) => Some(Messages("popular.twitter.first.visit", identification, url))
+        case pts: Long if(pts % 10 == 0) => Some(Messages("popular.twitter.ten.visits", identification, url))
+        case _ => None
+      }
     }
   }
 
@@ -62,7 +58,7 @@ object PopularCoder extends MongoHelpers with Function5[BSONObjectID,String, Opt
   }
 
   def uncheckedCreate(coder: PopularCoder) {
-    val coderAsJson = Json.toJson(coder)
+    val coderAsJson = PopularCoderJson.writesPopularCoder.writes(coder)
     collection.uncheckedInsert(coderAsJson)
   }
 
@@ -75,26 +71,5 @@ object PopularCoder extends MongoHelpers with Function5[BSONObjectID,String, Opt
     val all = Json.obj()
     val sorted = QueryBuilder().query(all).sort("points" -> Descending)
     collection.find[JsValue](sorted, QueryOpts()).toList(limit)
-  }
-
-  object json {
-    implicit val writesPopularCoder: Writes[PopularCoder] = new Writes[PopularCoder] {
-      def writes(coder: PopularCoder): JsValue = Json.obj(
-        "_id" -> Json.obj("$oid" -> coder._id),
-        "pseudo" -> coder.pseudo,
-        "fullname" -> coder.fullname,
-        "description" -> coder.description,
-        "points" -> coder.points
-      )
-    }
-
-    implicit val readPopularCoder = 
-    (
-      (__ \ '_id \ '$oid).read[BSONObjectID] and
-      (__ \ 'pseudo).read[String] and
-      (__ \ 'fullname).readNullable[String] and
-      (__ \ 'description).readNullable[String] and
-      (__ \ 'points).read[Long]
-    )(PopularCoder)
   }
 }

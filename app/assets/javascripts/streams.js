@@ -10,14 +10,9 @@
             progressES && progressES.close();
         };
 
-        this.progress = function(username, fullname, language) {
+        this.progress = function(username) {
             if(EventSource) {
-                var uri = jsRoutes.controllers.Application.progress(
-                    username,
-                    fullname,
-                    language
-                ).absoluteURL();
-
+                var uri = jsRoutes.controllers.Application.progress(username).absoluteURL();
                 progressES = new EventSource(uri);
                 progressES.onmessage = function(msg) {
                     var progress = JSON.parse(msg.data);
@@ -28,7 +23,7 @@
                         CoderSide.search.progress(progress);
                     }
                 };
-                progressES.onerror = handleError
+                progressES.onerror = handleError;
             }
         };
     };

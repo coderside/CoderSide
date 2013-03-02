@@ -98,6 +98,7 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
       .withHeaders(lastModifiedFor(url):_*)
       .get().map { implicit response =>
       (cachedResponseOrElse(url)) match {
+        case JsArray(Nil) => 0L
         case JsArray(contributors) => {
           contributors.map { contributor =>
             (contributor \ "login").asOpt[String] -> ((contributor \ "contributions").asOpt[Long] getOrElse 0L)
@@ -105,7 +106,7 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
             case (Some(login), commits) if (username == login) => commits
           }.headOption getOrElse 0
         }
-        case r => throw new GitHubApiException("Failed getting contributions for : " + username)
+        case r => 0
       }
     }
   }

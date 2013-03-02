@@ -17,26 +17,34 @@ import actors.Messages.{ InitQuery, AskProgress }
 import models.github._
 import models.twitter._
 import models.klout._
-import models.{ CoderGuy, PopularCoder }
+import models.popular._
+import models.popular.PopularCoderJson
+import models.CoderGuy
 import utils.Config
 
 object Application extends Controller {
 
   def index = Action { implicit request =>
     Logger.debug("[Application] Welcome !")
-    import models.PopularCoder.json._
     Async {
       PopularCoder.top(10).map { coders =>
-        Ok(views.html.index(coders.flatMap(_.asOpt[PopularCoder])))
+        PopularCoderJson.readPopularCoders.reads(JsArray(coders)).map { popular =>
+          Ok(views.html.index(popular))
+        }.recoverTotal { error =>
+          InternalServerError(error.toString)
+        }
       }
     }
   }
 
   def home = Action {
-    import models.PopularCoder.json._
     Async {
       PopularCoder.top(10).map { coders =>
-        Ok(views.html.search() += views.html.popular(coders.flatMap(_.asOpt[PopularCoder])))
+        PopularCoderJson.readPopularCoders.reads(JsArray(coders)).map { popular =>
+          Ok(views.html.search() += views.html.popular(popular))
+        }.recoverTotal { error =>
+          InternalServerError(error.toString)
+        }
       }
     }
   }
