@@ -1,7 +1,13 @@
 package models
 
+import scala.concurrent.future
+import scala.concurrent.Future
 import play.api.mvc.RequestHeader
+import play.api.libs.concurrent.Promise
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.Logger
 import utils.Config
+import models.popular.{ PopularCoder, PopularCoderJson }
 import models.github._
 import models.twitter._
 import models.klout._
@@ -10,7 +16,8 @@ case class CoderGuy(
   gitHubUser: Option[GitHubUser],
   twitterUser: Option[TwitterUser],
   kloutUser: Option[KloutUser],
-  errors: Seq[(String, String)] = Nil
+  errors: Seq[(String, String)] = Nil,
+  viewed: Option[Long] = None
 ) {
   def profileURL(): Option[String] = {
     for {
@@ -23,7 +30,7 @@ case class CoderGuy(
 
   lazy val oneBio: Option[String] = {
     gitHubUser.flatMap(_.bio) filter(!_.trim.isEmpty) orElse
-    twitterUser.map(_.prettyDesc) filter(!_.trim.isEmpty)
+    twitterUser.flatMap(_.prettyDesc) filter(!_.trim.isEmpty)
   }
 
   lazy val oneFullname: Option[String] = {
@@ -41,7 +48,7 @@ case class CoderGuy(
       gitHub <- gitHubUser
       avatar <- gitHub.avatarUrl
       if(avatar != Config.gitHubDftAvatar)
-    } yield avatar
+        } yield avatar
 
     maybeGitHubAvatar orElse maybeTwitterAvatar
   }

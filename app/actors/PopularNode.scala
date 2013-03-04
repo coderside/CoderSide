@@ -14,23 +14,23 @@ class PopularNode() extends Actor with ActorLogging {
 
   def receive = {
     case UpdatePopular(coderGuy) => {
+      val gathererRef = sender
       log.info("[PopularNode] Updating popular !")
-      coderGuy.gitHubUser foreach { gitHub =>
-        PopularCoder.findByPseudo(gitHub.login)
-          .collect {
-            case Some(coderAsJson) => {
-              PopularCoderJson.readPopularCoder.reads(coderAsJson).map(Some(_)).recoverTotal { error =>
-                log.error("An error occured while reading popular coder: " + error)
-                None
-              }
+      coderGuy.gitHubUser map { gitHub =>
+        PopularCoder.findByPseudo(gitHub.login).collect {
+          case Some(coderAsJson) => {
+            PopularCoderJson.readPopularCoder.reads(coderAsJson).map(Some(_)).recoverTotal { error =>
+              log.error("An error occured while reading popular coder: " + error)
+              None
             }
           }
-          .collect { case Some(coder) => coder } map { coder =>
-             coder.increment() foreach { pts =>
-               PopularCoder.generateTweet(coderGuy, pts) foreach { tweet =>
-                 TwitterAPI.updateStatuses(tweet)
-               }
-             }
+        }.collect { case Some(coder) => coder } map { coder =>
+          coder.increment() map { pts =>
+            gathererRef ! pts
+            PopularCoder.generateTweet(coderGuy, pts) foreach { tweet =>
+              TwitterAPI.updateStatuses(tweet)
+            }
+          } recover {  case e: Exception => gathererRef ! 1L }
         } recover {
           case e: NoSuchElementException => {
             log.error("An error occured while updating popular !")
@@ -38,17 +38,21 @@ class PopularNode() extends Actor with ActorLogging {
               BSONObjectID.generate,
               gitHub.login,
               coderGuy.oneFullname,
-              coderGuy.twitterUser map(_.description),
+              coderGuy.twitterUser flatMap (_.description),
               1
             )
             PopularCoder.uncheckedCreate(popularCoder)
             PopularCoder.generateTweet(coderGuy, 1) foreach { tweet =>
               TwitterAPI.updateStatuses(tweet)
             }
+            gathererRef ! 1L
           }
-          case e: Exception => log.error("Error while saving popular coder info: " + e.getMessage)
+          case e: Exception => {
+            log.error("Error while saving popular coder info: " + e.getMessage)
+            gathererRef ! 1L
+          }
         }
-      }
+      } getOrElse (gathererRef ! 1L)
     }
   }
 }

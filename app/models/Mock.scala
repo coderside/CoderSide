@@ -70,7 +70,7 @@ object Mock {
   val twitterUser = TwitterUser(
     screenName = "srenault",
     name = "Sébastien RENAULT",
-    description = "Web developper @Zenexity",
+    description = Some("Web developper @Zenexity"),
     followers = 10,
     avatar = None,
     timeline = Some(twitterTimeline)

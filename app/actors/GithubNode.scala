@@ -25,14 +25,14 @@ class GitHubNode extends Actor with ActorLogging {
       }) recover {
         case e: Exception => {
           log.error("[GitHubNode] Error while fetching user repositories: " + e.getMessage)
-          gathererRef ! ErrorQuery("GitHub", e, 3)
+          gathererRef ! ErrorQuery("GitHub", e, 3, Some(GitHubResult(user)))
         }
       }
     }
 
-    case GitHubOrgQuery(gitHubUser, gathererRef) => {
+    case GitHubOrgQuery(user, gathererRef) => {
       log.debug("[GitHubNode] receiving GitHub organization query")
-      GitHubAPI.organizations(gitHubUser.login) map { organizations =>
+      GitHubAPI.organizations(user.login) map { organizations =>
         Promise.sequence(
           organizations.map { org =>
             GitHubAPI.repositoriesByOrg(org.login).map { repos =>
@@ -40,54 +40,54 @@ class GitHubNode extends Actor with ActorLogging {
             }
           }
         ) map { orgs =>
-          self ! GitHubContribQuery(gitHubUser.copy(organizations = orgs), gathererRef)
+          self ! GitHubContribQuery(user.copy(organizations = orgs), gathererRef)
           gathererRef ! Decrement()
         } recover {
           case e: Exception => {
             log.error("[GitHubNode] Error while fetching user organizations repos: " + e.getMessage)
-            gathererRef ! ErrorQuery("GitHub", e, 2)
+            gathererRef ! ErrorQuery("GitHub", e, 2, Some(GitHubResult(user)))
           }
         }
       } recover {
         case e: Exception => {
           log.error("[GitHubNode] Error while fetching user organizations: " + e.getMessage)
-          gathererRef ! ErrorQuery("GitHub", e, 2)
+          gathererRef ! ErrorQuery("GitHub", e, 2, Some(GitHubResult(user)))
         }
       }
     }
 
-    case GitHubContribQuery(gitHubUser, gathererRef) => {
+    case GitHubContribQuery(user, gathererRef) => {
       log.debug("[GitHubNode] receiving GitHub contribution query")
       def contributions(repositories: List[GitHubRepository]): Future[List[GitHubRepository]] = {
         Promise.sequence(
           repositories map { repository =>
-            GitHubAPI.contributions(gitHubUser.login, repository) map { contrib =>
+            GitHubAPI.contributions(user.login, repository) map { contrib =>
               repository.copy(contributions = contrib)
             }
           }
         )
       }
       Promise.sequence(
-        gitHubUser.organizations map { org =>
+        user.organizations map { org =>
           contributions(org.repositories) map { repos =>
             org.copy(repositories = repos)
           }
         }
       ) map { orgs =>
-        contributions(gitHubUser.repositories) map { repos =>
-          gathererRef ! GitHubResult(gitHubUser.copy(organizations = orgs, repositories = repos))
+        contributions(user.repositories) map { repos =>
+          gathererRef ! GitHubResult(user.copy(organizations = orgs, repositories = repos))
         } recover {
           case e: Exception => {
             e.printStackTrace
             log.error("[GitHubNode] Error while fetching contribution for his repositories: " + e.getMessage)
-            gathererRef ! ErrorQuery("GitHub", e, 1)
+            gathererRef ! ErrorQuery("GitHub", e, 1, Some(GitHubResult(user)))
           }
         }
       } recover {
         case e: Exception => {
           e.printStackTrace
           log.error("[GitHubNode] Error while fetching contribution for his repositories: " + e.getMessage)
-          gathererRef ! ErrorQuery("GitHub", e, 1)
+          gathererRef ! ErrorQuery("GitHub", e, 1, Some(GitHubResult(user)))
         }
       }
     }

@@ -63,7 +63,7 @@
       }
     }
   </div>
-  @if(coderGuy.gitHubUser.filter(_.hireable).isDefined) {
-  <button class="btn white hireable">AVAILABLE</button>
-  }
+  <div class="viewed" title="@coderGuy.viewed.getOrElse(1L) times viewed">
+    <span class="icon icon-eye-open"></span>&nbsp;@coderGuy.viewed.getOrElse(1L)
+  </div>
 </div>

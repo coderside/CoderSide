@@ -61,8 +61,7 @@
             if(!$('.results .result.selected').length) {
                 var $gitHubUser = $(this),
                     gitHubUser = {
-                        username: $gitHubUser.find('.username').text(),
-                        fullname: $gitHubUser.find('.fullname').text()
+                        username: $gitHubUser.find('.username').text()
                     };
                 $gitHubUser.addClass('selected');
                 $gitHubUser.addClass('hover');

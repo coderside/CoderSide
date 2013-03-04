@@ -95,8 +95,6 @@ object Twitter {
   def matchUser(gitHubUser: GitHubUser, twitterUsers: List[TwitterUser]): Option[TwitterUser] = {
     val matchPseudo = (user: TwitterUser)      => user.screenName.toLowerCase.trim == gitHubUser.login.toLowerCase.trim
     val matchPseudoPart = (user: TwitterUser)  => user.screenName.toLowerCase.trim.contains(gitHubUser.login.toLowerCase.trim)
-    def containsLanguage = (user: TwitterUser) => user.description.toLowerCase.contains(gitHubUser.language)
-    def containsGitHub = (user: TwitterUser)   => user.description.toLowerCase.contains("github")
     val matchFullname = (user: TwitterUser) => {
       gitHubUser.name.filter { name =>
         val gitHubName = name.toLowerCase.trim
@@ -108,9 +106,7 @@ object Twitter {
     val conditions = List(
       matchFullname    -> 40,
       matchPseudo      -> 40,
-      matchPseudoPart  -> 20,
-      containsLanguage -> 10,
-      containsGitHub   -> 10
+      matchPseudoPart  -> 20
     )
 
     def scoring(user: TwitterUser, score: Int, tests: List[((TwitterUser) => Boolean, Int)]): Int = {
@@ -159,13 +155,13 @@ case class Tweet(
 case class TwitterUser(
   screenName: String,
   name: String,
-  description: String,
+  description: Option[String],
   followers: Int,
   avatar: Option[String],
   timeline: Option[TwitterTimeline] = None
 ) {
   import Twitter._
-  def prettyDesc = Twitter.pretty(description)
+  def prettyDesc: Option[String] = description.map(Twitter.pretty)
 }
 
 case class TwitterApiException(message: String) extends Exception

@@ -79,7 +79,7 @@
   <div class="logo"></div>
   <div class="info">
     <span class="pseudo">@twitter.screenName - @twitter.name</span>
-    <span class="desc">@Html(twitter.prettyDesc)</span>
+    <span class="desc">@Html(twitter.prettyDesc.getOrElse(""))</span>
     <span class="social">@twitter.followers followers</span>
   </div>
   @twitter.timeline.map { timeline =>

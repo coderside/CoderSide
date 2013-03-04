@@ -1,6 +1,8 @@
 package actors
 
 import scala.concurrent.duration._
+import akka.pattern.ask
+import akka.util.Timeout
 import akka.actor.{ Actor, ActorRef, ActorLogging, ReceiveTimeout }
 import play.api.libs.iteratee.Concurrent
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -54,9 +56,23 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
         kloutResult map (_.kloutUser),
         errors
       )
-      PopularNode.ref ! UpdatePopular(coderGuy)
-      clients foreach (_ ! coderGuy)
-      headNode ! End(self)
+
+      def giveResult(points: Option[Long] = None) = {
+        clients foreach (_ ! coderGuy.copy(viewed = points))
+        headNode ! End(self)
+      }
+
+      implicit val timeout = Timeout(10 seconds)
+      (PopularNode.ref ? UpdatePopular(coderGuy)).mapTo[Long].map { points =>
+        self ! Decrement()
+        giveResult(Some(points))
+      } recover {
+        case e: Exception => {
+          log.error("[GathererNode] Error while getting popular points: " + e.getMessage)
+          self ! Decrement()
+          giveResult()
+        }
+      }
     }
 
     case NotFound(message, notProcessed) => {
@@ -64,9 +80,13 @@ class GathererNode(headNode: ActorRef) extends Actor with ActorLogging {
       self ! Decrement(notProcessed)
     }
 
-    case ErrorQuery(from, e, notProcessed) => {
+    case ErrorQuery(from, e, notProcessed, default) => {
       log.info("[GathererNode] Error well received: " + e.getMessage)
       errors = (from, e.getMessage) +: errors
+      from match {
+        case "GitHub" => gitHubResult = default.asInstanceOf[Option[GitHubResult]]
+        case _ =>
+      }
       self ! Decrement(notProcessed)
     }
 

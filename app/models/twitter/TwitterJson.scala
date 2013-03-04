@@ -11,7 +11,7 @@ object TwitterJson {
     (
       (__ \ 'screen_name).read[String] and
       (__ \ 'name).read[String] and
-      (__ \ 'description).read[String] and
+      (__ \ 'description).readNullable[String] and
       (__ \ 'followers_count).read[Int] and
       (__ \ 'profile_image_url).readNullable[String]
     )((screenName, name, desc, followers, avatar) => TwitterUser(screenName, name, desc, followers, avatar))

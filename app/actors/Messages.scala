@@ -8,7 +8,7 @@ import models.CoderGuy
 
 object Messages {
   //Node to Gatherer
-  case class ErrorQuery(from: String, e: Throwable, notProcessed: Int)
+  case class ErrorQuery[A](from: String, e: Throwable, notProcessed: Int, default: Option[A] = None)
   //Application to Supervisor.
   case class InitQuery(user: GitHubUser)
   //Supervisor to Head
