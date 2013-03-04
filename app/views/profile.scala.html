@@ -47,8 +47,8 @@
   <div class="personal-container">
     <h1>Personal</h1>
     <ul class="personal">
-      @github.repositories.sortBy(r => -r.contributions).map { repository =>
-      <li class="repository">
+      @github.repositories.sortBy(r => -r.contributions).zipWithIndex.map { case (repository, index) =>
+      <li class="repository @if((index+1)==github.repositories.length) { last } else { "" }">
         <h3><a target="_blank" href="@repository.url">@repository.name</a></h3>
         <div class="info">
           @if(!repository.description.trim.isEmpty) {
