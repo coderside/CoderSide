@@ -16,6 +16,7 @@ import reactivemongo.core.commands.{ FindAndModify, Update }
 import reactivemongo.bson.handlers.DefaultBSONHandlers._
 import reactivemongo.bson._
 import models.CoderGuy
+import utils.Config
 
 case class PopularCoder(
   _id: BSONObjectID,
@@ -32,6 +33,7 @@ case class PopularCoder(
 object PopularCoder extends Function5[BSONObjectID,String, Option[String], Option[String], Long, PopularCoder]{
   val collectionName = "popular"
   val collection = ReactiveMongoPlugin.collection(collectionName)
+  val limitBeforeTweet: Int = Config.limitBeforeTweet
 
   def generateTweet(coderGuy: CoderGuy, pts: Long): Option[String] = {
     val maybeTwitter = coderGuy.twitterUser map ("@" + _.screenName)
@@ -39,7 +41,7 @@ object PopularCoder extends Function5[BSONObjectID,String, Option[String], Optio
     coderGuy.profileURL.flatMap { url =>
       pts match {
         case pts: Long if(pts == 1) => Some(Messages("popular.twitter.first.visit", identification, url))
-        case pts: Long if(pts % 10 == 0) => Some(Messages("popular.twitter.ten.visits", identification, url))
+        case pts: Long if(pts % limitBeforeTweet == 0) => Some(Messages("popular.twitter.ten.visits", identification, url))
         case _ => None
       }
     }

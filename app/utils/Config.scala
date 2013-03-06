@@ -7,6 +7,13 @@ import scala.concurrent.duration._
 
 object Config {
 
+  lazy val limitBeforeTweet: Int = {
+    Play.configuration.getInt("popular.limit.tweet").getOrElse {
+      Logger.warn("[Config] Please provide twitter access token secret for popular")
+      throw new ConfigException("Please provide twitter access token secret for popular")
+    }
+  }
+
   lazy val gitHubDftAvatar: String = {
     Play.configuration.getString("github.avatar.dft") getOrElse {
       Logger.warn("[Config] Please provide default github avatar")

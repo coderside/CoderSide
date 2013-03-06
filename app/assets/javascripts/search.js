@@ -60,12 +60,11 @@
         $(document).on('click', '.results .result', function(e) {
             if(!$('.results .result.selected').length) {
                 var $gitHubUser = $(this),
-                    gitHubUser = {
-                        username: $gitHubUser.find('.username').text()
-                    };
+                    username = $gitHubUser.find('.username').text();
+
                 $gitHubUser.addClass('selected');
                 $gitHubUser.addClass('hover');
-                CoderSide.navigate('/profile?' + $.param(gitHubUser));
+                CoderSide.navigate('/profile/' + encodeURIComponent(username));
             }
         });
 

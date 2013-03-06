@@ -62,30 +62,28 @@ $(document).ready(function() {
                 }
             }
         },
-        '/profile?*queryString': {
+        '/profile/:username': {
             get: function(any, params) {
                 if(CoderSide.home.isFirstLoading() || CoderSide.popular.oneSelected()) {
                     CoderSide.home.empty();
                     CoderSide.transitions.toLoading();
                 } else CoderSide.search.showProgress();
 
-                var data = parseQueryString(params.queryString);
-                if(data.username) {
-                    currentRequest = jsRoutes.controllers.Application.profile(data.username).ajax().done(function(response) {
+                if(params.username) {
+                    currentRequest = jsRoutes.controllers.Application.profile(params.username).ajax().done(function(response) {
                         CoderSide.profile.render(response);
                         CoderSide.transitions.toProfile().then(function() {
                             CoderSide.search.hideProgress();
                         });
                     }).fail(handleError);
-                    CoderSide.resolve('/progress?' + params.queryString, 'get');
+                    CoderSide.resolve('/progress/' + params.username, 'get');
                 }
             }
         },
-        '/progress?*queryString': {
+        '/progress/:username': {
             get: function(any, params) {
-                var data = parseQueryString(params.queryString);
-                if(data.username) {
-                    CoderSide.streams.progress(data.username);
+                if(params.username) {
+                    CoderSide.streams.progress(params.username);
                 }
             }
         },
