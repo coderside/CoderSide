@@ -114,6 +114,10 @@ object GitHubAPI extends URLEncoder with CacheHelpers with Debug {
 
 case class GitHubApiException(message: String) extends Exception
 
+object GitHubUser {
+  def asFullURL(url: String) = if(url.contains("http")) url else "http://" + url
+}
+
 case class GitHubUser(
   login: String,
   htmlUrl: String,

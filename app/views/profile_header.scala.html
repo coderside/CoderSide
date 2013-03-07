@@ -34,7 +34,7 @@
       @gitHubUser.blog.filter(!_.trim.isEmpty).map { blog =>
         <div class="details">
           <span class="icon icon-globe"></span>
-          <a target="_blank" href="@blog" class="blog">@blog</a>
+          <a target="_blank" href="@models.github.GitHubUser.asFullURL(blog)" class="blog">@blog</a>
         </div>
       }
       @gitHubUser.email.filter(!_.trim.isEmpty).map { email =>
